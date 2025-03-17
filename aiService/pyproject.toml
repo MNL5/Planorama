@@ -1,0 +1,13 @@
+[project]
+name = "flaskr"
+version = "1.0.0"
+description = "Ai Service for seating arrangement."
+dependencies = [
+    "flask",
+    "python-dotenv",
+    "build"
+]
+
+[build-system]
+requires = ["flit_core<4"]
+build-backend = "flit_core.buildapi"
