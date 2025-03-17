@@ -32,17 +32,31 @@ def create_app(test_config=None):
         if not data:
             return jsonify({"error": "No data provided"}), 400
 
-        # Example of accessing data
-        name = data.get("name")
-        age = data.get("age")
+        guests = []
+        for key, value in data.items():
+            for j in range(value):
+                guests.append(Guest(j, key))            
 
-        # You can process data here as needed
-        if not name or not age:
-            return jsonify({"error": "Name and age are required"}), 400
+        numOfTables = math.ceil(len(guests) / 10) + 1
+        numOfSeats = numOfTables * 10
 
-        # Example response
+        for i in range(numOfSeats - len(guests)):
+            guests.append(Guest(i, "_"))
+
+        algorithm = Algorithm(guests, numOfTables)
+
+        result = algorithm.solve(guests, generations=500, pop_size=200, elite_size=20)
+        fitness = algorithm.fitness(result)
+        resultMat = []
+        for i in range(numOfTables):
+            start = i * 10
+            resultMat.append(list(map(lambda guest: str(guest), sorted(result[start:start + 10]))))
+
         response = {
-            "message": f"Hello {name}, you are {age} years old!"
+            "numOfSeats": numOfSeats,
+            "result": resultMat,
+            "numOfTables": numOfTables,
+            "fitness": fitness
         }
 
         return jsonify(response), 200
@@ -70,17 +84,13 @@ def create_app(test_config=None):
 
         algorithm = Algorithm(guests, numOfTables)
 
-        print(groupToAmount)
-        print(numOfSeats)
         result = algorithm.solve(guests, generations=500, pop_size=200, elite_size=20)
-        print(algorithm.fitness(result))
+        fitness = algorithm.fitness(result)
         resultMat = []
         for i in range(numOfTables):
             start = i * 10
-            sortedTable = sorted(result[start:start + 10])
-            print(sortedTable)
-            resultMat.append(sortedTable)
+            resultMat.append(sorted(result[start:start + 10]))
 
-        return render_template('seating.html', groupToAmount=groupToAmount, numOfSeats=numOfSeats, result=resultMat, numOfTables=numOfTables)
+        return render_template('seating.html', groupToAmount=groupToAmount, numOfSeats=numOfSeats, result=resultMat, numOfTables=numOfTables, fitness=fitness)
 
     return app

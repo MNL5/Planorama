@@ -8,3 +8,7 @@ class Guest:
         return self.__str__()
     def __lt__(self, other):
         return self.group < other.group
+    def to_json(self):
+        return {"group": self.group, "id": self.id}
+    def to_dict(self):
+        return {"group": self.group, "id": self.id}
