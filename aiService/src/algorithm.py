@@ -17,16 +17,7 @@ def sig(x):
  return 1/(1 + math.exp(-x))
 
 def happinesFunc(guest, i, groupToAmountPerTable):
-    a = math.exp(groupToAmountPerTable[math.floor(i / 10)][guest.group] - 1) - 1
-    # b = math.exp(groupToAmount[guest.group] - 1) - 1
-    # return (a * 100 / b)
-    return a
-
-def happinesFunc2(guest, i, groupToAmountPerTable):
-    withMe = groupToAmountPerTable[math.floor(i / 10)][guest.group] - 1
-    total = groupToAmount[guest.group] - 1
-    x = (withMe * 10 / total) - 6
-    return sig(x)
+    return math.exp(groupToAmountPerTable[math.floor(i / 10)][guest.group] - 1) - 1
 
 def happines(guests):
     groupToAmountPerTable = [{} for i in range(numOfTables)]
@@ -38,13 +29,10 @@ def happines(guests):
             groupToAmountPerTable[table][guest.group] = 0
         groupToAmountPerTable[table][guest.group] += 1
 
-    # return [(groupToAmountPerTable[math.floor(i / 10)][guests[i].group] - 1) / (groupToAmount[guests[i].group] - 1) for i in range(len(guests)) if guests[i].group != "_"]
     return [happinesFunc(guests[i], i, groupToAmountPerTable) for i in range(len(guests)) if guests[i].group != "_"]
 
 def fitness(guests):
-    result = happines(guests)
-    # if 0 in result: return 0.1
-    return sum(result)
+    return sum(happines(guests))
 
 def sortGuests(guests, isReverse = False):
     mat = []
@@ -64,29 +52,6 @@ def create_population(guests, pop_size):
     return population
 
 def crossover(parent1, parent2):
-    child = [None] * len(parent1)
-    parent2 = sortGuests(parent2, isReverse=True)
-    tables = [i for i in range(numOfTables)]
-    random.shuffle(tables)
-    # firstTable = random.randint(0, numOfTables - 1)
-
-    for table in range(numOfTables):
-        start = random.randint(0, 9)
-        end = 9# random.randint(start, 9)
-        toTable = tables.pop()
-
-        for i in range(start, end + 1):
-            child[toTable * 10 + i] = parent1[table * 10 + i]
-
-    idx = 0
-    for i in range(len(parent2)):
-        if parent2[i] not in child:
-            while child[idx] is not None:
-                idx += 1
-            child[idx] = parent2[i]
-    return sortGuests(child)
-
-def crossover2(parent1, parent2):
     child = [None] * len(parent1)
     start = random.randint(0, len(parent1) - 1)
     end = random.randint(start, len(parent1) - 1)
@@ -139,7 +104,7 @@ def solve(guests, pop_size=100, elite_size=10, mutation_rate=0.01, generations=1
         next_gen = elites.copy()
         while len(next_gen) < pop_size:
             parent1, parent2 = select_parents(population, fitnesses)
-            child = crossover2(parent1, parent2)
+            child = crossover(parent1, parent2)
             mutate(child, mutation_rate)
             next_gen.append(child)
 
