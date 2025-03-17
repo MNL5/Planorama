@@ -61,7 +61,6 @@ def create_app(test_config=None):
 
         return jsonify(response), 200
     
-    # a simple page that says hello
     @app.route('/seating')
     def seating():
         guests = []
