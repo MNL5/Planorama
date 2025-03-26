@@ -6,15 +6,24 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 
+import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.util.Base64;
 
 @Mapper(componentModel = "spring")
 public interface EventMapper {
     @Mapping(source = "invitationImg", target = "invitationImg", qualifiedByName = "binaryToBase64")
+    @Mapping(source = "time", target = "time", qualifiedByName = "epochMillisToOffsetDateTime")
     EventDTO daoToDTO(EventDAO eventDAO);
 
     @Named("binaryToBase64")
     default String binaryToBase64(org.bson.types.Binary binary) {
         return binary != null ? Base64.getEncoder().encodeToString(binary.getData()) : null;
+    }
+
+    @Named("epochMillisToOffsetDateTime")
+    default OffsetDateTime epochMillisToOffsetDateTime(Long epochMillis) {
+        return epochMillis != null ? OffsetDateTime.ofInstant(Instant.ofEpochMilli(epochMillis), ZoneId.systemDefault()) : null;
     }
 }

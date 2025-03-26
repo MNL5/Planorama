@@ -4,7 +4,6 @@ import org.bson.types.Binary;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Document("events")
@@ -12,6 +11,6 @@ public record EventDAO(@Id UUID uuid,
                        String name,
                        String invitationText,
                        Binary invitationImg,
-                       OffsetDateTime time,
+                       Long time,
                        String diagram) {
 }

@@ -1,35 +1,58 @@
 package com.planorama.backend.event.api;
 
+import com.planorama.backend.event.EventService;
+import com.planorama.backend.event.mapper.EventMapper;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.UUID;
 
 @RestController
 @RequestMapping("events")
 public class EventController {
-    @GetMapping("/{eventId}")
-    public EventDTO getEvent(@PathVariable("eventId") UUID eventUUID) {
-        throw new UnsupportedOperationException();
+    private final EventService eventService;
+    private final EventMapper eventMapper;
+
+    public EventController(EventService eventService,
+                           EventMapper eventMapper) {
+        this.eventService = eventService;
+        this.eventMapper = eventMapper;
     }
 
-    @GetMapping("")
-    public EventDTO getEventByGuestID(@RequestParam("guest") UUID guestID) {
+    @GetMapping("/{eventId}")
+    public Mono<EventDTO> getEventByID(@PathVariable("eventId") UUID eventUUID) {
+        return eventService.findByID(eventUUID)
+                .map(eventMapper::daoToDTO);
+    }
+
+    @GetMapping("/list")
+    public Flux<EventDTO> getAllEvents() {
+        return eventService.findAll()
+                .map(eventMapper::daoToDTO);
+    }
+
+    @GetMapping
+    public Mono<EventDTO> getEventByGuestID(@RequestParam("guest") UUID guestID) {
         throw new UnsupportedOperationException("Until Guest are implemented");
     }
 
     @PostMapping
-    public CreateEventDTO createEvent(@RequestBody CreateEventDTO createEventDTO) {
-        throw new UnsupportedOperationException();
+    public Mono<EventDTO> createEvent(@RequestBody CreateEventDTO createEventDTO) {
+        return eventService.createEvent(createEventDTO)
+                .map(eventMapper::daoToDTO);
     }
 
     @PutMapping("/{eventId}")
-    public CreateEventDTO updateEvent(@PathVariable("eventId") UUID eventUUID,
+    public Mono<EventDTO> updateEvent(@PathVariable("eventId") UUID eventUUID,
                                       @RequestBody UpdateEventDTO createEventDTO) {
-        throw new UnsupportedOperationException();
+        return eventService.updateEvent(eventUUID, createEventDTO)
+                .map(eventMapper::daoToDTO);
     }
 
     @DeleteMapping("/{eventId}")
-    public EventDTO deleteEvent(@PathVariable("eventId") UUID eventUUID) {
-        throw new UnsupportedOperationException();
+    public Mono<EventDTO> deleteEvent(@PathVariable("eventId") UUID eventUUID) {
+        return eventService.deleteEvent(eventUUID)
+                .map(eventMapper::daoToDTO);
     }
 }
