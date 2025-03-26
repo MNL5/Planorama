@@ -8,7 +8,7 @@ import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface UserMapper {
-    @Mapping(target = "uuid", source = "user.uuid")
+    @Mapping(target = "id", source = "user.id")
     @Mapping(target = "email", source = "user.email")
     @Mapping(target = "refreshToken", source = "refreshToken.value")
     @Mapping(target = "accessToken", source = "accessToken")
