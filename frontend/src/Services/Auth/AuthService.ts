@@ -1,57 +1,19 @@
-import { CredentialResponse } from "@react-oauth/google";
-import apiClient, { Page } from "./apiClient";
+import { abortablePostRequest } from '../AbortableRequest';
+import Auth from './types/Auth';
+import Credentials from './types/Credentials';
 
-const signUp = (user: User) => {
-  const abortController = new AbortController();
-  const request = apiClient.post<LoginResponse>(`/auth/register`, user, {
-    signal: abortController.signal,
-  });
-  return { request, abort: () => abortController.abort() };
-};
+const signIn = (credentials: Credentials) =>
+    abortablePostRequest<Auth>('users/login', { credentials });
 
-const googleRegister = (credential: CredentialResponse) => {
-  const abortController = new AbortController();
-  const request = apiClient.post<LoginResponse>(`/auth/google`, credential, {
-    signal: abortController.signal,
-  });
-  return { request, abort: () => abortController.abort() };
-};
-
-const login = (identifier: string, password: string) => {
-  const abortController = new AbortController();
-  const request = apiClient.post<LoginResponse>(
-    `/auth/login`,
-    { username: identifier, email: identifier, password },
-    {
-      signal: abortController.signal,
-    }
-  );
-  return { request, abort: () => abortController.abort() };
-};
+const signUp = (credentials: Credentials) =>
+    abortablePostRequest<Auth>('users', { credentials });
 
 const refresh = (refreshToken: string) => {
-  const abortController = new AbortController();
-  const request = apiClient.post<LoginResponse>(
-    `/auth/refresh`,
-    { refreshToken },
-    {
-      signal: abortController.signal,
-    }
-  );
-  return { request, abort: () => abortController.abort() };
+    abortablePostRequest<Auth>('users/refresh', { refreshToken });
 };
 
-const logout = (refreshToken: string) => {
-  const abortController = new AbortController();
-  const request = apiClient.post<LoginResponse>(
-    `/auth/logout`,
-    { refreshToken },
-    {
-      signal: abortController.signal,
-    }
-  );
-  return { request, abort: () => abortController.abort() };
+const signOut = (refreshToken: string) => {
+    abortablePostRequest<Auth>('users/logout', { refreshToken });
 };
 
-
-export default { register, login, refresh, logout, googleRegister };
+export default { signIn, signUp, refresh, signOut };
