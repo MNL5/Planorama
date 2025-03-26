@@ -51,8 +51,8 @@ public class EventController {
     }
 
     @DeleteMapping("/{eventId}")
-    public Mono<EventDTO> deleteEvent(@PathVariable("eventId") UUID eventUUID) {
-        return eventService.deleteEvent(eventUUID)
+    public Mono<EventDTO> deleteEvent(@PathVariable("eventId") UUID eventID) {
+        return eventService.deleteEvent(eventID)
                 .map(eventMapper::daoToDTO);
     }
 }

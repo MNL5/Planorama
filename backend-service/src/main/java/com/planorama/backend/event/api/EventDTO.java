@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
-public record EventDTO(@NotNull UUID uuid,
+public record EventDTO(@NotNull UUID id,
                        @Nullable String name,
                        @Nullable String invitationText,
                        @Nullable String invitationImg,

@@ -7,7 +7,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.util.UUID;
 
 @Document("events")
-public record EventDAO(@Id UUID uuid,
+public record EventDAO(@Id UUID id,
                        String name,
                        String invitationText,
                        Binary invitationImg,

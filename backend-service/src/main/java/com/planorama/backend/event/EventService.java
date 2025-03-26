@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.Duration;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Function;
@@ -57,14 +58,14 @@ public class EventService {
                 createEventDTO.name(),
                 createEventDTO.invitationText(),
                 new Binary(BsonBinarySubType.BINARY, createEventDTO.invitationImg().getBytes()),
-                createEventDTO.time().toEpochSecond() * 1000,
+                Duration.ofSeconds(createEventDTO.time().toEpochSecond()).toMillis(),
                 null);
     }
 
-    public Mono<EventDAO> updateEvent(@Valid @NotNull UUID eventUUID, @Valid @NotNull UpdateEventDTO updateEventDTO) {
+    public Mono<EventDAO> updateEvent(@Valid @NotNull UUID eventID, @Valid @NotNull UpdateEventDTO updateEventDTO) {
         return Mono.just(updateEventDTO)
                 .map(this::createUpdateCommand)
-                .flatMap(updateCommand -> reactiveMongoTemplate.findAndModify(Query.query(where("uuid").is(eventUUID)),
+                .flatMap(updateCommand -> reactiveMongoTemplate.findAndModify(Query.query(where("id").is(eventID)),
                         updateCommand,
                         EventDAO.class));
     }
@@ -79,7 +80,7 @@ public class EventService {
         return update;
     }
 
-    public Mono<EventDAO> deleteEvent(@Valid @NotNull UUID eventUUID) {
-        return reactiveMongoTemplate.findAndRemove(Query.query(where("uuid").is(eventUUID)), EventDAO.class);
+    public Mono<EventDAO> deleteEvent(@Valid @NotNull UUID eventID) {
+        return reactiveMongoTemplate.findAndRemove(Query.query(where("id").is(eventID)), EventDAO.class);
     }
 }
