@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.time.Duration;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Function;
@@ -58,7 +57,7 @@ public class EventService {
                 createEventDTO.name(),
                 createEventDTO.invitationText(),
                 new Binary(BsonBinarySubType.BINARY, createEventDTO.invitationImg().getBytes()),
-                Duration.ofSeconds(createEventDTO.time().toEpochSecond()).toMillis(),
+                createEventDTO.time().toInstant().toEpochMilli(),
                 null);
     }
 
