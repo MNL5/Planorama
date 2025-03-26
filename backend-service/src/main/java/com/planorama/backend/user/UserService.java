@@ -69,9 +69,9 @@ public class UserService {
                 });
     }
 
-    public Mono<UserAccess> refreshToken(UUID uuid, UUID refreshToken) {
-        final Query findUser = Query.query(where("uuid").is(uuid));
-        return reactiveMongoTemplate.findById(uuid, UserDAO.class)
+    public Mono<UserAccess> refreshToken(UUID id, UUID refreshToken) {
+        final Query findUser = Query.query(where("id").is(id));
+        return reactiveMongoTemplate.findById(id, UserDAO.class)
                 .switchIfEmpty(Mono.error(new RuntimeException("user is not exist")))
                 .flatMap(user -> {
                     if (user.refreshTokens()
