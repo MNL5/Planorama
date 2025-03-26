@@ -8,12 +8,10 @@ const signIn = (credentials: Credentials) =>
 const signUp = (credentials: Credentials) =>
     abortablePostRequest<Auth>('users', { credentials });
 
-const refresh = (refreshToken: string) => {
+const refresh = (refreshToken: string) =>
     abortablePostRequest<Auth>('users/refresh', { refreshToken });
-};
 
-const signOut = (refreshToken: string) => {
+const signOut = (refreshToken: string) =>
     abortablePostRequest<Auth>('users/logout', { refreshToken });
-};
 
-export default { signIn, signUp, refresh, signOut };
+export default { signIn, signUp, refresh, logout: signOut };
