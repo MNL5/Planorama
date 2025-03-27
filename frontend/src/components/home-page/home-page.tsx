@@ -9,20 +9,14 @@ import {
   Container,
 } from "@mantine/core";
 
+import classes from "./home-page.module.css";
 import backgroundImage from "../../assets/background.webp";
 
 const HomePage: React.FC = () => {
   return (
     <Stack
+      className={classes.backgroundContainer}
       style={{
-        top: 0,
-        left: 0,
-        width: "100vw",
-        height: "100vh",
-        position: "absolute",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundRepeat: "no-repeat",
         backgroundImage: `url(${backgroundImage})`,
       }}
     >
