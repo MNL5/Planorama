@@ -1,19 +1,26 @@
-import { useState } from 'react'
-import { Routes, Route } from 'react-router-dom';
-import SignIn from './Pages/SignIn/SignIn.tsx'
-import SignUp from './Pages/SignUp/SignUp.tsx'
-import './App.css'
+import '@mantine/core/styles.css';
+import { Routes, Route } from "react-router-dom";
+import { createTheme, MantineProvider } from "@mantine/core";
 
-const App = () => {
-   return (
-      <>
-         <Routes>
-            <Route path="/signin" element={<SignIn />} />
-            <Route path="/signup" element={<SignUp />} />
-            // TODO: add not found route
-         </Routes>
-      </>
-   );
+import { SignIn } from "./components/sign-in/sign-in.tsx";
+import { SignUp } from "./components/sign-up/sign-up.tsx";
+import { HomePage } from "./components/home-page/home-page.tsx";
+
+const theme = createTheme({
+  fontFamily: "Roboto, sans-serif",
+});
+
+const App: React.FC = () => {
+  return (
+    <MantineProvider theme={theme}>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/signin" element={<SignIn />} />
+        <Route path="/signup" element={<SignUp />} />
+        // TODO: add not found route
+      </Routes>
+    </MantineProvider>
+  );
 };
 
-export default App;
+export { App };
