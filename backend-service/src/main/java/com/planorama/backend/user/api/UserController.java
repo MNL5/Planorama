@@ -36,7 +36,7 @@ public class UserController {
 
     @PostMapping("/refresh")
     public Mono<LoginUserDTO> refresh(@RequestBody @Valid RefreshTokenAction refreshTokenAction) {
-        return userService.refreshToken(refreshTokenAction.userID(), refreshTokenAction.refreshToken())
+        return userService.refreshToken(refreshTokenAction.refreshToken())
                 .map(user -> userMapper.daoWithTokensToLoginDto(user.userDAO(), user.accessToken(), user.refreshToken()))
                 .onErrorResume(Mono::error);
     }

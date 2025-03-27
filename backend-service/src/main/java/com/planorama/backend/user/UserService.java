@@ -1,21 +1,17 @@
 package com.planorama.backend.user;
 
 import com.planorama.backend.user.api.CreateUserAction;
-import com.planorama.backend.user.entity.RefreshToken;
 import com.planorama.backend.user.entity.UserAccess;
 import com.planorama.backend.user.entity.UserDAO;
 import com.planorama.backend.user.util.JWTUtil;
 import com.planorama.backend.user.util.PasswordUtil;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
-import java.time.Duration;
-import java.time.OffsetDateTime;
-import java.util.Date;
+import java.time.Instant;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -28,31 +24,29 @@ public class UserService {
     private final ReactiveMongoTemplate reactiveMongoTemplate;
     private final PasswordUtil passwordUtil;
     private final JWTUtil jwtUtil;
-    private final Duration refreshTokenExpire;
 
     public UserService(ReactiveMongoTemplate reactiveMongoTemplate,
                        PasswordUtil passwordUtil,
-                       JWTUtil jwtUtil,
-                       @Qualifier("refreshExpireTime") Duration refreshTokenExpire) {
+                       JWTUtil jwtUtil) {
         this.reactiveMongoTemplate = reactiveMongoTemplate;
         this.passwordUtil = passwordUtil;
         this.jwtUtil = jwtUtil;
-        this.refreshTokenExpire = refreshTokenExpire;
     }
 
     public Mono<UserAccess> createUser(CreateUserAction createUserAction) {
         UserDAO newUser = convertCreateActionToUser(createUserAction);
         return reactiveMongoTemplate.save(newUser)
                 .map(user -> new UserAccess(user,
-                        jwtUtil.generateToken(user.email()),
+                        createToken(user.id()),
                         user.refreshTokens().stream().findAny().orElseThrow(() -> new RuntimeException("Create User without Refresh Token"))));
     }
 
     private UserDAO convertCreateActionToUser(CreateUserAction createUserAction) {
-        return new UserDAO(UUID.randomUUID(),
+        UUID id = UUID.randomUUID();
+        return new UserDAO(id,
                 createUserAction.email(),
                 passwordUtil.hashPassword(createUserAction.password()),
-                Set.of(createRefreshToken()));
+                Set.of(createToken(id)));
     }
 
     public Mono<UserAccess> logicUser(String email, String password) {
@@ -61,41 +55,37 @@ public class UserService {
                 .filter(user -> passwordUtil.verifyPassword(password, user.password()))
                 .switchIfEmpty(Mono.error(new RuntimeException("email / password is incorrect")))
                 .flatMap(user -> {
-                    final RefreshToken refreshToken = createRefreshToken();
+                    final String refreshToken = createToken(user.id());
                     final Update pushNewRefreshTokenUpdate = new Update().push("refreshTokens").value(refreshToken);
                     return reactiveMongoTemplate.findAndModify(findUser, pushNewRefreshTokenUpdate, UserDAO.class)
                             .switchIfEmpty(Mono.error(new RuntimeException("Failed to update user")))
-                            .map(updatedUser -> new UserAccess(updatedUser, jwtUtil.generateToken(updatedUser.email()), refreshToken));
+                            .map(updatedUser -> new UserAccess(updatedUser, createToken(updatedUser.id()), refreshToken));
                 });
     }
 
-    public Mono<UserAccess> refreshToken(UUID id, UUID refreshToken) {
+    public Mono<UserAccess> refreshToken(String refreshToken) {
+        final UUID id = UUID.fromString(jwtUtil.verifyToken(refreshToken));
+        final Instant currentTime = Instant.now();
         final Query findUser = Query.query(where("id").is(id));
         return reactiveMongoTemplate.findById(id, UserDAO.class)
                 .switchIfEmpty(Mono.error(new RuntimeException("user is not exist")))
                 .flatMap(user -> {
-                    if (user.refreshTokens()
-                            .stream()
-                            .noneMatch(token -> refreshToken.equals(token.value()) &&
-                                    token.expireTimeEpochMillis() - OffsetDateTime.now().toInstant().toEpochMilli() > 0)) {
-                        throw new RuntimeException("Missing Refresh token");
-                    }
-                    final RefreshToken newRefreshToken = createRefreshToken();
-                    final Set<RefreshToken> updatedTokens = Stream.concat(user.refreshTokens().stream(), Set.of(newRefreshToken).stream())
-                            .filter(token -> !refreshToken.equals(token.value()))
+                    final String newRefreshToken = createToken(id);
+                    final Set<String> updatedTokens = Stream.concat(user.refreshTokens().stream(), Set.of(newRefreshToken).stream())
+                            .filter(t -> currentTime.isBefore(jwtUtil.getExpireTime(t)))
                             .collect(Collectors.toSet());
                     final Update pushNewRefreshTokenUpdate = new Update()
                             .set("refreshTokens", updatedTokens);
                     return reactiveMongoTemplate.findAndModify(findUser, pushNewRefreshTokenUpdate, UserDAO.class)
                             .switchIfEmpty(Mono.error(new RuntimeException("Failed to update user")))
                             .map(updatedUser -> new UserAccess(updatedUser,
-                                    jwtUtil.generateToken(updatedUser.email()),
+                                    createToken(updatedUser.id()),
                                     newRefreshToken)
                             );
                 });
     }
 
-    private RefreshToken createRefreshToken() {
-        return new RefreshToken(UUID.randomUUID(), new Date().toInstant().plus(refreshTokenExpire).toEpochMilli());
+    private String createToken(UUID id) {
+        return jwtUtil.generateToken(id);
     }
 }
