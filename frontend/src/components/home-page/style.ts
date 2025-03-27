@@ -1,5 +1,6 @@
 import {
   Flex,
+  Text,
   Paper,
   Stack,
   Title,
@@ -7,6 +8,7 @@ import {
   PaperProps,
   TitleProps,
   MantineThemeOverride,
+  TextProps,
 } from "@mantine/core";
 import styled, { StyledComponent } from "@emotion/styled";
 
@@ -74,10 +76,30 @@ const HomePaper: StyledComponent<
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 `;
 
+const PaperTitle = styled(Title)<TitleProps>`
+  z-index: 1;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+`;
+
+const PaperText: StyledComponent<
+  {
+    theme?: MantineThemeOverride;
+    children?: React.ReactNode;
+  } & TextProps
+> = styled(Text)<TextProps>`
+  color: rgba(0, 0, 0, 0.6);
+  font-style: italic;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+`;
+
 export {
-  BackgroundContainer,
-  TitleContainer,
-  PaperContainer,
   HomeTitle,
   HomePaper,
+  PaperText,
+  PaperTitle,
+  TitleContainer,
+  PaperContainer,
+  BackgroundContainer,
 };

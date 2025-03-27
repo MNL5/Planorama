@@ -1,48 +1,40 @@
-import { Title, Text, Group, Stack, Button } from "@mantine/core";
+import { Group, Stack, Button } from "@mantine/core";
 
-import backgroundImage from "../../assets/background.webp";
 import {
-  BackgroundContainer,
   HomePaper,
   HomeTitle,
+  PaperTitle,
   PaperContainer,
   TitleContainer,
+  BackgroundContainer,
+  PaperText,
 } from "./style";
+import {
+  titleText,
+  homePagePaperText,
+  homePagePaperTitleText,
+  signUpText,
+  signInText,
+} from "../../types/strings";
+import backgroundImage from "../../assets/background.webp";
 
 const HomePage: React.FC = () => {
   return (
     <BackgroundContainer backgroundImage={backgroundImage}>
       <TitleContainer>
         <HomeTitle c={"#add8e6"} ff={"heading"} mt={"xl"}>
-          Planorama
+          {titleText}
         </HomeTitle>
       </TitleContainer>
       <PaperContainer>
         <HomePaper p={"xl"} radius={"lg"} shadow={"lg"}>
           <Stack gap={"lg"}>
-            <Title
-              c={"#add8e6"}
-              ff={"text"}
-              style={{
-                zIndex: 1,
-                letterSpacing: "2px",
-                textTransform: "uppercase",
-                textShadow: "2px 2px 5px rgba(0, 0, 0, 0.5)",
-              }}
-            >
-              Plan your dream event
-            </Title>
-            <Text
-              size={"xl"}
-              ff={"text"}
-              style={{
-                color: "rgba(0, 0, 0, 0.6)",
-                fontStyle: "italic",
-                textShadow: "1px 1px 2px rgba(0, 0, 0, 0.2)",
-              }}
-            >
-              plan your events easily and efficiently
-            </Text>
+            <PaperTitle c={"#add8e6"} ff={"text"}>
+              {homePagePaperTitleText}
+            </PaperTitle>
+            <PaperText size={"xl"} ff={"text"}>
+              {homePagePaperText}
+            </PaperText>
             <Group gap={"xl"} justify={"center"}>
               <Button
                 w={"200px"}
@@ -50,7 +42,7 @@ const HomePage: React.FC = () => {
                 color={"white"}
                 variant={"outline"}
               >
-                Sign Up
+                {signUpText}
               </Button>
               <Button
                 size={"lg"}
@@ -58,7 +50,7 @@ const HomePage: React.FC = () => {
                 color={"white"}
                 variant={"outline"}
               >
-                Sign In
+                {signInText}
               </Button>
             </Group>
           </Stack>
