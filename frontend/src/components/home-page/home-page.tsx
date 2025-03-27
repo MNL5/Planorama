@@ -31,6 +31,7 @@ const HomePage: React.FC = () => {
         style={{
           top: 0,
           left: 0,
+          zIndex: 0,
           width: "100%",
           height: "100%",
           position: "absolute",
@@ -55,6 +56,7 @@ const HomePage: React.FC = () => {
       </Flex>
       <Container
         style={{
+          zIndex: 1,
           height: "60vh",
           display: "flex",
           alignItems: "center",
@@ -68,7 +70,8 @@ const HomePage: React.FC = () => {
           shadow={"lg"}
           style={{
             textAlign: "center",
-            backgroundColor: "white",
+            background: "linear-gradient(to bottom, #ffffff, #add8e6)",
+            boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
           }}
         >
           <Stack gap={"lg"}>
@@ -76,6 +79,7 @@ const HomePage: React.FC = () => {
               c={"#add8e6"}
               ff={"text"}
               style={{
+                zIndex: 1,
                 letterSpacing: "2px",
                 textTransform: "uppercase",
                 textShadow: "0 0 10px #add8e6",
