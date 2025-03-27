@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import { Group, Stack, Button } from "@mantine/core";
 
 import {
@@ -19,6 +20,8 @@ import {
 import backgroundImage from "../../assets/background.webp";
 
 const HomePage: React.FC = () => {
+  const navigate = useNavigate();
+
   return (
     <BackgroundContainer backgroundImage={backgroundImage}>
       <TitleContainer>
@@ -41,6 +44,7 @@ const HomePage: React.FC = () => {
                 size={"lg"}
                 color={"white"}
                 variant={"outline"}
+                onClick={() => navigate("/signup")}
               >
                 {signUpText}
               </Button>
@@ -49,6 +53,7 @@ const HomePage: React.FC = () => {
                 w={"200px"}
                 color={"white"}
                 variant={"outline"}
+                onClick={() => navigate("/signin")}
               >
                 {signInText}
               </Button>
