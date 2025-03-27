@@ -1,41 +1,24 @@
-import { Paper, Title, Text, Group, Stack, Button } from "@mantine/core";
+import { Title, Text, Group, Stack, Button } from "@mantine/core";
 
 import backgroundImage from "../../assets/background.webp";
-import { BackgroundContainer, PaperContainer, TitleContainer } from "./style";
+import {
+  BackgroundContainer,
+  HomePaper,
+  HomeTitle,
+  PaperContainer,
+  TitleContainer,
+} from "./style";
 
 const HomePage: React.FC = () => {
   return (
     <BackgroundContainer backgroundImage={backgroundImage}>
       <TitleContainer>
-        <Title
-          c={"#add8e6"}
-          ff={"heading"}
-          mt={"xl"}
-          style={{
-            zIndex: 1,
-            fontSize: "80px",
-            letterSpacing: "2px",
-            textTransform: "uppercase",
-            textShadow:
-              "0 0 25px rgba(173, 216, 230, 1), 0 0 50px rgba(173, 216, 230, 0.8)",
-          }}
-        >
+        <HomeTitle c={"#add8e6"} ff={"heading"} mt={"xl"}>
           Planorama
-        </Title>
+        </HomeTitle>
       </TitleContainer>
       <PaperContainer>
-        <Paper
-          p={"xl"}
-          radius={"lg"}
-          shadow={"lg"}
-          style={{
-            textAlign: "center",
-            background:
-              "linear-gradient(to bottom, rgba(255, 255, 255, 0.7), rgba(173, 216, 230, 0.7))",
-            border: "2px solid white",
-            boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
-          }}
-        >
+        <HomePaper p={"xl"} radius={"lg"} shadow={"lg"}>
           <Stack gap={"lg"}>
             <Title
               c={"#add8e6"}
@@ -58,7 +41,7 @@ const HomePage: React.FC = () => {
                 textShadow: "1px 1px 2px rgba(0, 0, 0, 0.2)",
               }}
             >
-              plan your event easily and efficiently
+              plan your events easily and efficiently
             </Text>
             <Group gap={"xl"} justify={"center"}>
               <Button
@@ -79,7 +62,7 @@ const HomePage: React.FC = () => {
               </Button>
             </Group>
           </Stack>
-        </Paper>
+        </HomePaper>
       </PaperContainer>
     </BackgroundContainer>
   );
