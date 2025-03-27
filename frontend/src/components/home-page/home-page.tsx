@@ -57,7 +57,7 @@ const HomePage: React.FC = () => {
       <Container
         style={{
           zIndex: 1,
-          height: "60vh",
+          height: "88vh",
           display: "flex",
           alignItems: "center",
           flexDirection: "column",
@@ -70,7 +70,9 @@ const HomePage: React.FC = () => {
           shadow={"lg"}
           style={{
             textAlign: "center",
-            background: "linear-gradient(to bottom, #ffffff, #add8e6)",
+            background:
+              "linear-gradient(to bottom, rgba(255, 255, 255, 0.7), rgba(173, 216, 230, 0.7))",
+            border: "2px solid white",
             boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
           }}
         >
@@ -82,19 +84,37 @@ const HomePage: React.FC = () => {
                 zIndex: 1,
                 letterSpacing: "2px",
                 textTransform: "uppercase",
-                textShadow: "0 0 10px #add8e6",
+                textShadow: "2px 2px 5px rgba(0, 0, 0, 0.5)",
               }}
             >
               Plan your dream event
             </Title>
-            <Text size={"lg"} ff={"text"}>
-              Helping you plan your event easily and efficiently
+            <Text
+              size={"xl"}
+              ff={"text"}
+              style={{
+                color: "rgba(0, 0, 0, 0.6)",
+                fontStyle: "italic",
+                textShadow: "1px 1px 2px rgba(0, 0, 0, 0.2)",
+              }}
+            >
+              plan your event easily and efficiently
             </Text>
             <Group gap={"xl"} justify={"center"}>
-              <Button variant={"outline"} size={"lg"} w={"200px"}>
+              <Button
+                variant={"outline"}
+                color={"white"}
+                size={"lg"}
+                w={"200px"}
+              >
                 Sign Up
               </Button>
-              <Button variant={"outline"} size={"lg"} w={"200px"}>
+              <Button
+                variant={"outline"}
+                color={"white"}
+                size={"lg"}
+                w={"200px"}
+              >
                 Sign In
               </Button>
             </Group>
