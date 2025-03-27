@@ -9,17 +9,12 @@ import {
   Container,
 } from "@mantine/core";
 
-import classes from "./home-page.module.css";
+import { BackgroundContainer } from "./style";
 import backgroundImage from "../../assets/background.webp";
 
 const HomePage: React.FC = () => {
   return (
-    <Stack
-      className={classes.backgroundContainer}
-      style={{
-        backgroundImage: `url(${backgroundImage})`,
-      }}
-    >
+    <BackgroundContainer backgroundImage={backgroundImage}>
       <Flex
         justify={"center"}
         style={{
@@ -115,7 +110,7 @@ const HomePage: React.FC = () => {
           </Stack>
         </Paper>
       </Container>
-    </Stack>
+    </BackgroundContainer>
   );
 };
 
