@@ -1,32 +1,12 @@
-import {
-  Flex,
-  Paper,
-  Title,
-  Text,
-  Group,
-  Stack,
-  Button,
-  Container,
-} from "@mantine/core";
+import { Paper, Title, Text, Group, Stack, Button } from "@mantine/core";
 
-import { BackgroundContainer } from "./style";
 import backgroundImage from "../../assets/background.webp";
+import { BackgroundContainer, PaperContainer, TitleContainer } from "./style";
 
 const HomePage: React.FC = () => {
   return (
     <BackgroundContainer backgroundImage={backgroundImage}>
-      <Flex
-        justify={"center"}
-        style={{
-          top: 0,
-          left: 0,
-          zIndex: 0,
-          width: "100%",
-          height: "100%",
-          position: "absolute",
-          backgroundColor: "rgba(0, 0, 0, 0.5)",
-        }}
-      >
+      <TitleContainer>
         <Title
           c={"#add8e6"}
           ff={"heading"}
@@ -42,17 +22,8 @@ const HomePage: React.FC = () => {
         >
           Planorama
         </Title>
-      </Flex>
-      <Container
-        style={{
-          zIndex: 1,
-          height: "88vh",
-          display: "flex",
-          alignItems: "center",
-          flexDirection: "column",
-          justifyContent: "center",
-        }}
-      >
+      </TitleContainer>
+      <PaperContainer>
         <Paper
           p={"xl"}
           radius={"lg"}
@@ -91,25 +62,25 @@ const HomePage: React.FC = () => {
             </Text>
             <Group gap={"xl"} justify={"center"}>
               <Button
-                variant={"outline"}
-                color={"white"}
-                size={"lg"}
                 w={"200px"}
+                size={"lg"}
+                color={"white"}
+                variant={"outline"}
               >
                 Sign Up
               </Button>
               <Button
-                variant={"outline"}
-                color={"white"}
                 size={"lg"}
                 w={"200px"}
+                color={"white"}
+                variant={"outline"}
               >
                 Sign In
               </Button>
             </Group>
           </Stack>
         </Paper>
-      </Container>
+      </PaperContainer>
     </BackgroundContainer>
   );
 };
