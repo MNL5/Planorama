@@ -2,6 +2,7 @@ import { CanceledError } from 'axios';
 import { useEffect, useState } from 'react';
 import AuthService from '../../Services/Auth/AuthService';
 import { cacheAuthInfo, getRefreshToken } from '../../Utils/AuthUtil';
+import Loader from '../Loader/Loader';
 
 const AuthContainer = () => {
     const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -29,7 +30,9 @@ const AuthContainer = () => {
     }, []);
 
     // TODO: add isLoading and a circular progress or something
-    return isCreateUser ? (
+    return isLoading ? (
+        <Loader />
+    ) : isCreateUser ? (
         <SignUpForm switchToSignIn={() => setCreateUser(false)} />
     ) : (
         <SignInForm switchToSignUp={() => setCreateUser(true)} />
