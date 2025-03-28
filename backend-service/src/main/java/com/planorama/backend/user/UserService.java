@@ -73,6 +73,7 @@ public class UserService {
                     final String newRefreshToken = createToken(id);
                     final Set<String> updatedTokens = Stream.concat(user.refreshTokens().stream(), Set.of(newRefreshToken).stream())
                             .filter(t -> currentTime.isBefore(jwtUtil.getExpireTime(t)))
+                            .filter(t -> !t.equals(refreshToken))
                             .collect(Collectors.toSet());
                     final Update pushNewRefreshTokenUpdate = new Update()
                             .set("refreshTokens", updatedTokens);
