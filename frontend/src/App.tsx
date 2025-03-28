@@ -8,7 +8,7 @@ import { Overview } from "./components/overview/overview.tsx";
 import { HomePage } from "./components/home-page/home-page.tsx";
 
 const theme = createTheme({
-  fontFamily: "Quicksand, sans-serif",
+  fontFamily: "Roboto, sans-serif",
 });
 
 const App: React.FC = () => {

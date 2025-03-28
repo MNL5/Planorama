@@ -17,7 +17,7 @@ import {
   signUpText,
   signInText,
 } from "../../types/strings";
-import backgroundImage from "../../assets/background.webp";
+import backgroundImage from "../../assets/wedding.png";
 
 const HomePage: React.FC = () => {
   const navigate = useNavigate();
@@ -32,9 +32,7 @@ const HomePage: React.FC = () => {
       <PaperContainer>
         <HomePaper p={"xl"} radius={"lg"} shadow={"lg"}>
           <Stack gap={"lg"}>
-            <PaperTitle c={"#add8e6"} ff={"text"}>
-              {homePagePaperTitleText}
-            </PaperTitle>
+            <PaperTitle ff={"text"}>{homePagePaperTitleText}</PaperTitle>
             <PaperText size={"xl"} ff={"text"}>
               {homePagePaperText}
             </PaperText>
@@ -42,8 +40,12 @@ const HomePage: React.FC = () => {
               <Button
                 w={"200px"}
                 size={"lg"}
-                color={"white"}
-                variant={"outline"}
+                color={"#00C853"}
+                radius={"md"}
+                variant={"filled"}
+                style={{
+                  border: "2px solid #00b244",
+                }}
                 onClick={() => navigate("/signup")}
               >
                 {signUpText}
@@ -51,8 +53,9 @@ const HomePage: React.FC = () => {
               <Button
                 size={"lg"}
                 w={"200px"}
-                color={"white"}
-                variant={"outline"}
+                color={"#1976D2"}
+                radius={"md"}
+                variant={"filled"}
                 onClick={() => navigate("/signin")}
               >
                 {signInText}

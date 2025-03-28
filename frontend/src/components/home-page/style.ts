@@ -39,7 +39,7 @@ const TitleContainer: StyledComponent<{
   height: 100%;
   position: absolute;
   justify-content: center;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.3);
 `;
 
 const HomeTitle = styled(Title)<TitleProps>`
@@ -53,7 +53,7 @@ const HomeTitle = styled(Title)<TitleProps>`
 
 const PaperContainer = styled(Container)`
   z-index: 1;
-  height: 88vh;
+  height: 86vh;
   display: flex;
   align-items: center;
   flex-direction: column;
@@ -79,8 +79,9 @@ const HomePaper: StyledComponent<
 const PaperTitle = styled(Title)<TitleProps>`
   z-index: 1;
   letter-spacing: 2px;
-  text-transform: uppercase;
-  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+  color: #3e4c59;
+  font-family: Pattaya, cursive !important;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
 `;
 
 const PaperText: StyledComponent<
@@ -89,7 +90,7 @@ const PaperText: StyledComponent<
     children?: React.ReactNode;
   } & TextProps
 > = styled(Text)<TextProps>`
-  color: rgba(0, 0, 0, 0.6);
+  color: #4b4b4b;
   font-style: italic;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
 `;
