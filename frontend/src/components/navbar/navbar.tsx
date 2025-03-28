@@ -26,7 +26,7 @@ const NavBar: React.FC = () => {
       }}
     >
       <Container m={0}>
-        <Flex w={'90vw'} align={"center"} justify={"space-between"}>
+        <Flex w={'96vw'} align={"center"} justify={"space-between"}>
           <Group gap={"xl"} align={"center"}>
             <NavbarTitle
               c={"white"}
