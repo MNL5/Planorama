@@ -25,7 +25,7 @@ const HomePage: React.FC = () => {
   return (
     <BackgroundContainer backgroundImage={backgroundImage}>
       <TitleContainer>
-        <HomeTitle c={"#add8e6"} ff={"heading"} mt={"xl"}>
+        <HomeTitle c={"secondary.0"} ff={"heading"} mt={"xl"}>
           {titleText}
         </HomeTitle>
       </TitleContainer>
