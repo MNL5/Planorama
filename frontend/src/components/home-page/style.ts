@@ -44,9 +44,9 @@ const TitleContainer: StyledComponent<{
 
 const HomeTitle = styled(Title)<TitleProps>`
   z-index: 1;
-  font-size: 80px;
+  font-size: 140px;
   letter-spacing: 2px;
-  text-transform: uppercase;
+  font-family: Rouge Script, cursive !important;
   text-shadow: 0 0 25px rgba(173, 216, 230, 1),
     0 0 50px rgba(173, 216, 230, 0.8);
 `;
