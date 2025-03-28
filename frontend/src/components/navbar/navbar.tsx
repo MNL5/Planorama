@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { Group, Button, Box, Container } from "@mantine/core";
+import { Group, Button, Box, Container, Flex } from "@mantine/core";
 
 import { NavbarTitle } from "./style";
 import { titleText } from "../../types/strings";
@@ -15,7 +15,7 @@ const NavBar: React.FC = () => {
   return (
     <Box
       p={"md"}
-      bg={"#add8e6"}
+      bg={"secondary.0"}
       style={{
         top: 0,
         left: 0,
@@ -25,36 +25,37 @@ const NavBar: React.FC = () => {
         boxShadow: "0px 2px 10px rgba(0, 0, 0, 0.1)",
       }}
     >
-      <Container size={"xl"} m={0}>
-        <Group gap={"xl"} align={"center"}>
-          <NavbarTitle
-            c={"white"}
-            style={{ cursor: "pointer" }}
-            onClick={() => navigate("/")}
-          >
-            {titleText}
-          </NavbarTitle>
-
-          <Group gap={"lg"} mt={'sm'}>
-            <Button
-              size={"md"}
-              color={"white"}
-              variant={"subtle"}
-              onClick={() => navigate("/events")}
+      <Container m={0}>
+        <Flex w={'90vw'} align={"center"} justify={"space-between"}>
+          <Group gap={"xl"} align={"center"}>
+            <NavbarTitle
+              c={"white"}
+              style={{ cursor: "pointer" }}
+              onClick={() => navigate("/")}
             >
-              My Events
-            </Button>
-            <Button
-              size={"md"}
-              radius={"md"}
-              variant={"filled"}
-              color={"#1976D2"}
-              onClick={handleLogout}
-            >
-              Sign Out
-            </Button>
+              {titleText}
+            </NavbarTitle>
+            <Group gap={"lg"} mt={"sm"}>
+              <Button
+                size={"lg"}
+                color={"primary"}
+                variant={"subtle"}
+                onClick={() => navigate("/events")}
+              >
+                My Events
+              </Button>
+            </Group>
           </Group>
-        </Group>
+          <Button
+            size={"md"}
+            radius={"md"}
+            variant={"filled"}
+            color={"#1976D2"}
+            onClick={handleLogout}
+          >
+            Sign Out
+          </Button>
+        </Flex>
       </Container>
     </Box>
   );
