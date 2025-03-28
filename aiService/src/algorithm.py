@@ -1,10 +1,6 @@
 import math
 import random
 import numpy as np
-from .guest import Guest
-
-def sig(x):
- return 1/(1 + math.exp(-x))
 
 class Algorithm:
     def __init__(self, guests, numOfTables):
@@ -48,16 +44,19 @@ class Algorithm:
 
     def crossover(self, parent1, parent2):
         child = [None] * len(parent1)
+        chlidSet = set()
         start = random.randint(0, len(parent1) - 1)
         end = random.randint(start, len(parent1) - 1)
         for i in range(start, end + 1):
             child[i] = parent1[i]
+            chlidSet.add(parent1[i])
         idx = 0
         for i in range(len(parent2)):
-            if parent2[i] not in child:
+            if parent2[i] not in chlidSet:
                 while child[idx] is not None:
                     idx += 1
                 child[idx] = parent2[i]
+                chlidSet.add(parent2[i])
         return child
 
     def mutate(self, individual, mutation_rate):
@@ -66,16 +65,13 @@ class Algorithm:
                 j = random.randint(0, len(individual) - 1)
                 individual[i], individual[j] = individual[j], individual[i]
 
-    def select_parents(self, population, fitnesses):
-        # Perform roulette wheel selection
-        total_fitness = sum(fitnesses)
-        selection_probs = [f / total_fitness for f in fitnesses]
+    def select_parents(self, population, selection_probs):
         parent1_idx = np.random.choice(len(population), p=selection_probs)
         parent2_idx = np.random.choice(len(population), p=selection_probs)
         while parent2_idx == parent1_idx:
             parent2_idx = np.random.choice(len(population), p=selection_probs)
         return population[parent1_idx], population[parent2_idx]
-
+    
     def solve(self, guests, pop_size=100, elite_size=10, mutation_rate=0.01, generations=100):
         population = self.create_population(guests, pop_size)
         best_distance = 0
@@ -93,9 +89,14 @@ class Algorithm:
                 best_distance = currBest
                 best_individual = currBestIndividual
 
+            if generations - 1 == generation:
+                break
+
             next_gen = elites.copy()
-            while len(next_gen) < pop_size:
-                parent1, parent2 = self.select_parents(population, fitnesses)
+            total_fitness = sum(fitnesses)
+            selection_probs = [f / total_fitness for f in fitnesses]
+            for _ in range(len(population) - elite_size):
+                parent1, parent2 = self.select_parents(population, selection_probs)
                 child = self.crossover(parent1, parent2)
                 self.mutate(child, mutation_rate)
                 next_gen.append(child)
