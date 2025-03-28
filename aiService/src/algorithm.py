@@ -25,14 +25,14 @@ class Algorithm:
     def fitness(self, guests):
         return sum(self.happines(guests))
 
-    def sortGuests(self, guests, isReverse = False):
-        mat = []
+    def sortGuests(self, guests):
+        result = []
         for tableNum in range(self.numOfTables):
             start = tableNum * 10
             table = sorted(guests[start:start + 10])
-            if isReverse: table.reverse()
-            mat.append(table)
-        return [item for row in mat for item in row]
+            for i in range(len(table)):
+                result.append(table[i])
+        return result
 
     def create_population(self, guests, pop_size):
         population = []
@@ -74,7 +74,7 @@ class Algorithm:
     
     def solve(self, guests, pop_size=100, elite_size=10, mutation_rate=0.01, generations=100):
         population = self.create_population(guests, pop_size)
-        best_distance = 0
+        best_fitness = 0
         best_individual = None
 
         for generation in range(generations):
@@ -85,8 +85,8 @@ class Algorithm:
             currBest = fitnesses[fitnessSortedIndexes[-1]]
             currBestIndividual = population[fitnessSortedIndexes[-1]]
 
-            if currBest > best_distance:
-                best_distance = currBest
+            if currBest > best_fitness:
+                best_fitness = currBest
                 best_individual = currBestIndividual
 
             if generations - 1 == generation:
