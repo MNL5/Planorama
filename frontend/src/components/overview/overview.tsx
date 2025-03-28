@@ -5,7 +5,7 @@ import { NavBar } from "../navbar/navbar";
 
 const Overview: React.FC = () => {
   return (
-    <Box style={{ paddingTop: "60px" }}>
+    <Box pt={180} pl={20}>
       <NavBar />
       <div>
         {/* Your main content goes here */}

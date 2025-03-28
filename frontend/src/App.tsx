@@ -2,14 +2,13 @@ import "@mantine/core/styles.css";
 import { Routes, Route } from "react-router-dom";
 import { createTheme, MantineProvider } from "@mantine/core";
 
+import { mantheme } from "./types/mantheme.ts";
 import { SignIn } from "./components/sign-in/sign-in.tsx";
 import { SignUp } from "./components/sign-up/sign-up.tsx";
 import { Overview } from "./components/overview/overview.tsx";
 import { HomePage } from "./components/home-page/home-page.tsx";
 
-const theme = createTheme({
-  fontFamily: "Roboto, sans-serif",
-});
+const theme = createTheme(mantheme);
 
 const App: React.FC = () => {
   return (

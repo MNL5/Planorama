@@ -1,14 +1,15 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { Group, Text, Button, Box, Container } from "@mantine/core";
+import { Group, Button, Box, Container } from "@mantine/core";
 
+import { NavbarTitle } from "./style";
 import { titleText } from "../../types/strings";
 
 const NavBar: React.FC = () => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    navigate("/signin");
+    navigate("/");
   };
 
   return (
@@ -24,29 +25,33 @@ const NavBar: React.FC = () => {
         boxShadow: "0px 2px 10px rgba(0, 0, 0, 0.1)",
       }}
     >
-      <Container size={"xl"}>
-        <Group justify={"space-between"}>
-          {/* Logo section */}
-          <Text
-            size={"xl"}
-            fw={700}
+      <Container size={"xl"} m={0}>
+        <Group gap={"xl"} align={"center"}>
+          <NavbarTitle
             c={"white"}
             style={{ cursor: "pointer" }}
             onClick={() => navigate("/")}
           >
             {titleText}
-          </Text>
+          </NavbarTitle>
 
-          <Group gap={"lg"}>
+          <Group gap={"lg"} mt={'sm'}>
             <Button
+              size={"md"}
               color={"white"}
-              variant={"outline"}
+              variant={"subtle"}
               onClick={() => navigate("/events")}
             >
               My Events
             </Button>
-            <Button variant={"white"} onClick={handleLogout} color={"white"}>
-              Logout
+            <Button
+              size={"md"}
+              radius={"md"}
+              variant={"filled"}
+              color={"#1976D2"}
+              onClick={handleLogout}
+            >
+              Sign Out
             </Button>
           </Group>
         </Group>
