@@ -1,35 +1,27 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import "@mantine/core/styles.css";
+import { Routes, Route } from "react-router-dom";
+import { createTheme, MantineProvider } from "@mantine/core";
 
-function App() {
-  const [count, setCount] = useState(0)
+import { mantheme } from "./types/mantheme.ts";
+import { SignIn } from "./components/sign-in/sign-in.tsx";
+import { SignUp } from "./components/sign-up/sign-up.tsx";
+import { Overview } from "./components/overview/overview.tsx";
+import { HomePage } from "./components/home-page/home-page.tsx";
 
+const theme = createTheme(mantheme);
+
+const App: React.FC = () => {
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <MantineProvider theme={theme}>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/signin" element={<SignIn />} />
+        <Route path="/signup" element={<SignUp />} />
+        <Route path="/overview" element={<Overview />} />
+        // TODO: add not found route
+      </Routes>
+    </MantineProvider>
+  );
+};
 
-export default App
+export { App };
