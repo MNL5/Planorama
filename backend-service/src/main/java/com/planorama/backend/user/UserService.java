@@ -77,6 +77,8 @@ public class UserService {
         final UUID id = UUID.fromString(jwtUtil.verifyToken(refreshToken));
         final Instant currentTime = Instant.now();
         return findUserByID(id)
+                .filter(user -> user.refreshTokens().contains(refreshToken))
+                .switchIfEmpty(Mono.error(new RuntimeException("User already has been logout")))
                 .flatMap(user -> {
                     final Set<String> updatedTokens = filterExpireTokens(user.refreshTokens().stream(), currentTime, Set.of(refreshToken));
                     return reactiveMongoTemplate.findAndModify(findByIdQuery(id), replaceRefreshTokenUpdate(updatedTokens), UserDAO.class)
@@ -89,6 +91,8 @@ public class UserService {
         final UUID id = UUID.fromString(jwtUtil.verifyToken(refreshToken));
         final Instant currentTime = Instant.now();
         return findUserByID(id)
+                .filter(user -> user.refreshTokens().contains(refreshToken))
+                .switchIfEmpty(Mono.error(new RuntimeException("Token already has been used")))
                 .flatMap(user -> {
                     final String newRefreshToken = createToken(id, refreshExpirationTime);
                     final Set<String> updatedTokens = filterExpireTokens(Stream.concat(user.refreshTokens().stream(), Set.of(newRefreshToken).stream()),
