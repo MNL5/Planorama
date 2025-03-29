@@ -63,27 +63,56 @@ public class UserService {
                 });
     }
 
+
+    public Mono<String> logout(String refreshToken) {
+        final UUID id = UUID.fromString(jwtUtil.verifyToken(refreshToken));
+        final Instant currentTime = Instant.now();
+        return findUserByID(id)
+                .flatMap(user -> {
+                    final Set<String> updatedTokens = filterExpireTokens(user.refreshTokens().stream(), currentTime, Set.of(refreshToken));
+                    return reactiveMongoTemplate.findAndModify(findByIdQuery(id), replaceRefreshTokenUpdate(updatedTokens), UserDAO.class)
+                            .switchIfEmpty(Mono.error(new RuntimeException("Failed to logout user")))
+                            .map(updatedUser -> "Successfully log out user");
+                });
+    }
+
     public Mono<UserAccess> refreshToken(String refreshToken) {
         final UUID id = UUID.fromString(jwtUtil.verifyToken(refreshToken));
         final Instant currentTime = Instant.now();
-        final Query findUser = Query.query(where("id").is(id));
-        return reactiveMongoTemplate.findById(id, UserDAO.class)
-                .switchIfEmpty(Mono.error(new RuntimeException("user is not exist")))
+        return findUserByID(id)
                 .flatMap(user -> {
                     final String newRefreshToken = createToken(id);
-                    final Set<String> updatedTokens = Stream.concat(user.refreshTokens().stream(), Set.of(newRefreshToken).stream())
-                            .filter(t -> currentTime.isBefore(jwtUtil.getExpireTime(t)))
-                            .filter(t -> !t.equals(refreshToken))
-                            .collect(Collectors.toSet());
-                    final Update pushNewRefreshTokenUpdate = new Update()
-                            .set("refreshTokens", updatedTokens);
-                    return reactiveMongoTemplate.findAndModify(findUser, pushNewRefreshTokenUpdate, UserDAO.class)
+                    final Set<String> updatedTokens = filterExpireTokens(Stream.concat(user.refreshTokens().stream(), Set.of(newRefreshToken).stream()),
+                            currentTime,
+                            Set.of(refreshToken));
+                    return reactiveMongoTemplate.findAndModify(findByIdQuery(id), replaceRefreshTokenUpdate(updatedTokens), UserDAO.class)
                             .switchIfEmpty(Mono.error(new RuntimeException("Failed to update user")))
                             .map(updatedUser -> new UserAccess(updatedUser,
                                     createToken(updatedUser.id()),
                                     newRefreshToken)
                             );
                 });
+    }
+
+    private Query findByIdQuery(UUID id) {
+        return Query.query(where("id").is(id));
+    }
+
+    private Update replaceRefreshTokenUpdate(Set<String> updatedTokens) {
+        return new Update()
+                .set("refreshTokens", updatedTokens);
+    }
+
+    private Set<String> filterExpireTokens(Stream<String> tokens, Instant timeLimit, Set<String> usedTokens) {
+        return tokens
+                .filter(t -> timeLimit.isBefore(jwtUtil.getExpireTime(t)))
+                .filter(t -> !usedTokens.contains(t))
+                .collect(Collectors.toSet());
+    }
+
+    private Mono<UserDAO> findUserByID(UUID id) {
+        return reactiveMongoTemplate.findById(id, UserDAO.class)
+                .switchIfEmpty(Mono.error(new RuntimeException("user is not exist")));
     }
 
     private String createToken(UUID id) {
