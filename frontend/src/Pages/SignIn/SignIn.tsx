@@ -1,22 +1,24 @@
 import {
-    Anchor,
-    Box,
-    Button,
-    Group,
-    PasswordInput,
-    Text,
-    TextInput,
+   Anchor,
+   Box,
+   Button,
+   Group,
+   PasswordInput,
+   Text,
+   TextInput,
 } from '@mantine/core';
 import { useNavigate } from 'react-router-dom';
 import useAuthForm from '../../hooks/useFormAuth';
+import authService from '../../Services/Auth/AuthService';
 
 const SignIn = () => {
     const form = useAuthForm();
     const navigate = useNavigate();
 
     const handleSubmit = (values) => {
-        console.log('Sign-In Data:', values);
-        navigate('/dashboard');
+        console.log('Signin Data:', values);
+        authService.signIn(values);
+        navigate('/overview');
     };
 
     return (

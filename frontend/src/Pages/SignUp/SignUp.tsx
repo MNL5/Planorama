@@ -1,6 +1,7 @@
 import { Box, Button, PasswordInput, TextInput } from '@mantine/core';
 import { useNavigate } from 'react-router-dom';
 import useAuthForm from '../../hooks/useFormAuth';
+import authService from '../../Services/Auth/AuthService';
 
 const SignUp = () => {
     const form = useAuthForm(true); // Pass true to enable confirm password validation
@@ -8,7 +9,8 @@ const SignUp = () => {
 
     const handleSubmit = (values) => {
         console.log('Sign-Up Data:', values);
-        navigate('/');
+        authService.signUp(values);
+        navigate('/overview');
     };
 
     return (
