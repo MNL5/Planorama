@@ -103,4 +103,7 @@ class Algorithm:
 
             population = next_gen
 
+        for i in range(len(best_individual)):
+            best_individual[i].table = math.floor(i / 10)
+
         return best_individual

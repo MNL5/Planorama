@@ -32,6 +32,35 @@ def create_app(test_config=None):
         data = request.get_json()
         if not data:
             return jsonify({"error": "No data provided"}), 400
+        
+        if not isinstance(data, dict):
+            return jsonify({"error": "Invalid data format"}), 400
+
+        if 'guests' not in data:
+            return jsonify({"error": "Missing required keys"}), 400
+        
+        guests = [Guest.from_dict(guest) for guest in data['guests']]         
+
+        numOfTables = math.ceil(len(guests) / 10) + 1
+        numOfSeats = numOfTables * 10
+
+        for i in range(numOfSeats - len(guests)):
+            guests.append(Guest(i, "_"))
+
+        algorithm = Algorithm(guests, numOfTables)
+        result = algorithm.solve(guests, generations=500, pop_size=200, elite_size=20)
+
+        response = {
+            "guests": [guest.to_dict() for guest in result if guest.group != "_"]
+        }
+
+        return jsonify(response), 200
+
+    @app.route('/seating/poc', methods = ['POST'])
+    def calculatePOC():
+        data = request.get_json()
+        if not data:
+            return jsonify({"error": "No data provided"}), 400
 
         guests = []
         for key, value in data.items():
