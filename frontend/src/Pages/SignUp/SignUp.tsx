@@ -8,8 +8,9 @@ const SignUp = () => {
     const navigate = useNavigate();
 
     const handleSubmit = (values) => {
-        console.log('Sign-Up Data:', values);
-        authService.signUp(values);
+        const { email, password } = values;
+        console.log('Signup Data:', values);
+        authService.signUp({ email, password });
         navigate('/overview');
     };
 
