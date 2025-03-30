@@ -1,7 +1,7 @@
 import axios, { CanceledError } from 'axios';
 
 const httpClient = axios.create({
-    baseURL: import.meta.env.BASE_URL,
+    baseURL: 'http://localhost:8080',
 });
 
 httpClient.interceptors.request.use(

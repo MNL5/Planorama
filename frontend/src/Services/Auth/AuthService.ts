@@ -3,10 +3,10 @@ import Auth from './types/Auth';
 import Credentials from './types/Credentials';
 
 const signIn = (credentials: Credentials) =>
-    abortablePostRequest<Auth>('users/login', { credentials });
+    abortablePostRequest<Auth>('users/login', { ...credentials });
 
 const signUp = (credentials: Credentials) =>
-    abortablePostRequest<Auth>('users', { credentials });
+    abortablePostRequest<Auth>('users', { ...credentials });
 
 const refresh = (refreshToken: string) =>
     abortablePostRequest<Auth>('users/refresh', { refreshToken });
