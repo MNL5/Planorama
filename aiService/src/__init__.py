@@ -2,6 +2,7 @@ import os
 import random
 import math
 from .guest import Guest
+import time
 from .algorithm import Algorithm
 
 from flask import Flask, request, jsonify, render_template
@@ -45,7 +46,10 @@ def create_app(test_config=None):
 
         algorithm = Algorithm(guests, numOfTables)
 
+        milliseconds = int(time.time() * 1000)
         result = algorithm.solve(guests, generations=500, pop_size=200, elite_size=20)
+        print(int(time.time() * 1000) - milliseconds)
+
         fitness = algorithm.fitness(result)
         resultMat = []
         for i in range(numOfTables):
@@ -83,13 +87,17 @@ def create_app(test_config=None):
 
         algorithm = Algorithm(guests, numOfTables)
 
+        milliseconds = int(time.time() * 1000)
         result = algorithm.solve(guests, generations=500, pop_size=200, elite_size=20)
+        duration = int(time.time() * 1000) - milliseconds
+        print(f"Duration: {duration}ms")
+
         fitness = algorithm.fitness(result)
         resultMat = []
         for i in range(numOfTables):
             start = i * 10
             resultMat.append(sorted(result[start:start + 10]))
 
-        return render_template('seating.html', groupToAmount=groupToAmount, numOfSeats=numOfSeats, result=resultMat, numOfTables=numOfTables, fitness=fitness)
+        return render_template('seating.html', groupToAmount=groupToAmount, numOfSeats=numOfSeats, result=resultMat, numOfTables=numOfTables, fitness=fitness, duration=duration)
 
     return app
