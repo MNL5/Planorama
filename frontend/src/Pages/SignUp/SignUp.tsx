@@ -1,17 +1,23 @@
 import { Box, Button, PasswordInput, TextInput } from '@mantine/core';
-import { useNavigate } from 'react-router-dom';
 import useAuthForm from '../../hooks/useFormAuth';
 import authService from '../../Services/Auth/AuthService';
+import { toast } from 'react-toastify';
+import { cacheAuthInfo } from '../../Utils/AuthUtil';
 
 const SignUp = () => {
     const form = useAuthForm(true); // Pass true to enable confirm password validation
-    const navigate = useNavigate();
 
-    const handleSubmit = (values) => {
+    const handleSubmit = async (values) => {
         const { email, password } = values;
         console.log('Signup Data:', values);
-        authService.signUp({ email, password });
-        navigate('/overview');
+        try {
+            const tokens = (await authService.signUp({ email, password }).request).data;
+            cacheAuthInfo(tokens);
+        } catch (error) {
+            console.error(error);
+            const innerError = error as { response: { data: string }; message: string };
+            toast.error(innerError.response.data || "Problem has occured");
+        }
     };
 
     return (

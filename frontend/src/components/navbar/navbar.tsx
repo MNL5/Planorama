@@ -4,12 +4,18 @@ import { Group, Button, Box, Container, Flex } from "@mantine/core";
 
 import { NavbarTitle } from "./style";
 import { titleText } from "../../types/strings";
+import AuthService from "../../Services/Auth/AuthService";
+import { clearCache } from "../../Utils/AuthUtil";
 
 const NavBar: React.FC = () => {
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    navigate("/");
+  const handleLogout = async () => {
+    const refreshToken = localStorage.getItem("refreshToken");
+    if (refreshToken) {
+      await AuthService.logout(refreshToken);
+      clearCache();
+    }
   };
 
   return (

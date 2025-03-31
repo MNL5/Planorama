@@ -10,16 +10,29 @@ import {
 import { useNavigate } from 'react-router-dom';
 import useAuthForm from '../../hooks/useFormAuth';
 import authService from '../../Services/Auth/AuthService';
+import { toast } from 'react-toastify';
+import { cacheAuthInfo } from '../../Utils/AuthUtil';
 
 const SignIn = () => {
     const form = useAuthForm();
     const navigate = useNavigate();
 
-    const handleSubmit = (values) => {
-        const { email, password } = values;
-        console.log('Signin Data:', values);
-        authService.signIn({ email, password });
-        navigate('/overview');
+    const handleSubmit = async (values) => {
+        const { email, password } = values;       
+
+        try {
+            const tokens = (
+              await authService.signIn({ email, password }).request
+            ).data;
+            cacheAuthInfo(tokens);
+        } catch (error) {
+            console.error(error);
+            const innerError = error as {
+              response: { data: string };
+              message: string;
+            };
+            toast.error(innerError.response.data || "Problem has occured");
+        }
     };
 
     return (
