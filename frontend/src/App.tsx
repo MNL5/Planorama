@@ -2,7 +2,7 @@ import { createTheme, MantineProvider } from '@mantine/core';
 import '@mantine/core/styles.css';
 import { Route, Routes } from 'react-router-dom';
 
-import { HomePage } from './components/home-page/home-page.tsx';
+import HomePage from './components/home-page/home-page.tsx';
 import { Overview } from './components/overview/overview.tsx';
 import { mantheme } from './types/mantheme.ts';
 import SignIn from './Pages/SignIn/SignIn.tsx';

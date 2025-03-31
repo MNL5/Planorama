@@ -1,71 +1,63 @@
-import { useNavigate } from "react-router-dom";
-import { Group, Stack, Button } from "@mantine/core";
+import { Container, Text, Title } from '@mantine/core';
+import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
+import illustration from '../../assets/couple.png'; // Replace with actual image
+import './HomePage.css';
 
-import {
-  HomePaper,
-  HomeTitle,
-  PaperTitle,
-  PaperContainer,
-  TitleContainer,
-  BackgroundContainer,
-  PaperText,
-} from "./style";
-import {
-  titleText,
-  homePagePaperText,
-  homePagePaperTitleText,
-  signUpText,
-  signInText,
-} from "../../types/strings";
-import backgroundImage from "../../assets/wedding.png";
+const HomePage = () => {
+    const navigate = useNavigate();
 
-const HomePage: React.FC = () => {
-  const navigate = useNavigate();
+    return (
+        <div className="homepage">
+            {/* Navigation Bar */}
+            <header className="navbar">
+                <motion.h1
+                    className="logo"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 1 }}
+                >
+                    PLANORAMA
+                </motion.h1>
+                <div className="auth-links">
+                    <a href="/signin">Login</a> | <a href="/signup">Register</a>
+                </div>
+            </header>
 
-  return (
-    <BackgroundContainer backgroundImage={backgroundImage}>
-      <TitleContainer>
-        <HomeTitle c={"secondary.0"} ff={"heading"} mt={"xl"}>
-          {titleText}
-        </HomeTitle>
-      </TitleContainer>
-      <PaperContainer>
-        <HomePaper p={"xl"} radius={"lg"} shadow={"lg"}>
-          <Stack gap={"lg"}>
-            <PaperTitle ff={"text"}>{homePagePaperTitleText}</PaperTitle>
-            <PaperText size={"xl"} ff={"text"}>
-              {homePagePaperText}
-            </PaperText>
-            <Group gap={"xl"} justify={"center"}>
-              <Button
-                w={"200px"}
-                size={"lg"}
-                color={"#00C853"}
-                radius={"md"}
-                variant={"filled"}
-                style={{
-                  border: "2px solid #00b244",
-                }}
-                onClick={() => navigate("/signup")}
-              >
-                {signUpText}
-              </Button>
-              <Button
-                size={"lg"}
-                w={"200px"}
-                color={"#1976D2"}
-                radius={"md"}
-                variant={"filled"}
-                onClick={() => navigate("/signin")}
-              >
-                {signInText}
-              </Button>
-            </Group>
-          </Stack>
-        </HomePaper>
-      </PaperContainer>
-    </BackgroundContainer>
-  );
+            {/* Main Content */}
+            <Container className="content">
+                <motion.div
+                    className="left-section"
+                    initial={{ x: -50, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    transition={{ duration: 1 }}
+                >
+                    <Title className="main-title">Plan Your Dream Event</Title>
+                    <Text className="subtitle">
+                        All the tools you need to create the perfect
+                        celebration.
+                    </Text>
+                    <motion.button
+                        className="primary-btn"
+                        onClick={() => navigate('/signup')}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                    >
+                        Create Event Project
+                    </motion.button>
+                </motion.div>
+
+                <motion.div
+                    className="right-section"
+                    initial={{ x: 50, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    transition={{ duration: 1.2 }}
+                >
+                    <img src={illustration} alt="Wedding Planning" />
+                </motion.div>
+            </Container>
+        </div>
+    );
 };
 
-export { HomePage };
+export default HomePage;
