@@ -1,70 +1,57 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
-import { Group, Button, Box, Container, Flex } from "@mantine/core";
-
-import { NavbarTitle } from "./style";
-import { titleText } from "../../types/strings";
+import { Group } from '@mantine/core';
+import { Link } from 'react-router-dom';
+import logo from '../../assets/logo.png';
+import './Navbar.css';
 import AuthService from "../../Services/Auth/AuthService";
 import { clearCache } from "../../Utils/AuthUtil";
 
-const NavBar: React.FC = () => {
-  const navigate = useNavigate();
+const Navbar = () => {
+    const handleLogout = async () => {
+        const refreshToken = localStorage.getItem("refreshToken");
+        if (refreshToken) {
+          await AuthService.logout(refreshToken);
+          clearCache();
+        }
+      };
 
-  const handleLogout = async () => {
-    const refreshToken = localStorage.getItem("refreshToken");
-    if (refreshToken) {
-      await AuthService.logout(refreshToken);
-      clearCache();
-    }
-  };
-
-  return (
-    <Box
-      p={"md"}
-      bg={"secondary.0"}
-      style={{
-        top: 0,
-        left: 0,
-        right: 0,
-        zIndex: 100,
-        position: "fixed",
-        boxShadow: "0px 2px 10px rgba(0, 0, 0, 0.1)",
-      }}
-    >
-      <Container m={0}>
-        <Flex w={'96vw'} align={"center"} justify={"space-between"}>
-          <Group gap={"xl"} align={"center"}>
-            <NavbarTitle
-              c={"white"}
-              style={{ cursor: "pointer" }}
-              onClick={() => navigate("/")}
-            >
-              {titleText}
-            </NavbarTitle>
-            <Group gap={"lg"} mt={"sm"}>
-              <Button
-                size={"lg"}
-                color={"primary"}
-                variant={"subtle"}
-                onClick={() => navigate("/events")}
-              >
-                My Events
-              </Button>
+    return (
+        <nav className="navbar">
+            <Group>
+                <div className="navbar-logo">
+                    <Link to="/home">
+                        <img src={logo} alt="logo" className="logo" />
+                    </Link>
+                </div>
+                <ul className="navbar-links">
+                    <li>
+                        <Link to="/event-details">Event Details</Link>
+                    </li>
+                    <li>
+                        <Link to="/guests">Guests</Link>
+                    </li>
+                    <li>
+                        <Link to="/preferences">Preferences</Link>
+                    </li>
+                    <li>
+                        <Link to="/tasks">Tasks</Link>
+                    </li>
+                    <li>
+                        <Link to="/venue-seats">Venue Seats</Link>
+                    </li>
+                    <li>
+                        <Link to="/seating">Seating</Link>
+                    </li>
+                    <li>
+                        <Link to="/notes">To Do</Link>
+                    </li>
+                </ul>
             </Group>
-          </Group>
-          <Button
-            size={"md"}
-            radius={"md"}
-            variant={"filled"}
-            color={"#1976D2"}
-            onClick={handleLogout}
-          >
-            Sign Out
-          </Button>
-        </Flex>
-      </Container>
-    </Box>
-  );
+
+            <div className="navbar-actions">
+                <button className="logout-btn" onClick={handleLogout}>Logout</button>
+            </div>
+        </nav>
+    );
 };
 
-export { NavBar };
+export default Navbar;

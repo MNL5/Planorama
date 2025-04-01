@@ -2,15 +2,15 @@ import { createTheme, MantineProvider } from '@mantine/core';
 import '@mantine/core/styles.css';
 import { Route, Routes, Navigate } from 'react-router-dom';
 
-import { HomePage } from './components/home-page/home-page.tsx';
-import { Overview } from './components/overview/overview.tsx';
+import Home from './pages/Home/Home.tsx';
+import { Overview } from './components/Overview/Overview.tsx';
 import { mantheme } from './types/mantheme.ts';
 import { useState } from 'react';
 import { useEventListener } from './hooks/useEventListener.ts';
-import SignIn from './Pages/SignIn/SignIn.tsx';
-import SignUp from './Pages/SignUp/SignUp.tsx';
 import { ToastContainer } from 'react-toastify';
 import useRefresh from './hooks/useRefresh.ts';
+import SignIn from './pages/SignIn/SignIn.tsx';
+import SignUp from './pages/SignUp/SignUp.tsx';
 
 const theme = createTheme(mantheme);
 
@@ -39,7 +39,7 @@ const App: React.FC = () => {
                 style={{ zIndex: "999999999999" }}
               />
             <Routes>
-                <Route exact path="/" element={isLogged ? <Navigate replace to="/overview" /> : <HomePage />} />
+                <Route exact path="/" element={isLogged ? <Navigate replace to="/overview" /> : <Home />} />
                 {
                     isLogged ? <Route path="/overview" element={<Overview />} /> :
                     <>

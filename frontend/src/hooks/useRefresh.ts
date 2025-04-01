@@ -1,7 +1,7 @@
 import { CanceledError } from 'axios';
 import { useEffect, useState } from 'react';
-import AuthService from '../Services/Auth/AuthService';
-import { cacheAuthInfo, getRefreshToken } from '../Utils/AuthUtil';
+import AuthService from '../services/Auth/AuthService';
+import { cacheAuthInfo, getRefreshToken } from '../utils/AuthUtil';
 
 const useRefresh = () => {
     const [isLoading, setIsLoading] = useState<boolean>(true);
