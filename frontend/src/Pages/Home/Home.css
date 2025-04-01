@@ -1,0 +1,133 @@
+/* General Styles */
+body {
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(to right, #f8f0fc, #fff);
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
+
+/* navbar */
+.home-navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 60px;
+    backdrop-filter: blur(10px);
+    position: sticky;
+    top: 0;
+}
+
+.logo {
+    font-size: 28px;
+    font-weight: bold;
+    color: #6a0572;
+}
+
+.home-navbar nav a {
+    margin: 0 15px;
+    font-weight: 500;
+    text-decoration: none;
+    color: black;
+    transition: color 0.3s ease;
+}
+
+.home-navbar nav a:hover {
+    color: #6a0572;
+}
+
+.auth-links {
+    font-weight: 500;
+}
+
+.auth-links a {
+    text-decoration: none;
+    color: #6a0572;
+}
+
+/* Main Content */
+.content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 80px 60px;
+}
+
+.left-section {
+    max-width: 50%;
+}
+
+.main-title {
+    font-size: 42px;
+    font-weight: bold;
+    color: #6a0572;
+    text-transform: uppercase;
+}
+
+.subtitle {
+    font-size: 18px;
+    color: #555;
+    margin-top: 15px;
+}
+
+.primary-btn {
+    background: #6a0572;
+    color: white;
+    font-size: 18px;
+    margin-top: 20px;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.primary-btn:hover {
+    background: #4e024c;
+}
+
+/* Image Section */
+.right-section img {
+    max-width: 400px;
+    filter: drop-shadow(0px 4px 6px rgba(0, 0, 0, 0.2));
+}
+
+/* Bottom Section */
+.bottom-section {
+    text-align: center;
+    margin-top: 40px;
+    font-size: 16px;
+}
+
+.business-btn {
+    margin-top: 10px;
+    padding: 10px 20px;
+    border: 2px solid #6a0572;
+    color: #6a0572;
+    font-weight: bold;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    background: white;
+}
+
+.business-btn:hover {
+    background: #6a0572;
+    color: white;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .content {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .left-section {
+        max-width: 100%;
+    }
+
+    .right-section img {
+        max-width: 80%;
+        margin-top: 20px;
+    }
+}
