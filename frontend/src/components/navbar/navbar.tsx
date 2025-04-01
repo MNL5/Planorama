@@ -4,6 +4,45 @@ import logo from '../../assets/logo.png';
 import './Navbar.css';
 import AuthService from "../../Services/Auth/AuthService";
 import { clearCache } from "../../Utils/AuthUtil";
+import Overview from '../../Pages/Overview/Overview.tsx';
+
+export const ENDPOINTS = [
+    {
+        name: "Event Details",
+        path: "/event-details",
+        element: <Overview />,
+    },
+    {
+        name: "Guests",
+        path: "/guests",
+        element: <Overview />,
+    },
+    {
+        name: "Preferences",
+        path: "/preferences",
+        element: <Overview />,
+    },
+    {
+        name: "Tasks",
+        path: "/tasks",
+        element: <Overview />,
+    },
+    {
+        name: "Venue Seats",
+        path: "/venue-seats",
+        element: <Overview />,
+    },
+    {
+        name: "Seating",
+        path: "/seating",
+        element: <Overview />,
+    },
+    {
+        name: "To Do",
+        path: "/notes",
+        element: <Overview />,
+    }
+]
 
 const Navbar = () => {
     const handleLogout = async () => {
@@ -18,32 +57,18 @@ const Navbar = () => {
         <nav className="navbar">
             <Group>
                 <div className="navbar-logo">
-                    <Link to="/home">
+                    <Link to="/">
                         <img src={logo} alt="logo" className="logo" />
                     </Link>
                 </div>
                 <ul className="navbar-links">
-                    <li>
-                        <Link to="/event-details">Event Details</Link>
-                    </li>
-                    <li>
-                        <Link to="/guests">Guests</Link>
-                    </li>
-                    <li>
-                        <Link to="/preferences">Preferences</Link>
-                    </li>
-                    <li>
-                        <Link to="/tasks">Tasks</Link>
-                    </li>
-                    <li>
-                        <Link to="/venue-seats">Venue Seats</Link>
-                    </li>
-                    <li>
-                        <Link to="/seating">Seating</Link>
-                    </li>
-                    <li>
-                        <Link to="/notes">To Do</Link>
-                    </li>
+                    {
+                        ENDPOINTS.map((endpoint) => (
+                            <li key={endpoint.name}>
+                                <Link to={endpoint.path}>{endpoint.name}</Link>
+                            </li>
+                        ))
+                    }
                 </ul>
             </Group>
 

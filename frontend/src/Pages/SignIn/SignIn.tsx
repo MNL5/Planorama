@@ -13,29 +13,34 @@ import { useNavigate } from 'react-router-dom';
 import useAuthForm from '../../hooks/useFormAuth';
 import { toast } from 'react-toastify';
 import { cacheAuthInfo } from '../../Utils/AuthUtil';
-import authService from '../../services/Auth/AuthService';
+import authService from '../../Services/Auth/AuthService';
+import { CircularProgress } from "@mui/material";
 import './SignIn.css';
+import { useTransition } from 'react';
 
 const SignIn = () => {
     const form = useAuthForm();
+    const [isPending, startTransition] = useTransition();
     const navigate = useNavigate();
 
-    const handleSubmit = async (values) => {
-        const { email, password } = values;       
+    const handleSubmit = (values) => {
+        startTransition(async () => {
+            const { email, password } = values;       
 
-        try {
-            const tokens = (
-              await authService.signIn({ email, password }).request
-            ).data;
-            cacheAuthInfo(tokens);
-        } catch (error) {
-            console.error(error);
-            const innerError = error as {
-              response: { data: string };
-              message: string;
-            };
-            toast.error(innerError.response.data || "Problem has occured");
-        }
+            try {
+                const tokens = (
+                  await authService.signIn({ email, password }).request
+                ).data;
+                cacheAuthInfo(tokens);
+            } catch (error) {
+                console.error(error);
+                const innerError = error as {
+                  response: { data: string };
+                  message: string;
+                };
+                toast.error(innerError.response.data || "Problem has occured");
+            }
+        })
     };
 
     return (
@@ -46,7 +51,8 @@ const SignIn = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8 }}
             >
-                <Card shadow="lg" radius="md" p="xl" className="auth-card">
+                <Card shadow="lg" radius="md" p="xl" className="auth-card" style={isPending ? { pointerEvents: "none", opacity: .4 } : {}}>
+                    {isPending && <CircularProgress color="secondary" style={{position: "absolute", top: "40%", left: "45%", zIndex: 10, opacity: 1}} /> }
                     <Title order={2} className="auth-title">
                         Sign In
                     </Title>
