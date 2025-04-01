@@ -1,23 +1,33 @@
-import { Container, Text, Title } from '@mantine/core';
+import { Container, Text, Title, Image, Group } from '@mantine/core';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import illustration from '../../assets/couple.png'; // Replace with actual image
-import './HomePage.css';
+import image from '../../assets/couple.png';
+import logo from '../../assets/logo.png';
+import './Home.css';
 
-const HomePage = () => {
+const Home = () => {
     const navigate = useNavigate();
 
     return (
         <div className="homepage">
             {/* Navigation Bar */}
-            <header className="navbar">
+            <header className="home-navbar">
                 <motion.h1
                     className="logo"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ duration: 1 }}
                 >
-                    PLANORAMA
+                    <Group>
+                        <Image
+                            radius="md"
+                            h={32}
+                            w="auto"
+                            fit="contain"
+                            src={logo}
+                        />
+                        PLANORAMA
+                    </Group>
                 </motion.h1>
                 <div className="auth-links">
                     <a href="/signin">Login</a> | <a href="/signup">Register</a>
@@ -53,11 +63,11 @@ const HomePage = () => {
                     animate={{ x: 0, opacity: 1 }}
                     transition={{ duration: 1.2 }}
                 >
-                    <img src={illustration} alt="Wedding Planning" />
+                    <img src={image} alt="couple" />
                 </motion.div>
             </Container>
         </div>
     );
 };
 
-export default HomePage;
+export default Home;

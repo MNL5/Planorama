@@ -1,10 +1,22 @@
-import { Box, Button, PasswordInput, TextInput } from '@mantine/core';
+import {
+    Anchor,
+    Box,
+    Button,
+    Card,
+    Group,
+    PasswordInput,
+    Text,
+    TextInput,
+    Title,
+} from '@mantine/core';
+import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import useAuthForm from '../../hooks/useFormAuth';
 import authService from '../../Services/Auth/AuthService';
+import './SignUp.css';
 
 const SignUp = () => {
-    const form = useAuthForm(true); // Pass true to enable confirm password validation
+    const form = useAuthForm(true); // Enable confirm password validation
     const navigate = useNavigate();
 
     const handleSubmit = (values) => {
@@ -15,29 +27,51 @@ const SignUp = () => {
     };
 
     return (
-        <Box maw={400} mx="auto">
-            <h2>Sign Up</h2>
-            <form onSubmit={form.onSubmit(handleSubmit)}>
-                <TextInput
-                    label="Email"
-                    placeholder="Enter your email"
-                    {...form.getInputProps('email')}
-                />
-                <PasswordInput
-                    label="Password"
-                    placeholder="Enter your password"
-                    {...form.getInputProps('password')}
-                />
-                <PasswordInput
-                    label="Confirm Password"
-                    placeholder="Re-enter your password"
-                    {...form.getInputProps('confirmPassword')}
-                />
-                <Button type="submit" mt="md" fullWidth>
-                    Sign Up
-                </Button>
-            </form>
-        </Box>
+        <div className="auth-page">
+            <motion.div
+                className="auth-container"
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8 }}
+            >
+                <Card shadow="lg" radius="md" p="xl" className="auth-card">
+                    <Title order={2} className="auth-title">Sign Up</Title>
+                    <form onSubmit={form.onSubmit(handleSubmit)}>
+                        <TextInput
+                            label="Email"
+                            placeholder="Enter your email"
+                            className="auth-input"
+                            {...form.getInputProps('email')}
+                        />
+                        <PasswordInput
+                            label="Password"
+                            placeholder="Enter your password"
+                            className="auth-input"
+                            {...form.getInputProps('password')}
+                        />
+                        <PasswordInput
+                            label="Confirm Password"
+                            placeholder="Re-enter your password"
+                            className="auth-input"
+                            {...form.getInputProps('confirmPassword')}
+                        />
+                        <Button type="submit" fullWidth mt="md" className="auth-button">
+                            Sign Up
+                        </Button>
+                    </form>
+                    <Group position="apart" mt="md">
+                        <Text size="sm">Already have an account?</Text>
+                        <Anchor
+                            size="sm"
+                            onClick={() => navigate('/signin')}
+                            className="auth-link"
+                        >
+                            Sign In
+                        </Anchor>
+                    </Group>
+                </Card>
+            </motion.div>
+        </div>
     );
 };
 
