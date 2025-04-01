@@ -2,12 +2,12 @@ import { createTheme, MantineProvider } from '@mantine/core';
 import '@mantine/core/styles.css';
 import { Route, Routes } from 'react-router-dom';
 
-import Home from './Pages/Home/Home.tsx';
-import { Overview } from './components/overview/overview.tsx';
+import Home from './pages/Home/Home.tsx';
+import { Overview } from './components/Overview/Overview.tsx';
 import { mantheme } from './types/mantheme.ts';
-import SignIn from './Pages/SignIn/SignIn.tsx';
-import SignUp from './Pages/SignUp/SignUp.tsx';
-import NotFound from './Pages/NotFound/NotFound.tsx';
+import SignIn from './pages/SignIn/SignIn.tsx';
+import SignUp from './pages/SignUp/SignUp.tsx';
+import NotFound from './pages/NotFound/NotFound.tsx';
 
 const theme = createTheme(mantheme);
 

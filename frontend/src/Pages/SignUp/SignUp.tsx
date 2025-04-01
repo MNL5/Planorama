@@ -12,7 +12,7 @@ import {
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import useAuthForm from '../../hooks/useFormAuth';
-import authService from '../../Services/Auth/AuthService';
+import authService from '../../services/Auth/AuthService';
 import './SignUp.css';
 
 const SignUp = () => {
