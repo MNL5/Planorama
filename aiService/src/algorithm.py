@@ -1,9 +1,10 @@
 import math
 import random
+from functools import reduce
 import numpy as np
 
 class Algorithm:
-    def __init__(self, guests, tables):
+    def __init__(self, guests, tables, relations):
         self.guests = guests
         self.tables = tables
         sortedTables = sorted(tables, key=lambda x: x.numOfSeats)
@@ -14,14 +15,41 @@ class Algorithm:
                 self.seatToTable.append(table.id)
         self.numOfTables = len(sortedTables)
 
-    def happinesFunc(self, guest, i, groupToAmountPerTable):
-        return math.exp(groupToAmountPerTable[self.seatToTable[i]][guest.group] - 1) - 1
+        self.relations = {}
+        for relation in relations:
+            if relation.firstGuestId not in self.relations:
+                self.relations[relation.firstGuestId] = {}
+            if relation.secondGuestId not in self.relations:
+                self.relations[relation.secondGuestId] = {}
+            
+            if relation.type not in self.relations[relation.firstGuestId]:
+                self.relations[relation.firstGuestId][relation.type] = []
+            if relation.type not in self.relations[relation.secondGuestId]:
+                self.relations[relation.secondGuestId][relation.type] = []
+            
+            self.relations[relation.firstGuestId][relation.type].append(relation.secondGuestId)
+            self.relations[relation.secondGuestId][relation.type].append(relation.firstGuestId)
 
-    def happines(self, guests):
+    def happinesFunc(self, guest, i, groupToAmountPerTable, guestToTable):
+        table = self.seatToTable[i]
+        score = groupToAmountPerTable[table][guest.group] - 1
+
+        if guest.name in self.relations:
+            if 'loving' in self.relations[guest.name]:
+                score += reduce(lambda acc, guestId: acc + (1 if guestToTable[guestId] == table else 0), self.relations[guest.name].loving, 0) * 0.5
+            if 'hating' in self.relations[guest.name]:
+                score -= reduce(lambda acc, guestId: acc + (1 if guestToTable[guestId] == table else 0), self.relations[guest.name].hating, 0) * 1.2
+
+        return math.exp(score) - 1
+    
+    def calcHelpers(self, guests):
         groupToAmountPerTable = {}
+        guestToTable = {}
 
         for i, guest in enumerate(guests):
             table = self.seatToTable[i]
+            guestToTable[guest.name] = table
+
             if table not in groupToAmountPerTable:
                 groupToAmountPerTable[table] = {}
             
@@ -29,10 +57,11 @@ class Algorithm:
                 groupToAmountPerTable[table][guest.group] = 0
             groupToAmountPerTable[table][guest.group] += 1
 
-        return [self.happinesFunc(guest, i, groupToAmountPerTable) for i, guest in enumerate(guests) if guests[i].group != "_"]
+        return groupToAmountPerTable, guestToTable
 
     def fitness(self, guests):
-        return sum(self.happines(guests))
+        groupToAmountPerTable, guestToTable = self.calcHelpers(guests)
+        return sum([self.happinesFunc(guest, i, groupToAmountPerTable, guestToTable) for i, guest in enumerate(guests) if guests[i].group != "_"])
 
     def sortGuests(self, guests):
         numOfPrevSeats = 0
