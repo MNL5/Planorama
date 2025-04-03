@@ -13,30 +13,13 @@ import { useNavigate } from 'react-router-dom';
 import useAuthForm from '../../hooks/useFormAuth';
 import authService from '../../Services/Auth/AuthService';
 import './SignUp.css';
-import { toast } from 'react-toastify';
-import { cacheAuthInfo } from '../../Utils/AuthUtil';
-import { useTransition } from 'react';
 import { CircularProgress } from "@mui/material";
+import useLogin from '../../hooks/useLogin';
 
 const SignUp = () => {
     const form = useAuthForm(true); // Enable confirm password validation
-    const [isPending, startTransition] = useTransition();
     const navigate = useNavigate();
-
-    const handleSubmit = async (values) => {
-        startTransition(async () => {
-            const { email, password } = values;
-            console.log('Signup Data:', values);
-            try {
-                const tokens = (await authService.signUp({ email, password }).request).data;
-                cacheAuthInfo(tokens);
-            } catch (error) {
-                console.error(error);
-                const innerError = error as { response: { data: string }; message: string };
-                toast.error(innerError.response.data || "Problem has occured");
-            }
-        })
-    };
+    const {isPending, handleSubmit} = useLogin(authService.signUp);
 
     return (
         <div className="auth-page">

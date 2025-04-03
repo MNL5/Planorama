@@ -11,7 +11,8 @@ import { ToastContainer } from 'react-toastify';
 import useRefresh from './hooks/useRefresh.ts';
 import SignIn from './Pages/SignIn/SignIn.tsx';
 import SignUp from './Pages/SignUp/SignUp.tsx';
-import Navbar, { ENDPOINTS } from './components/navbar/Navbar.tsx';
+import Navbar from './components/navbar/Navbar.tsx';
+import { ENDPOINTS } from './Utils/Endpoints.tsx';
 
 const theme = createTheme(mantheme);
 

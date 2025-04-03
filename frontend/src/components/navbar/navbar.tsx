@@ -4,45 +4,7 @@ import logo from '../../assets/logo.png';
 import './Navbar.css';
 import AuthService from "../../Services/Auth/AuthService";
 import { clearCache } from "../../Utils/AuthUtil";
-import Overview from '../../Pages/Overview/Overview.tsx';
-
-export const ENDPOINTS = [
-    {
-        name: "Event Details",
-        path: "/event-details",
-        element: <Overview />,
-    },
-    {
-        name: "Guests",
-        path: "/guests",
-        element: <Overview />,
-    },
-    {
-        name: "Preferences",
-        path: "/preferences",
-        element: <Overview />,
-    },
-    {
-        name: "Tasks",
-        path: "/tasks",
-        element: <Overview />,
-    },
-    {
-        name: "Venue Seats",
-        path: "/venue-seats",
-        element: <Overview />,
-    },
-    {
-        name: "Seating",
-        path: "/seating",
-        element: <Overview />,
-    },
-    {
-        name: "To Do",
-        path: "/notes",
-        element: <Overview />,
-    }
-]
+import { ENDPOINTS } from '../../Utils/Endpoints';
 
 const Navbar = () => {
     const handleLogout = async () => {

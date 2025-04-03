@@ -1,3 +1,4 @@
+import { AxiosResponse } from 'axios';
 import httpClient from './HttpClient';
 
 const abortablePostRequest = <T>(url: string, body: object) => {
@@ -11,6 +12,11 @@ const abortablePostRequest = <T>(url: string, body: object) => {
         request,
         abort: () => abortController.abort(),
     };
+};
+
+export type abortablePostRequestReturnType<T> = {
+    request: Promise<AxiosResponse<T>>;
+    abort: () => void;
 };
 
 export { abortablePostRequest };
