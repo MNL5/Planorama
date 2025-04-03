@@ -20,10 +20,10 @@ const useLogin = (callback: (Credentials: Credentials) => abortablePostRequestRe
             } catch (error) {
                 console.error(error);
                 const innerError = error as {
-                  response: { data: string };
+                  response: { data: {error: string} };
                   message: string;
                 };
-                toast.error(innerError.response.data || "Problem has occured");
+                toast.error(innerError.response.data.error || "Problem has occured");
             }
         })
     };
