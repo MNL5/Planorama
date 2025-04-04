@@ -41,16 +41,33 @@ class Algorithm:
         seatWithMe = groupToAmountPerTable[table][guest.group] - 1
         score = seatWithMe
 
-        if guest.name in self.relations:
-            if 'loving' in self.relations[guest.name]:
-                score += reduce(lambda acc, guestId: acc + (1 if guestToTable[guestId] == table else 0), self.relations[guest.name].loving, 0) * 0.5
-            if 'hating' in self.relations[guest.name]:
-                score -= reduce(lambda acc, guestId: acc + (1 if guestToTable[guestId] == table else 0), self.relations[guest.name].hating, 0) * 1.2
+        def getNumOf(type):
+            return reduce(lambda acc, guestId: acc + (1 if guestToTable[guestId] == table else 0), self.relations[guest.id][type], 0)
 
-        notSeatingWithPrecent = (self.groupToAmount[guest.group] - seatWithMe) / self.groupToAmount[guest.group]
+        if guest.id in self.relations:
+            if 'must' in self.relations[guest.id]:
+                withMust = getNumOf('must')
+                withoutMust = len(self.relations[guest.id]['must']) - withMust
+                score += withMust * 1.5
+                score -= withoutMust * 5
+            if 'like' in self.relations[guest.id]:
+                score += getNumOf('like')
+            if 'hate' in self.relations[guest.id]:
+                score -= getNumOf('hate') * 1.2
+            if 'must not' in self.relations[guest.id]:
+                withMustNot = getNumOf('must not')
+                score -= withMustNot * 5
+
+        notSeatingWithPrecent = ((self.groupToAmount[guest.group] - 1) - seatWithMe) / (self.groupToAmount[guest.group] - 1)
         groupSizeFactor = self.maxGroupSize / self.groupToAmount[guest.group]
-        score -= notSeatingWithPrecent * groupSizeFactor
-        
+        score -= notSeatingWithPrecent * groupSizeFactor * 5
+
+        if '_' in groupToAmountPerTable[table] and groupToAmountPerTable[table]['_'] > groupToAmountPerTable[table][guest.group]:
+            score -= groupToAmountPerTable[table]['_'] * 0.3
+
+        if groupToAmountPerTable[table][guest.group] == 1:
+            score -= 5
+
         return score
     
     def calcHelpers(self, guests):
@@ -59,7 +76,7 @@ class Algorithm:
 
         for i, guest in enumerate(guests):
             table = self.seatToTable[i]
-            guestToTable[guest.name] = table
+            guestToTable[guest.id] = table
 
             if table not in groupToAmountPerTable:
                 groupToAmountPerTable[table] = {}
