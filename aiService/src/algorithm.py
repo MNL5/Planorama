@@ -97,34 +97,48 @@ class Algorithm:
         return population
 
     def crossover(self, parent1, parent2):
-        child = [None] * len(parent1)
-        chlidSet = set()
+        child1 = [None] * len(parent1)
+        child2 = [None] * len(parent1)
+        chlid1Set = set()
+        chlid2Set = set()
         start = random.randint(0, len(parent1) - 1)
         end = random.randint(start, len(parent1) - 1)
-        for i in range(start, end + 1):
-            child[i] = parent1[i]
-            chlidSet.add(parent1[i])
-        idx = 0
+        for i in range(len(parent1)):
+            if start <= i <= end:
+                child1[i] = parent1[i]
+                chlid1Set.add(parent1[i])
+            else:
+                child2[i] = parent2[i]
+                chlid2Set.add(parent2[i])
+        idx1 = 0
+        idx2 = 0
         for i in range(len(parent2)):
-            if parent2[i] not in chlidSet:
-                while child[idx] is not None:
-                    idx += 1
-                child[idx] = parent2[i]
-                chlidSet.add(parent2[i])
-        return child
+            if parent2[i] not in chlid1Set:
+                while child1[idx1] is not None:
+                    idx1 += 1
+                child1[idx1] = parent2[i]
+                chlid1Set.add(parent2[i])
+            if parent2[i] not in chlid2Set:
+                while child2[idx2] is not None:
+                    idx2 += 1
+                child2[idx2] = parent2[i]
+                chlid2Set.add(parent2[i])
+        return child1, child2
 
     def mutate(self, individual, mutation_rate):
         for i in range(len(individual)):
             if random.random() < mutation_rate:
                 j = random.randint(0, len(individual) - 1)
                 individual[i], individual[j] = individual[j], individual[i]
-
-    def select_parents(self, population, selection_probs):
-        parent1_idx = np.random.choice(len(population), p=selection_probs)
-        parent2_idx = np.random.choice(len(population), p=selection_probs)
-        while parent2_idx == parent1_idx:
-            parent2_idx = np.random.choice(len(population), p=selection_probs)
-        return population[parent1_idx], population[parent2_idx]
+        return individual
+    
+    def selection(self, population, fitnesses, elite_size, tournament_size=3):
+        selected = []
+        for _ in range(len(population) - elite_size):
+            tournament = random.sample(list(zip(population, fitnesses)), tournament_size)
+            winner = max(tournament, key=lambda x: x[1])[0]
+            selected.append(winner)
+        return selected
     
     def solve(self, guests, pop_size=100, elite_size=10, mutation_rate=0.01, generations=100):
         population = self.create_population(guests, pop_size)
@@ -150,14 +164,17 @@ class Algorithm:
             if generations - 1 == generation:
                 break
 
+            population = self.selection(population, fitnesses, elite_size, tournament_size=10)
+
             next_gen = elites.copy()
-            total_fitness = sum(fitnesses)
-            selection_probs = [f / total_fitness for f in fitnesses]
-            for _ in range(len(population) - elite_size):
-                parent1, parent2 = self.select_parents(population, selection_probs)
-                child = self.crossover(parent1, parent2)
-                self.mutate(child, mutation_rate)
-                next_gen.append(child)
+            for i in range(0, len(population), 2):
+                parent1 = population[i]
+                parent2 = population[i + 1]
+
+                child1, child2 = self.crossover(parent1, parent2)
+
+                next_gen.append(self.mutate(child1, mutation_rate))
+                next_gen.append(self.mutate(child2, mutation_rate))
 
             population = next_gen
 
