@@ -6,14 +6,13 @@ import numpy as np
 class Algorithm:
     def __init__(self, guests, tables, relations):
         self.guests = guests
-        self.tables = tables
-        sortedTables = sorted(tables, key=lambda x: x.numOfSeats)
+        self.tables = sorted(tables, key=lambda x: x.numOfSeats)
         
         self.seatToTable = []
-        for table in sortedTables:
-            for i in range(table.numOfSeats):
+        for table in self.tables:
+            for _ in range(table.numOfSeats):
                 self.seatToTable.append(table.id)
-        self.numOfTables = len(sortedTables)
+        self.numOfTables = len(self.tables)
 
         self.relations = {}
         for relation in relations:
@@ -30,9 +29,17 @@ class Algorithm:
             self.relations[relation.firstGuestId][relation.type].append(relation.secondGuestId)
             self.relations[relation.secondGuestId][relation.type].append(relation.firstGuestId)
 
+        self.groupToAmount = {}
+        for guest in guests:
+            if guest.group not in self.groupToAmount:
+                self.groupToAmount[guest.group] = 0
+            self.groupToAmount[guest.group] += 1
+        self.maxGroupSize = max(self.groupToAmount.values())
+
     def happinesFunc(self, guest, i, groupToAmountPerTable, guestToTable):
         table = self.seatToTable[i]
-        score = groupToAmountPerTable[table][guest.group] - 1
+        seatWithMe = groupToAmountPerTable[table][guest.group] - 1
+        score = seatWithMe
 
         if guest.name in self.relations:
             if 'loving' in self.relations[guest.name]:
@@ -40,6 +47,12 @@ class Algorithm:
             if 'hating' in self.relations[guest.name]:
                 score -= reduce(lambda acc, guestId: acc + (1 if guestToTable[guestId] == table else 0), self.relations[guest.name].hating, 0) * 1.2
 
+        notSeatingWithPrecent = (self.groupToAmount[guest.group] - seatWithMe) / self.groupToAmount[guest.group]
+        groupSizeFactor = self.maxGroupSize / self.groupToAmount[guest.group]
+        score -= notSeatingWithPrecent * groupSizeFactor
+
+        if score < 0:
+            return -(math.exp(-score) - 1)
         return math.exp(score) - 1
     
     def calcHelpers(self, guests):
@@ -63,11 +76,12 @@ class Algorithm:
         groupToAmountPerTable, guestToTable = self.calcHelpers(guests)
         return sum([self.happinesFunc(guest, i, groupToAmountPerTable, guestToTable) for i, guest in enumerate(guests) if guests[i].group != "_"])
 
-    def sortGuests(self, guests):
+    def sortGuests(self, guests, isReverse = False):
         numOfPrevSeats = 0
         result = []
         for table in self.tables:
             tableList = sorted(guests[numOfPrevSeats:numOfPrevSeats + table.numOfSeats], key=lambda x: x.group)
+            if isReverse: tableList.reverse()
             numOfPrevSeats += table.numOfSeats
             for guest in tableList:
                 result.append(guest)
@@ -119,6 +133,10 @@ class Algorithm:
 
         for generation in range(generations):
             fitnesses = [self.fitness(individual) for individual in population]
+            minFitness = min(fitnesses)
+            if minFitness < 0:
+                fitnesses = [f - minFitness for f in fitnesses]
+
             fitnessSortedIndexes = np.argsort(fitnesses)
             elites = [population[idx] for idx in fitnessSortedIndexes[-elite_size:]]
 
