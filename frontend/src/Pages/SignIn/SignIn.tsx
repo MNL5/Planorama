@@ -11,19 +11,15 @@ import {
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import useAuthForm from '../../hooks/useFormAuth';
-import authService from '../../services/Auth/AuthService';
+import authService from '../../Services/Auth/AuthService';
+import { CircularProgress } from "@mui/material";
 import './SignIn.css';
+import useLogin from '../../hooks/useLogin';
 
 const SignIn = () => {
     const form = useAuthForm();
+    const {isPending, handleSubmit} = useLogin(authService.signIn);
     const navigate = useNavigate();
-
-    const handleSubmit = (values) => {
-        const { email, password } = values;
-        console.log('Signin Data:', values);
-        authService.signIn({ email, password });
-        navigate('/overview');
-    };
 
     return (
         <div className="auth-page">
@@ -33,7 +29,8 @@ const SignIn = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8 }}
             >
-                <Card shadow="lg" radius="md" p="xl" className="auth-card">
+                <Card shadow="lg" radius="md" p="xl" className="auth-card" style={isPending ? { pointerEvents: "none", opacity: .4 } : {}}>
+                    {isPending && <CircularProgress color="secondary" style={{position: "absolute", top: "40%", left: "45%", zIndex: 10, opacity: 1}} /> }
                     <Title order={2} className="auth-title">
                         Sign In
                     </Title>
