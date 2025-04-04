@@ -50,10 +50,8 @@ class Algorithm:
         notSeatingWithPrecent = (self.groupToAmount[guest.group] - seatWithMe) / self.groupToAmount[guest.group]
         groupSizeFactor = self.maxGroupSize / self.groupToAmount[guest.group]
         score -= notSeatingWithPrecent * groupSizeFactor
-
-        if score < 0:
-            return -(math.exp(-score) - 1)
-        return math.exp(score) - 1
+        
+        return score
     
     def calcHelpers(self, guests):
         groupToAmountPerTable = {}
