@@ -1,6 +1,5 @@
 import {
     Anchor,
-    Box,
     Button,
     Card,
     Group,
@@ -12,19 +11,15 @@ import {
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import useAuthForm from '../../hooks/useFormAuth';
-import authService from '../../services/Auth/AuthService';
+import authService from '../../Services/Auth/AuthService';
 import './SignUp.css';
+import { CircularProgress } from "@mui/material";
+import useLogin from '../../hooks/useLogin';
 
 const SignUp = () => {
     const form = useAuthForm(true); // Enable confirm password validation
     const navigate = useNavigate();
-
-    const handleSubmit = (values) => {
-        const { email, password } = values;
-        console.log('Signup Data:', values);
-        authService.signUp({ email, password });
-        navigate('/overview');
-    };
+    const {isPending, handleSubmit} = useLogin(authService.signUp);
 
     return (
         <div className="auth-page">
@@ -34,7 +29,8 @@ const SignUp = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8 }}
             >
-                <Card shadow="lg" radius="md" p="xl" className="auth-card">
+                <Card shadow="lg" radius="md" p="xl" className="auth-card" style={isPending ? { pointerEvents: "none", opacity: .4 } : {}}>
+                    {isPending && <CircularProgress color="secondary" style={{position: "absolute", top: "40%", left: "45%", zIndex: 10, opacity: 1}} /> }
                     <Title order={2} className="auth-title">Sign Up</Title>
                     <form onSubmit={form.onSubmit(handleSubmit)}>
                         <TextInput
