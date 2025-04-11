@@ -34,6 +34,13 @@ public class UserController {
                 .onErrorResume(Mono::error);
     }
 
+    @PostMapping("/logout")
+    public String logout(@RequestBody @Valid RefreshTokenAction refreshTokenAction) {
+        return userService.logout(refreshTokenAction.refreshToken())
+                .onErrorResume(Mono::error)
+                .block();
+    }
+
     @PostMapping("/refresh")
     public Mono<LoginUserDTO> refresh(@RequestBody @Valid RefreshTokenAction refreshTokenAction) {
         return userService.refreshToken(refreshTokenAction.refreshToken())
