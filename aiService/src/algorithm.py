@@ -6,7 +6,7 @@ import numpy as np
 class Algorithm:
     def __init__(self, guests, tables, relations):
         self.guests = guests
-        self.tables = sorted(tables, key=lambda x: x.numOfSeats)
+        self.tables = tables
         
         self.seatToTable = []
         for table in self.tables:
