@@ -1,8 +1,7 @@
 import os
-import random
-import math
+from functools import reduce
 from .guest import Guest
-import time
+from .table import Table
 from .algorithm import Algorithm
 
 from flask import Flask, request, jsonify, render_template
@@ -36,18 +35,21 @@ def create_app(test_config=None):
         if not isinstance(data, dict):
             return jsonify({"error": "Invalid data format"}), 400
 
-        if 'guests' not in data:
+        if 'guests' not in data or 'tables' not in data:
             return jsonify({"error": "Missing required keys"}), 400
         
         guests = [Guest.from_dict(guest) for guest in data['guests']]         
+        tables = [Table.from_dict(table) for table in data['tables']]     
 
-        numOfTables = math.ceil(len(guests) / 10) + 1
-        numOfSeats = numOfTables * 10
+        numOfSeats = reduce(lambda acc, table: acc + table.numOfSeats, tables, 0)
+
+        if numOfSeats < len(guests):
+            return jsonify({"error": "Not enough seats for all guests"}), 400
 
         for i in range(numOfSeats - len(guests)):
             guests.append(Guest(i, "_"))
 
-        algorithm = Algorithm(guests, numOfTables)
+        algorithm = Algorithm(guests, tables)
         result = algorithm.solve(guests, generations=500, pop_size=200, elite_size=20)
 
         response = {
@@ -55,78 +57,5 @@ def create_app(test_config=None):
         }
 
         return jsonify(response), 200
-
-    @app.route('/seating/poc', methods = ['POST'])
-    def calculatePOC():
-        data = request.get_json()
-        if not data:
-            return jsonify({"error": "No data provided"}), 400
-
-        guests = []
-        for key, value in data.items():
-            for j in range(value):
-                guests.append(Guest(j, key))            
-
-        numOfTables = math.ceil(len(guests) / 10) + 1
-        numOfSeats = numOfTables * 10
-
-        for i in range(numOfSeats - len(guests)):
-            guests.append(Guest(i, "_"))
-
-        algorithm = Algorithm(guests, numOfTables)
-
-        milliseconds = int(time.time() * 1000)
-        result = algorithm.solve(guests, generations=500, pop_size=200, elite_size=20)
-        print(int(time.time() * 1000) - milliseconds)
-
-        fitness = algorithm.fitness(result)
-        resultMat = []
-        for i in range(numOfTables):
-            start = i * 10
-            resultMat.append(list(map(lambda guest: str(guest), sorted(result[start:start + 10]))))
-
-        response = {
-            "numOfSeats": numOfSeats,
-            "result": resultMat,
-            "numOfTables": numOfTables,
-            "fitness": fitness
-        }
-
-        return jsonify(response), 200
-    
-    @app.route('/seating')
-    def seating():
-        guests = []
-        for i in range(10):
-            amount = random.randint(3, 10)
-            for j in range(amount):
-                guests.append(Guest(j, chr(i+65)))
-
-        numOfTables = math.ceil(len(guests) / 10) + 1
-        numOfSeats = numOfTables * 10
-
-        for i in range(numOfSeats - len(guests)):
-            guests.append(Guest(i, "_"))
-
-        groupToAmount = {}
-        for guest in guests:
-            if guest.group not in groupToAmount:
-                groupToAmount[guest.group] = 0
-            groupToAmount[guest.group] += 1
-
-        algorithm = Algorithm(guests, numOfTables)
-
-        milliseconds = int(time.time() * 1000)
-        result = algorithm.solve(guests, generations=500, pop_size=200, elite_size=20)
-        duration = int(time.time() * 1000) - milliseconds
-        print(f"Duration: {duration}ms")
-
-        fitness = algorithm.fitness(result)
-        resultMat = []
-        for i in range(numOfTables):
-            start = i * 10
-            resultMat.append(sorted(result[start:start + 10]))
-
-        return render_template('seating.html', groupToAmount=groupToAmount, numOfSeats=numOfSeats, result=resultMat, numOfTables=numOfTables, fitness=fitness, duration=duration)
 
     return app
