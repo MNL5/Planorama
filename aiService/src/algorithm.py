@@ -1,4 +1,4 @@
-import math
+from .relation import RelationType
 import random
 from functools import reduce
 import numpy as np
@@ -45,17 +45,17 @@ class Algorithm:
             return reduce(lambda acc, guestId: acc + (1 if guestToTable[guestId] == table else 0), self.relations[guest.id][type], 0)
 
         if guest.id in self.relations:
-            if 'must' in self.relations[guest.id]:
-                withMust = getNumOf('must')
-                withoutMust = len(self.relations[guest.id]['must']) - withMust
+            if RelationType.MUST in self.relations[guest.id]:
+                withMust = getNumOf(RelationType.MUST)
+                withoutMust = len(self.relations[guest.id][RelationType.MUST]) - withMust
                 score += withMust * 1.5
                 score -= withoutMust * 5
-            if 'like' in self.relations[guest.id]:
-                score += getNumOf('like')
-            if 'hate' in self.relations[guest.id]:
-                score -= getNumOf('hate') * 1.2
-            if 'must not' in self.relations[guest.id]:
-                withMustNot = getNumOf('must not')
+            if RelationType.LIKE in self.relations[guest.id]:
+                score += getNumOf(RelationType.LIKE)
+            if RelationType.HATE in self.relations[guest.id]:
+                score -= getNumOf(RelationType.HATE) * 1.2
+            if RelationType.MUST_NOT in self.relations[guest.id]:
+                withMustNot = getNumOf(RelationType.MUST_NOT)
                 score -= withMustNot * 5
 
         notSeatingWithPrecent = ((self.groupToAmount[guest.group] - 1) - seatWithMe) / (self.groupToAmount[guest.group] - 1)
