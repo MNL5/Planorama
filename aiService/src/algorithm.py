@@ -3,35 +3,46 @@ import random
 import numpy as np
 
 class Algorithm:
-    def __init__(self, guests, numOfTables):
+    def __init__(self, guests, tables):
         self.guests = guests
-        self.numOfTables = numOfTables
+        self.tables = tables
+        sortedTables = sorted(tables, key=lambda x: x.numOfSeats)
+        
+        self.seatToTable = []
+        for table in sortedTables:
+            for i in range(table.numOfSeats):
+                self.seatToTable.append(table.id)
+        self.numOfTables = len(sortedTables)
 
     def happinesFunc(self, guest, i, groupToAmountPerTable):
-        return math.exp(groupToAmountPerTable[math.floor(i / 10)][guest.group] - 1) - 1
+        return math.exp(groupToAmountPerTable[self.seatToTable[i]][guest.group] - 1) - 1
 
     def happines(self, guests):
-        groupToAmountPerTable = [{} for i in range(self.numOfTables)]
+        groupToAmountPerTable = {}
 
-        for i in range(len(guests)):
-            table = math.floor(i / 10)
-            guest = guests[i]
+        for i, guest in enumerate(guests):
+            table = self.seatToTable[i]
+            if table not in groupToAmountPerTable:
+                groupToAmountPerTable[table] = {}
+            
             if guest.group not in groupToAmountPerTable[table]:
                 groupToAmountPerTable[table][guest.group] = 0
             groupToAmountPerTable[table][guest.group] += 1
 
-        return [self.happinesFunc(guests[i], i, groupToAmountPerTable) for i in range(len(guests)) if guests[i].group != "_"]
+        return [self.happinesFunc(guest, i, groupToAmountPerTable) for i, guest in enumerate(guests) if guests[i].group != "_"]
 
     def fitness(self, guests):
         return sum(self.happines(guests))
 
     def sortGuests(self, guests):
+        numOfPrevSeats = 0
         result = []
-        for tableNum in range(self.numOfTables):
-            start = tableNum * 10
-            table = sorted(guests[start:start + 10])
-            for i in range(len(table)):
-                result.append(table[i])
+        for table in self.tables:
+            tableList = sorted(guests[numOfPrevSeats:numOfPrevSeats + table.numOfSeats], key=lambda x: x.group)
+            numOfPrevSeats += table.numOfSeats
+            for guest in tableList:
+                result.append(guest)
+
         return result
 
     def create_population(self, guests, pop_size):
@@ -39,7 +50,7 @@ class Algorithm:
         for i in range(pop_size):
             individual = guests.copy()
             random.shuffle(individual)
-            population.append(self.sortGuests(individual))
+            population.append(individual)
         return population
 
     def crossover(self, parent1, parent2):
@@ -103,7 +114,7 @@ class Algorithm:
 
             population = next_gen
 
-        for i in range(len(best_individual)):
-            best_individual[i].table = math.floor(i / 10)
+        for i, guest in enumerate(best_individual):
+            guest.table = self.seatToTable[i]
 
         return best_individual
