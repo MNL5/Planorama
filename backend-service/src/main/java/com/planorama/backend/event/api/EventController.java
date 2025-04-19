@@ -48,9 +48,9 @@ public class EventController {
 
     @PutMapping("/{eventId}")
     public Mono<EventDTO> updateEvent(@PathVariable("eventId") UUID eventUUID,
-                                      @RequestBody UpdateEventDTO createEventDTO,
+                                      @RequestBody UpdateEventDTO updateEventDTO,
                                       @NotNull @NotEmpty @RequestAttribute("ownerID") String userID) {
-        return eventService.updateEvent(eventUUID, createEventDTO, userID)
+        return eventService.updateEvent(eventUUID, updateEventDTO, userID)
                 .map(eventMapper::daoToDTO);
     }
 
