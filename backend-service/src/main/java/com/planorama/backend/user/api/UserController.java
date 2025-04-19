@@ -21,19 +21,17 @@ public class UserController {
     }
 
     @PostMapping
-    public LoginUserDTO createUser(@RequestBody @Valid CreateUserAction createUserAction) {
+    public Mono<LoginUserDTO> createUser(@RequestBody @Valid CreateUserAction createUserAction) {
         return userService.createUser(createUserAction)
                 .map(user -> userMapper.daoWithTokensToLoginDto(user.userDAO(), user.accessToken(), user.refreshToken()))
-                .onErrorResume(Mono::error)
-                .block();
+                .onErrorResume(Mono::error);
     }
 
     @PostMapping("/login")
-    public LoginUserDTO login(@RequestBody @Valid LoginUserAction loginUserAction) {
+    public Mono<LoginUserDTO> login(@RequestBody @Valid LoginUserAction loginUserAction) {
         return userService.logicUser(loginUserAction.email(), loginUserAction.password())
                 .map(user -> userMapper.daoWithTokensToLoginDto(user.userDAO(), user.accessToken(), user.refreshToken()))
-                .onErrorResume(Mono::error)
-                .block();
+                .onErrorResume(Mono::error);
     }
 
     @PostMapping("/logout")
@@ -44,10 +42,9 @@ public class UserController {
     }
 
     @PostMapping("/refresh")
-    public LoginUserDTO refresh(@RequestBody @Valid RefreshTokenAction refreshTokenAction) {
+    public Mono<LoginUserDTO> refresh(@RequestBody @Valid RefreshTokenAction refreshTokenAction) {
         return userService.refreshToken(refreshTokenAction.refreshToken())
                 .map(user -> userMapper.daoWithTokensToLoginDto(user.userDAO(), user.accessToken(), user.refreshToken()))
-                .onErrorResume(Mono::error)
-                .block();
+                .onErrorResume(Mono::error);
     }
 }
