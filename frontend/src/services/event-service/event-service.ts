@@ -6,11 +6,21 @@ import {
 import { EventType } from "../../types/event";
 import { AxiosResponse } from "axios";
 
-const createEvent = (event: EventType) =>
-  abortablePostRequest<EventType>("events", event);
+const createEvent = async (event: Omit<EventType, "id">) => {
+  const response = await abortablePostRequest<EventType>(
+    "events",
+    event
+  ).request;
+  return response.data;
+};
 
-const updateEvent = (event: Partial<EventType>) =>
-  abortablePutRequest<EventType>(`events/${event.id}`, event);
+const updateEvent = async (eventToEdit: Omit<EventType, "id">, id: string) => {
+  const response = await abortablePutRequest<EventType>(
+    `events/${id}`,
+    eventToEdit
+  ).request;
+  return response.data;
+};
 
 const getEventList = async () => {
   const response: AxiosResponse<EventType[]> = await abortableGetRequest<

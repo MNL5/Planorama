@@ -1,6 +1,6 @@
 import { isEmpty } from "lodash";
 import { Link } from "react-router-dom";
-import { Flex, Group } from "@mantine/core";
+import { Flex, Group, Button, Text } from "@mantine/core";
 
 import "./navbar.css";
 import logo from "../../assets/logo.png";
@@ -39,10 +39,18 @@ const Navbar = () => {
           </Group>
         )}
 
-        <Flex className="navbar-actions">
-          <button className="logout-btn" onClick={handleLogout}>
-            Logout
-          </button>
+        <Flex
+          className="navbar-actions"
+          ml={!isEmpty(currentEvent) ? 0 : "90vw"}
+        >
+          <Button
+            size={"md"}
+            radius={"md"}
+            variant={"light"}
+            onClick={handleLogout}
+          >
+            <Text size={"md"}>Log Out</Text>
+          </Button>
         </Flex>
       </Flex>
     </nav>
