@@ -1,6 +1,6 @@
-import { abortablePostRequest } from '../AbortableRequest';
-import Auth from './types/Auth';
-import Credentials from './types/Credentials';
+import Auth from './types/auth';
+import Credentials from './types/credentials';
+import { abortablePostRequest } from '../abortable-request';
 
 const signIn = (credentials: Credentials) =>
     abortablePostRequest<Auth>('users/login', { ...credentials });

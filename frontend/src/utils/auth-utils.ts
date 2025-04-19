@@ -1,4 +1,4 @@
-import Auth from '../services/Auth/types/Auth';
+import Auth from '../services/auth-service/types/auth';
 
 const cacheAuthInfo = (auth: Auth) => {
     localStorage.setItem('accessToken', auth.accessToken);
