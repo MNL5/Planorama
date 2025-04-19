@@ -2,6 +2,7 @@ import os
 from functools import reduce
 from .guest import Guest
 from .table import Table
+from .relation import Relation
 from .algorithm import Algorithm
 
 from flask import Flask, request, jsonify, render_template
@@ -35,11 +36,12 @@ def create_app(test_config=None):
         if not isinstance(data, dict):
             return jsonify({"error": "Invalid data format"}), 400
 
-        if 'guests' not in data or 'tables' not in data:
+        if 'guests' not in data or 'tables' not in data or 'relations' not in data:
             return jsonify({"error": "Missing required keys"}), 400
         
         guests = [Guest.from_dict(guest) for guest in data['guests']]         
         tables = [Table.from_dict(table) for table in data['tables']]     
+        relations = [Relation.from_dict(relation) for relation in data['relations']]     
 
         numOfSeats = reduce(lambda acc, table: acc + table.numOfSeats, tables, 0)
 
@@ -49,7 +51,7 @@ def create_app(test_config=None):
         for i in range(numOfSeats - len(guests)):
             guests.append(Guest(i, "_"))
 
-        algorithm = Algorithm(guests, tables)
+        algorithm = Algorithm(guests, tables, relations)
         result = algorithm.solve(guests, generations=500, pop_size=200, elite_size=20)
 
         response = {
