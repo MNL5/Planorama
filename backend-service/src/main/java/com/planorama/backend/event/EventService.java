@@ -4,6 +4,7 @@ import com.planorama.backend.event.api.CreateEventDTO;
 import com.planorama.backend.event.api.UpdateEventDTO;
 import com.planorama.backend.event.entity.EventDAO;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import org.bson.BsonBinarySubType;
 import org.bson.types.Binary;
@@ -29,11 +30,11 @@ public class EventService {
     public EventService(ReactiveMongoTemplate reactiveMongoTemplate) {
         this.reactiveMongoTemplate = reactiveMongoTemplate;
         this.updateFields = Map.of(
-                "name", UpdateEventDTO::name,
-                "invitationText", UpdateEventDTO::invitationText,
-                "invitationImg", u -> u.invitationImg() != null ? new Binary(BsonBinarySubType.BINARY, u.invitationImg().getBytes()) : null,
-                "time", u -> u.time() != null ? u.time().toInstant().toEpochMilli() : null,
-                "diagram", UpdateEventDTO::diagram
+                EventDAO.NAME_FIELD, UpdateEventDTO::name,
+                EventDAO.INVITATION_TEXT_FIELD, UpdateEventDTO::invitationText,
+                EventDAO.INVITATION_IMAGE_FIELD, u -> u.invitationImg() != null ? new Binary(BsonBinarySubType.BINARY, u.invitationImg().getBytes()) : null,
+                EventDAO.TIME_FIELD, u -> u.time() != null ? u.time().toInstant().toEpochMilli() : null,
+                EventDAO.DIAGRAM_FIELD, UpdateEventDTO::diagram
         );
     }
 
@@ -41,19 +42,19 @@ public class EventService {
         return reactiveMongoTemplate.findById(eventUUID, EventDAO.class);
     }
 
-    public Flux<EventDAO> findAll() {
-        return reactiveMongoTemplate.findAll(EventDAO.class);
+    public Flux<EventDAO> findAllByUserID(String userID) {
+        return reactiveMongoTemplate.find(Query.query(where(EventDAO.OWNER_ID_FIELD).is(userID)), EventDAO.class);
     }
 
-    public Mono<EventDAO> createEvent(@Valid @NotNull CreateEventDTO createEventDTO) {
-        return Mono.just(createEventDTO)
-                .map(this::createEventDAO)
+    public Mono<EventDAO> createEvent(@Valid @NotNull CreateEventDTO createEventDTO, String userID) {
+        return Mono.just(this.createEventDAO(createEventDTO, userID))
                 .flatMap(reactiveMongoTemplate::save)
                 .switchIfEmpty(Mono.error(new RuntimeException("Failed to create an event")));
     }
 
-    private EventDAO createEventDAO(CreateEventDTO createEventDTO) {
+    private EventDAO createEventDAO(CreateEventDTO createEventDTO, String userID) {
         return new EventDAO(UUID.randomUUID(),
+                userID,
                 createEventDTO.name(),
                 createEventDTO.invitationText(),
                 new Binary(BsonBinarySubType.BINARY, createEventDTO.invitationImg().getBytes()),
@@ -61,10 +62,10 @@ public class EventService {
                 null);
     }
 
-    public Mono<EventDAO> updateEvent(@Valid @NotNull UUID eventID, @Valid @NotNull UpdateEventDTO updateEventDTO) {
+    public Mono<EventDAO> updateEvent(@Valid @NotNull UUID eventID, @Valid @NotNull UpdateEventDTO updateEventDTO, @NotNull @NotEmpty String userID) {
         return Mono.just(updateEventDTO)
                 .map(this::createUpdateCommand)
-                .flatMap(updateCommand -> reactiveMongoTemplate.findAndModify(Query.query(where("id").is(eventID)),
+                .flatMap(updateCommand -> reactiveMongoTemplate.findAndModify(Query.query(where(EventDAO.ID_FIELD).is(eventID).and(EventDAO.OWNER_ID_FIELD).is(userID)),
                         updateCommand,
                         EventDAO.class));
     }
@@ -79,7 +80,7 @@ public class EventService {
         return update;
     }
 
-    public Mono<EventDAO> deleteEvent(@Valid @NotNull UUID eventID) {
-        return reactiveMongoTemplate.findAndRemove(Query.query(where("id").is(eventID)), EventDAO.class);
+    public Mono<EventDAO> deleteEvent(@Valid @NotNull UUID eventID, @NotNull @NotEmpty String userID) {
+        return reactiveMongoTemplate.findAndRemove(Query.query(where(EventDAO.ID_FIELD).is(eventID).and(EventDAO.OWNER_ID_FIELD).is(userID)), EventDAO.class);
     }
 }

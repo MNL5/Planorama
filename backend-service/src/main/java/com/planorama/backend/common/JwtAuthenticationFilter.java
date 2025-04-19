@@ -38,7 +38,7 @@ public class JwtAuthenticationFilter implements Filter {
         }
 
         try {
-            jwtUtil.verifyToken(token);
+            httpRequest.setAttribute("userID", jwtUtil.verifyToken(token));
             filterChain.doFilter(request, response);
         } catch (Exception e) {
             ((HttpServletResponse) response).sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid or expired token");

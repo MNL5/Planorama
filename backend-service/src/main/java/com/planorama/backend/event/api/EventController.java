@@ -2,6 +2,8 @@ package com.planorama.backend.event.api;
 
 import com.planorama.backend.event.EventService;
 import com.planorama.backend.event.mapper.EventMapper;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -27,8 +29,8 @@ public class EventController {
     }
 
     @GetMapping("/list")
-    public Flux<EventDTO> getAllEvents() {
-        return eventService.findAll()
+    public Flux<EventDTO> getAllEvents(@NotNull @NotEmpty @RequestAttribute("ownerID") String userID) {
+        return eventService.findAllByUserID(userID)
                 .map(eventMapper::daoToDTO);
     }
 
@@ -38,21 +40,24 @@ public class EventController {
     }
 
     @PostMapping
-    public Mono<EventDTO> createEvent(@RequestBody CreateEventDTO createEventDTO) {
-        return eventService.createEvent(createEventDTO)
+    public Mono<EventDTO> createEvent(@RequestBody CreateEventDTO createEventDTO,
+                                      @NotNull @NotEmpty @RequestAttribute("ownerID") String userID) {
+        return eventService.createEvent(createEventDTO, userID)
                 .map(eventMapper::daoToDTO);
     }
 
     @PutMapping("/{eventId}")
     public Mono<EventDTO> updateEvent(@PathVariable("eventId") UUID eventUUID,
-                                      @RequestBody UpdateEventDTO createEventDTO) {
-        return eventService.updateEvent(eventUUID, createEventDTO)
+                                      @RequestBody UpdateEventDTO createEventDTO,
+                                      @NotNull @NotEmpty @RequestAttribute("ownerID") String userID) {
+        return eventService.updateEvent(eventUUID, createEventDTO, userID)
                 .map(eventMapper::daoToDTO);
     }
 
     @DeleteMapping("/{eventId}")
-    public Mono<EventDTO> deleteEvent(@PathVariable("eventId") UUID eventID) {
-        return eventService.deleteEvent(eventID)
+    public Mono<EventDTO> deleteEvent(@PathVariable("eventId") UUID eventID,
+                                      @NotNull @NotEmpty @RequestAttribute("ownerID") String userID) {
+        return eventService.deleteEvent(eventID, userID)
                 .map(eventMapper::daoToDTO);
     }
 }
