@@ -15,6 +15,8 @@ import SignUp from "./components/sign-up/sign-up.tsx";
 import Overview from "./components/overview/overview.tsx";
 import { useEventListener } from "./hooks/use-event-listener.ts";
 import { EventContextProvider } from "./contexts/event-context.tsx";
+import { CreateEvent } from "./components/create-event/create-event.tsx";
+import { useFetchEventsList } from "./hooks/use-fetch-events-list.ts";
 
 const theme = createTheme(mantheme);
 
@@ -23,6 +25,7 @@ const LOGIN_EVENT = "loginEvent";
 const App: React.FC = () => {
   const [isLogged, setLogged] = useState<boolean>(false);
   const { isLoading } = useRefresh();
+  const { doesUserHaveEvents } = useFetchEventsList(isLogged);
 
   useEventListener(LOGIN_EVENT, (event: CustomEvent) =>
     setLogged(event.detail)
@@ -51,11 +54,21 @@ const App: React.FC = () => {
           theme={"colored"}
           style={{ zIndex: "999999999999" }}
         />
-        {isLogged && <Navbar />}
+        {isLogged && doesUserHaveEvents && <Navbar />}
         <Routes>
           <Route
             path="/"
-            element={isLogged ? <Navigate replace to="/overview" /> : <Home />}
+            element={
+              isLogged ? (
+                doesUserHaveEvents ? (
+                  <Navigate replace to="/overview" />
+                ) : (
+                  <Navigate replace to="/createEvent" />
+                )
+              ) : (
+                <Home />
+              )
+            }
           />
           {isLogged ? (
             <>
@@ -67,6 +80,7 @@ const App: React.FC = () => {
                   element={endpoint.element}
                 />
               ))}
+              <Route path="/createEvent" element={<CreateEvent />} />
             </>
           ) : (
             <>

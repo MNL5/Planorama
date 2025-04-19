@@ -1,13 +1,13 @@
-import { useTransition } from 'react';
-import { toast } from 'react-toastify';
+import { useTransition } from "react";
+import { toast } from "react-toastify";
 
-import { cacheAuthInfo } from '../utils/auth-utils';
-import Auth from '../services/auth-service/types/auth';
-import Credentials from '../services/auth-service/types/credentials';
-import { abortablePostRequestReturnType } from '../services/abortable-request';
+import { cacheAuthInfo } from "../utils/auth-utils";
+import Auth from "../services/auth-service/types/auth";
+import Credentials from "../services/auth-service/types/credentials";
+import { AbortableRequestReturnType } from "../services/abortable-request";
 
 const useLogin = (
-  callback: (Credentials: Credentials) => abortablePostRequestReturnType<Auth>
+  callback: (Credentials: Credentials) => AbortableRequestReturnType<Auth>
 ) => {
   const [isPending, startTransition] = useTransition();
 
@@ -24,7 +24,7 @@ const useLogin = (
           response: { data: { error: string } };
           message: string;
         };
-        toast.error(innerError.response.data.error || 'Problem has occured');
+        toast.error(innerError.response.data.error || "Problem has occured");
       }
     });
   };

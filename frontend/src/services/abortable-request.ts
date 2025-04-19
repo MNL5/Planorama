@@ -31,19 +31,20 @@ const abortablePutRequest = <T>(url: string, body: object) => {
 const abortableGetRequest = <T>(url: string) => {
   const abortController = new AbortController();
 
-  const response = httpClient.get<T>(url, {
+  const request = httpClient.get<T>(url, {
     signal: abortController.signal,
   });
 
   return {
-    response,
+    request,
     abort: () => abortController.abort(),
   };
 };
 
-export type abortablePostRequestReturnType<T> = {
+type AbortableRequestReturnType<T> = {
   request: Promise<AxiosResponse<T>>;
   abort: () => void;
 };
 
+export type { AbortableRequestReturnType };
 export { abortablePostRequest, abortableGetRequest, abortablePutRequest };
