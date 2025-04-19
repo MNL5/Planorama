@@ -5,6 +5,7 @@ import { Route, Routes, Navigate } from "react-router-dom";
 import { createTheme, MantineProvider } from "@mantine/core";
 
 import "@mantine/core/styles.css";
+import '@mantine/dates/styles.css';
 import Home from "./components/home/home.tsx";
 import { mantheme } from "./types/mantheme.ts";
 import useRefresh from "./hooks/use-refresh.ts";
@@ -54,7 +55,7 @@ const App: React.FC = () => {
           theme={"colored"}
           style={{ zIndex: "999999999999" }}
         />
-        {isLogged && doesUserHaveEvents && <Navbar />}
+        {isLogged && <Navbar />}
         <Routes>
           <Route
             path="/"
@@ -80,7 +81,10 @@ const App: React.FC = () => {
                   element={endpoint.element}
                 />
               ))}
-              <Route path="/createEvent" element={<CreateEvent />} />
+              <Route
+                path="/createEvent"
+                element={<CreateEvent eventToEdit={null} />}
+              />
             </>
           ) : (
             <>
