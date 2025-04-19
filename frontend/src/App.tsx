@@ -5,7 +5,7 @@ import { Route, Routes, Navigate } from "react-router-dom";
 import { createTheme, MantineProvider } from "@mantine/core";
 
 import "@mantine/core/styles.css";
-import '@mantine/dates/styles.css';
+import "@mantine/dates/styles.css";
 import Home from "./components/home/home.tsx";
 import { mantheme } from "./types/mantheme.ts";
 import useRefresh from "./hooks/use-refresh.ts";
@@ -26,13 +26,14 @@ const LOGIN_EVENT = "loginEvent";
 const App: React.FC = () => {
   const [isLogged, setLogged] = useState<boolean>(false);
   const { isLoading } = useRefresh();
-  const { doesUserHaveEvents } = useFetchEventsList(isLogged);
+  const { doesUserHaveEvents, isLoadingEventsList } =
+    useFetchEventsList(isLogged);
 
   useEventListener(LOGIN_EVENT, (event: CustomEvent) =>
     setLogged(event.detail)
   );
 
-  if (isLoading)
+  if (isLoading || (isLogged && isLoadingEventsList))
     return (
       <CircularProgress
         color="secondary"

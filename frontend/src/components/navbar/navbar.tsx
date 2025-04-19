@@ -19,6 +19,8 @@ const Navbar = () => {
     }
   };
 
+  console.log(currentEvent);
+
   return (
     <nav className="navbar">
       <Flex>

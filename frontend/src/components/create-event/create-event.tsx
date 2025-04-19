@@ -11,21 +11,23 @@ import {
 import { isEmpty, isNil } from "lodash";
 import { useForm } from "@mantine/form";
 import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { DateTimePicker } from "@mantine/dates";
 import { useMutation } from "@tanstack/react-query";
 
-import { EventType } from "../../types/event";
 import {
   createEvent,
   updateEvent,
 } from "../../services/event-service/event-service";
-import { useNavigate } from "react-router-dom";
+import { EventType } from "../../types/event";
 import { fileToBase64 } from "../../utils/image-utils";
+import { useEventContext } from "../../contexts/event-context";
 
 const CreateEvent: React.FC<{ eventToEdit: EventType | null }> = ({
   eventToEdit,
 }) => {
   const navigate = useNavigate();
+  const { setCurrentEvent } = useEventContext();
   const [invitationImage, setInvitationImage] = useState<File | null>(null);
 
   const form = useForm({
@@ -73,7 +75,8 @@ const CreateEvent: React.FC<{ eventToEdit: EventType | null }> = ({
         return createEvent(newEvent);
       }
     },
-    onSuccess: () => {
+    onSuccess: (event: EventType) => {
+      setCurrentEvent(event);
       navigate("/overview");
     },
   });
