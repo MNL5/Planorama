@@ -5,9 +5,7 @@ import { BrowserRouter as Router } from "react-router-dom";
 
 import { App } from "./App.tsx";
 
-const queryClient = new QueryClient({
-  defaultOptions: { queries: { staleTime: 1000 * 60 * 60 * 24 } },
-});
+const queryClient = new QueryClient();
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>

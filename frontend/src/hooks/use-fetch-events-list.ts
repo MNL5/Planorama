@@ -19,8 +19,6 @@ const useFetchEventsList = (isLogged: boolean) => {
     return !isLoadingEventsList ? !isEmpty(eventsList) : null;
   }, [eventsList, isLoadingEventsList]);
 
-  console.log(doesUserHaveEvents);
-
   return { eventsList, isLoadingEventsList, doesUserHaveEvents };
 };
 
