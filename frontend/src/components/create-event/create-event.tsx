@@ -31,12 +31,12 @@ const CreateEvent: React.FC<{ eventToEdit: EventType | null }> = ({
   const form = useForm({
     initialValues: {
       eventName: eventToEdit?.name ?? "",
-      invitationTxt: eventToEdit?.invitationTxt ?? "",
+      invitationText: eventToEdit?.invitationText ?? "",
       eventDate: eventToEdit?.time ?? new Date(),
     },
     validate: {
       eventName: (value) => (value.trim() ? null : "event name is required"),
-      invitationTxt: (value) =>
+      invitationText: (value) =>
         value.trim() ? null : "event invitation text is required",
       eventDate: (value) => (value ? null : "Please select a date and time"),
     },
@@ -108,11 +108,12 @@ const CreateEvent: React.FC<{ eventToEdit: EventType | null }> = ({
       <form
         onSubmit={form.onSubmit(async (values) => {
           const image = (await getBase64Image()) ?? eventToEdit?.invitationImg;
+          console.log(image);
           if (image) {
             mutateEvent({
               name: values.eventName,
               invitationImg: image as string,
-              invitationTxt: values.invitationTxt,
+              invitationText: values.invitationText,
               time: values.eventDate,
             });
           }
@@ -141,9 +142,9 @@ const CreateEvent: React.FC<{ eventToEdit: EventType | null }> = ({
             size={"xl"}
             label="Event invitation text"
             placeholder="We’d be honored to have you celebrate our special day with us."
-            key={form.key("invitationTxt")}
-            {...form.getInputProps("invitationTxt")}
-            error={form.errors.invitationTxt}
+            key={form.key("invitationText")}
+            {...form.getInputProps("invitationText")}
+            error={form.errors.invitationText}
           />
           <Flex justify={"flex-end"}>
             <Button

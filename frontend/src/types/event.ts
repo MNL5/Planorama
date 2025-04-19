@@ -1,7 +1,7 @@
 type EventType = {
   id: string;
   name: string;
-  invitationTxt: string;
+  invitationText: string;
   invitationImg: string;
   time: Date;
 };
