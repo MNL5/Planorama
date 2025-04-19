@@ -19,11 +19,9 @@ const Navbar = () => {
     }
   };
 
-  console.log(currentEvent);
-
   return (
     <nav className="navbar">
-      <Flex>
+      <Flex align={'center'}>
         {!isEmpty(currentEvent) && (
           <Group>
             <div className="navbar-logo">
@@ -43,7 +41,7 @@ const Navbar = () => {
 
         <Flex
           className="navbar-actions"
-          ml={!isEmpty(currentEvent) ? 0 : "90vw"}
+          ml={!isEmpty(currentEvent) ? "52vw" : "90vw"}
         >
           <Button
             size={"md"}

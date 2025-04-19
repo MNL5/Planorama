@@ -15,9 +15,8 @@ import SignIn from "./components/sign-in/sign-in.tsx";
 import SignUp from "./components/sign-up/sign-up.tsx";
 import Overview from "./components/overview/overview.tsx";
 import { useEventListener } from "./hooks/use-event-listener.ts";
-import { EventContextProvider } from "./contexts/event-context.tsx";
-import { CreateEvent } from "./components/create-event/create-event.tsx";
 import { useFetchEventsList } from "./hooks/use-fetch-events-list.ts";
+import { CreateEvent } from "./components/create-event/create-event.tsx";
 
 const theme = createTheme(mantheme);
 
@@ -43,59 +42,57 @@ const App: React.FC = () => {
 
   return (
     <MantineProvider theme={theme}>
-      <EventContextProvider>
-        <ToastContainer
-          position="top-right"
-          autoClose={3000}
-          hideProgressBar={false}
-          newestOnTop
-          closeOnClick
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-          theme={"colored"}
-          style={{ zIndex: "999999999999" }}
-        />
-        {isLogged && <Navbar />}
-        <Routes>
-          <Route
-            path="/"
-            element={
-              isLogged ? (
-                doesUserHaveEvents ? (
-                  <Navigate replace to="/overview" />
-                ) : (
-                  <Navigate replace to="/createEvent" />
-                )
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme={"colored"}
+        style={{ zIndex: "999999999999" }}
+      />
+      {isLogged && <Navbar />}
+      <Routes>
+        <Route
+          path="/"
+          element={
+            isLogged ? (
+              doesUserHaveEvents ? (
+                <Navigate replace to="/overview" />
               ) : (
-                <Home />
+                <Navigate replace to="/createEvent" />
               )
-            }
-          />
-          {isLogged ? (
-            <>
-              <Route path="/overview" element={<Overview />} />
-              {ENDPOINTS.map((endpoint) => (
-                <Route
-                  key={endpoint.path}
-                  path={endpoint.path}
-                  element={endpoint.element}
-                />
-              ))}
+            ) : (
+              <Home />
+            )
+          }
+        />
+        {isLogged ? (
+          <>
+            <Route path="/overview" element={<Overview />} />
+            {ENDPOINTS.map((endpoint) => (
               <Route
-                path="/createEvent"
-                element={<CreateEvent eventToEdit={null} />}
+                key={endpoint.path}
+                path={endpoint.path}
+                element={endpoint.element}
               />
-            </>
-          ) : (
-            <>
-              <Route path="/signin" element={<SignIn />} />
-              <Route path="/signup" element={<SignUp />} />
-            </>
-          )}
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </EventContextProvider>
+            ))}
+            <Route
+              path="/createEvent"
+              element={<CreateEvent eventToEdit={null} />}
+            />
+          </>
+        ) : (
+          <>
+            <Route path="/signin" element={<SignIn />} />
+            <Route path="/signup" element={<SignUp />} />
+          </>
+        )}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
     </MantineProvider>
   );
 };
