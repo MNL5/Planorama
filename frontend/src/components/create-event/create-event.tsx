@@ -29,7 +29,6 @@ const CreateEvent: React.FC<{ eventToEdit: EventType | null }> = ({
   const [invitationImage, setInvitationImage] = useState<File | null>(null);
 
   const form = useForm({
-    mode: "uncontrolled",
     initialValues: {
       eventName: eventToEdit?.name ?? "",
       invitationTxt: eventToEdit?.invitationTxt ?? "",
@@ -51,11 +50,12 @@ const CreateEvent: React.FC<{ eventToEdit: EventType | null }> = ({
     }
   }, [invitationImage, eventToEdit]);
 
-  const base64Image = useMemo(async () => {
+  const getBase64Image = async () => {
     if (invitationImage) {
-      return (await fileToBase64(invitationImage)) as string;
+      return await fileToBase64(invitationImage);
     }
-  }, [invitationImage]);
+    return null;
+  };
 
   const handeImageReset = () => {
     setInvitationImage(null);
@@ -77,19 +77,6 @@ const CreateEvent: React.FC<{ eventToEdit: EventType | null }> = ({
       navigate("/overview");
     },
   });
-
-  const handleSave = async (event: React.FormEvent) => {
-    event.preventDefault();
-    const image = (await base64Image) ?? eventToEdit?.invitationImg;
-    if (image) {
-      mutateEvent({
-        name: form.getValues().eventName,
-        invitationImg: image,
-        invitationTxt: form.getValues().eventName,
-        time: form.getValues().eventDate,
-      });
-    }
-  };
 
   return (
     <Flex w={"100%"} align={"center"} justify={"space-evenly"} mt={"18vh"}>
@@ -118,8 +105,20 @@ const CreateEvent: React.FC<{ eventToEdit: EventType | null }> = ({
           </Button>
         )}
       </Flex>
-      <Stack gap={"xl"}>
-        <form onSubmit={handleSave}>
+      <form
+        onSubmit={form.onSubmit(async (values) => {
+          const image = (await getBase64Image()) ?? eventToEdit?.invitationImg;
+          if (image) {
+            mutateEvent({
+              name: values.eventName,
+              invitationImg: image as string,
+              invitationTxt: values.invitationTxt,
+              time: values.eventDate,
+            });
+          }
+        })}
+      >
+        <Stack gap={"xl"}>
           <TextInput
             w={400}
             size={"xl"}
@@ -127,13 +126,15 @@ const CreateEvent: React.FC<{ eventToEdit: EventType | null }> = ({
             placeholder="What's your event?"
             key={form.key("eventName")}
             {...form.getInputProps("eventName")}
+            error={form.errors.eventName}
           />
           <DateTimePicker
-            size={"xl"}
+            size={"lg"}
             clearable
             label="Event date and time"
             placeholder="Choose date and time of the event"
             {...form.getInputProps("eventDate")}
+            error={form.errors.eventDate}
           />
           <Textarea
             w={400}
@@ -142,6 +143,7 @@ const CreateEvent: React.FC<{ eventToEdit: EventType | null }> = ({
             placeholder="We’d be honored to have you celebrate our special day with us."
             key={form.key("invitationTxt")}
             {...form.getInputProps("invitationTxt")}
+            error={form.errors.invitationTxt}
           />
           <Flex justify={"flex-end"}>
             <Button
@@ -149,14 +151,13 @@ const CreateEvent: React.FC<{ eventToEdit: EventType | null }> = ({
               size={"md"}
               radius={"md"}
               type={"submit"}
-              onClick={handleSave}
               variant={"transparent"}
             >
               <Text size={"md"}>Save</Text>
             </Button>
           </Flex>
-        </form>
-      </Stack>
+        </Stack>
+      </form>
     </Flex>
   );
 };
