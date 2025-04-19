@@ -1,9 +1,10 @@
-import { Container, Text, Title, Image, Group } from '@mantine/core';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import image from '../../assets/couple.png';
+import { Container, Text, Title, Image, Group } from '@mantine/core';
+
+import './home.css';
 import logo from '../../assets/logo.png';
-import './Home.css';
+import image from '../../assets/couple.png';
 
 const Home = () => {
     const navigate = useNavigate();

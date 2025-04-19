@@ -1,4 +1,4 @@
-import Overview from '../Pages/Overview/Overview';
+import Overview from '../components/overview/overview';
 
 export const ENDPOINTS = [
     {

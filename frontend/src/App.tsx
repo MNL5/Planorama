@@ -1,18 +1,19 @@
-import { createTheme, MantineProvider } from '@mantine/core';
-import '@mantine/core/styles.css';
-import { Route, Routes, Navigate } from 'react-router-dom';
-import { CircularProgress } from "@mui/material";
-import Home from './Pages/Home/Home.tsx';
-import Overview from './Pages/Overview/Overview.tsx';
-import { mantheme } from './types/mantheme.ts';
 import { useState } from 'react';
-import { useEventListener } from './hooks/useEventListener.ts';
 import { ToastContainer } from 'react-toastify';
-import useRefresh from './hooks/useRefresh.ts';
-import SignIn from './Pages/SignIn/SignIn.tsx';
-import SignUp from './Pages/SignUp/SignUp.tsx';
-import Navbar from './components/navbar/Navbar.tsx';
-import { ENDPOINTS } from './Utils/Endpoints.tsx';
+import { CircularProgress } from "@mui/material";
+import { Route, Routes, Navigate } from 'react-router-dom';
+import { createTheme, MantineProvider } from '@mantine/core';
+
+import '@mantine/core/styles.css';
+import Home from './components/home/home.tsx';
+import { mantheme } from './types/mantheme.ts';
+import useRefresh from './hooks/use-refresh.ts';
+import { ENDPOINTS } from './utils/end-points.tsx';
+import Navbar from './components/navbar/navbar.tsx';
+import SignIn from './components/sign-in/sign-in.tsx';
+import SignUp from './components/sign-up/sign-up.tsx';
+import Overview from './components/overview/overview.tsx';
+import { useEventListener } from './hooks/use-event-listener.ts';
 
 const theme = createTheme(mantheme);
 
@@ -42,7 +43,7 @@ const App: React.FC = () => {
               />
               {isLogged && <Navbar />}
             <Routes>
-                <Route exact path="/" element={isLogged ? <Navigate replace to="/overview" /> : <Home />} />
+                <Route path="/" element={isLogged ? <Navigate replace to="/overview" /> : <Home />} />
                 {
                     isLogged ? 
                     <>

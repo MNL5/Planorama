@@ -1,5 +1,6 @@
 import { AxiosResponse } from 'axios';
-import httpClient from './HttpClient';
+
+import httpClient from './http-client';
 
 const abortablePostRequest = <T>(url: string, body: object) => {
     const abortController = new AbortController();

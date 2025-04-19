@@ -1,10 +1,11 @@
 import { Group } from '@mantine/core';
 import { Link } from 'react-router-dom';
+
+import './navbar.css';
 import logo from '../../assets/logo.png';
-import './Navbar.css';
-import AuthService from "../../Services/Auth/AuthService";
-import { clearCache } from "../../Utils/AuthUtil";
-import { ENDPOINTS } from '../../Utils/Endpoints';
+import { ENDPOINTS } from '../../utils/end-points';
+import { clearCache } from "../../utils/auth-utils";
+import AuthService from "../../services/auth-service/auth-service";
 
 const Navbar = () => {
     const handleLogout = async () => {

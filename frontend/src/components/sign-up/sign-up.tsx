@@ -1,20 +1,21 @@
 import {
-    Anchor,
-    Button,
     Card,
-    Group,
-    PasswordInput,
     Text,
-    TextInput,
     Title,
+    Group,
+    Button,
+    Anchor,
+    TextInput,
+    PasswordInput,
 } from '@mantine/core';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import useAuthForm from '../../hooks/useFormAuth';
-import authService from '../../Services/Auth/AuthService';
-import './SignUp.css';
 import { CircularProgress } from "@mui/material";
-import useLogin from '../../hooks/useLogin';
+
+import './sign-up.css';
+import useLogin from '../../hooks/use-login';
+import useAuthForm from '../../hooks/use-form-auth';
+import authService from '../../services/auth-service/auth-service';
 
 const SignUp = () => {
     const form = useAuthForm(true); // Enable confirm password validation
@@ -55,7 +56,7 @@ const SignUp = () => {
                             Sign Up
                         </Button>
                     </form>
-                    <Group position="apart" mt="md">
+                    <Group mt="md">
                         <Text size="sm">Already have an account?</Text>
                         <Anchor
                             size="sm"
