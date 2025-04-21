@@ -5,9 +5,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Set;
 
 @Component
@@ -31,14 +33,19 @@ public class JwtAuthenticationFilter implements Filter {
             }
         }
 
-        final String token = httpRequest.getHeader("Authorization");
+        if (HttpMethod.OPTIONS.matches(httpRequest.getMethod())) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        final String token = httpRequest.getHeader("authorization");
         if (token == null || token.isEmpty()) {
             ((HttpServletResponse) response).sendError(HttpServletResponse.SC_UNAUTHORIZED, "Missing token");
             return;
         }
 
         try {
-            httpRequest.setAttribute("userID", jwtUtil.verifyToken(token));
+            httpRequest.setAttribute("userID", jwtUtil.verifyToken(Arrays.stream(token.split(" ")).toList().getLast()));
             filterChain.doFilter(request, response);
         } catch (Exception e) {
             ((HttpServletResponse) response).sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid or expired token");
