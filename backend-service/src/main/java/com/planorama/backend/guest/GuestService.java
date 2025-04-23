@@ -63,7 +63,7 @@ public class GuestService {
                 null);
     }
 
-    public Mono<GuestDAO> updateGuest(UpdateGuestDTO updateGuestDTO, String guestId) {
+    public Mono<GuestDAO> updateGuest(UpdateGuestDTO updateGuestDTO, UUID guestId) {
         return reactiveMongoTemplate.findAndModify(Query.query(Criteria.where(GuestDAO.ID_FIELD).is(guestId)), createUpdateCommand(updateGuestDTO), GuestDAO.class);
     }
 
