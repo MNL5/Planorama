@@ -12,12 +12,12 @@ import java.time.ZoneId;
 
 @Mapper(componentModel = "spring")
 public interface EventMapper {
-    @Mapping(source = "invitationImg", target = "invitationImg", qualifiedByName = "binaryToBase64")
+    @Mapping(source = "invitationImg", target = "invitationImg", qualifiedByName = "binaryToString")
     @Mapping(source = "time", target = "time", qualifiedByName = "epochMillisToOffsetDateTime")
     EventDTO daoToDTO(EventDAO eventDAO);
 
-    @Named("binaryToBase64")
-    default String binaryToBase64(org.bson.types.Binary binary) {
+    @Named("binaryToString")
+    default String binaryToString(org.bson.types.Binary binary) {
         return binary != null ? new String(binary.getData()) : null;
     }
 
