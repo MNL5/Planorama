@@ -29,4 +29,10 @@ const getEventList = async () => {
   return response.data;
 };
 
-export { createEvent, updateEvent, getEventList };
+const getEventByGuestId = (guestId: string) => {
+  return abortableGetRequest<
+    EventType
+  >(`events?guest=${guestId}`);
+};
+
+export { createEvent, updateEvent, getEventList, getEventByGuestId };

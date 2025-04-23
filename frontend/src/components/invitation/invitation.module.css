@@ -1,0 +1,43 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    justify-content: center;
+    padding: 20px;
+    color: #420F0F;
+}
+
+.container > * {
+    width: fit-content;
+}
+
+.rsvpContainer {
+    margin-top: 20px;
+}
+
+.img {
+    width: 100%;
+    max-width: 400px;
+    height: auto;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    margin-top: 20px;
+}
+
+.date {
+    font-size: 28px;
+    margin-top: 0;
+}
+
+.title {
+    font-size: 50px;
+    margin: 0.4em 0;
+}
+.name {
+    font-size: 32px;
+}
+
+.text {
+    white-space: pre-wrap;
+}

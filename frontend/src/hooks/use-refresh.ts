@@ -4,12 +4,12 @@ import { useEffect, useState } from 'react';
 import AuthService from '../services/auth-service/auth-service';
 import { cacheAuthInfo, getRefreshToken } from '../utils/auth-utils';
 
-const useRefresh = () => {
+const useRefresh = (disable: boolean) => {
     const [isLoading, setIsLoading] = useState<boolean>(true);
 
     useEffect(() => {
         const refreshToken = getRefreshToken();
-        if (refreshToken) {
+        if (refreshToken && !disable) {
             const { request, abort } = AuthService.refresh(refreshToken);
             request
                 .then((response) => {

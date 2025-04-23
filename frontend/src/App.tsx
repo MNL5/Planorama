@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { ToastContainer } from "react-toastify";
 import { CircularProgress } from "@mui/material";
-import { Route, Routes, Navigate } from "react-router-dom";
+import { Route, Routes, Navigate, useLocation } from "react-router-dom";
 import { createTheme, MantineProvider } from "@mantine/core";
 
 import "@mantine/core/styles.css";
@@ -16,14 +16,17 @@ import SignUp from "./components/sign-up/sign-up.tsx";
 import Overview from "./components/overview/overview.tsx";
 import { useEventListener } from "./hooks/use-event-listener.ts";
 import { useFetchEventsList } from "./hooks/use-fetch-events-list.ts";
+import Invitation from "./components/invitation/invitation.tsx";
 
 const theme = createTheme(mantheme);
 
 const LOGIN_EVENT = "loginEvent";
 
 const App: React.FC = () => {
+  const { pathname } = useLocation();
+  const isGuest = pathname.startsWith("/rsvp");
   const [isLogged, setLogged] = useState<boolean>(false);
-  const { isLoading } = useRefresh();
+  const { isLoading } = useRefresh(isGuest);
   const { doesUserHaveEvents, isLoadingEventsList } =
     useFetchEventsList(isLogged);
 
@@ -86,6 +89,7 @@ const App: React.FC = () => {
             <Route path="/signup" element={<SignUp />} />
           </>
         )}
+        <Route path="/rsvp/:id" element={<Invitation />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </MantineProvider>
