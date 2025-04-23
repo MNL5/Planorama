@@ -29,19 +29,20 @@ public class EventController {
     }
 
     @GetMapping("/list")
-    public Flux<EventDTO> getAllEvents(@NotNull @NotEmpty @RequestAttribute("ownerID") String userID) {
+    public Flux<EventDTO> getAllEvents(@NotNull @NotEmpty @RequestAttribute("userID") String userID) {
         return eventService.findAllByUserID(userID)
                 .map(eventMapper::daoToDTO);
     }
 
     @GetMapping
     public Mono<EventDTO> getEventByGuestID(@RequestParam("guest") UUID guestID) {
-        throw new UnsupportedOperationException("Until Guest are implemented");
+        return eventService.findEventByGuestID(guestID)
+                .map(eventMapper::daoToDTO);
     }
 
     @PostMapping
     public Mono<EventDTO> createEvent(@RequestBody CreateEventDTO createEventDTO,
-                                      @NotNull @NotEmpty @RequestAttribute("ownerID") String userID) {
+                                      @NotNull @NotEmpty @RequestAttribute("userID") String userID) {
         return eventService.createEvent(createEventDTO, userID)
                 .map(eventMapper::daoToDTO);
     }
@@ -49,14 +50,14 @@ public class EventController {
     @PutMapping("/{eventId}")
     public Mono<EventDTO> updateEvent(@PathVariable("eventId") UUID eventUUID,
                                       @RequestBody UpdateEventDTO updateEventDTO,
-                                      @NotNull @NotEmpty @RequestAttribute("ownerID") String userID) {
+                                      @NotNull @NotEmpty @RequestAttribute("userID") String userID) {
         return eventService.updateEvent(eventUUID, updateEventDTO, userID)
                 .map(eventMapper::daoToDTO);
     }
 
     @DeleteMapping("/{eventId}")
     public Mono<EventDTO> deleteEvent(@PathVariable("eventId") UUID eventID,
-                                      @NotNull @NotEmpty @RequestAttribute("ownerID") String userID) {
+                                      @NotNull @NotEmpty @RequestAttribute("userID") String userID) {
         return eventService.deleteEvent(eventID, userID)
                 .map(eventMapper::daoToDTO);
     }

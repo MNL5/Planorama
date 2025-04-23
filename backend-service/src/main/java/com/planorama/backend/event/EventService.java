@@ -3,6 +3,8 @@ package com.planorama.backend.event;
 import com.planorama.backend.event.api.CreateEventDTO;
 import com.planorama.backend.event.api.UpdateEventDTO;
 import com.planorama.backend.event.entity.EventDAO;
+import com.planorama.backend.guest.api.GuestAPI;
+import com.planorama.backend.guest.api.GuestDTO;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -24,11 +26,14 @@ import static org.springframework.data.mongodb.core.query.Criteria.where;
 @Service
 public class EventService {
     private final ReactiveMongoTemplate reactiveMongoTemplate;
+    private final GuestAPI guestAPI;
     private final Map<String, Function<UpdateEventDTO, Object>> updateFields;
 
 
-    public EventService(ReactiveMongoTemplate reactiveMongoTemplate) {
+    public EventService(ReactiveMongoTemplate reactiveMongoTemplate,
+                        GuestAPI guestAPI) {
         this.reactiveMongoTemplate = reactiveMongoTemplate;
+        this.guestAPI = guestAPI;
         this.updateFields = Map.of(
                 EventDAO.NAME_FIELD, UpdateEventDTO::name,
                 EventDAO.INVITATION_TEXT_FIELD, UpdateEventDTO::invitationText,
@@ -82,5 +87,12 @@ public class EventService {
 
     public Mono<EventDAO> deleteEvent(@Valid @NotNull UUID eventID, @NotNull @NotEmpty String userID) {
         return reactiveMongoTemplate.findAndRemove(Query.query(where(EventDAO.ID_FIELD).is(eventID).and(EventDAO.OWNER_ID_FIELD).is(userID)), EventDAO.class);
+    }
+
+    public Mono<EventDAO> findEventByGuestID(UUID guestID) {
+        Mono<GuestDTO> guest = guestAPI.getGuest(guestID);
+        return guest.flatMap(guestDTO ->
+                reactiveMongoTemplate.findById(UUID.fromString(guestDTO.eventID()), EventDAO.class)
+        );
     }
 }
