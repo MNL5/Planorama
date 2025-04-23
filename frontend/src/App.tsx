@@ -16,7 +16,6 @@ import SignUp from "./components/sign-up/sign-up.tsx";
 import Overview from "./components/overview/overview.tsx";
 import { useEventListener } from "./hooks/use-event-listener.ts";
 import { useFetchEventsList } from "./hooks/use-fetch-events-list.ts";
-import { CreateEvent } from "./components/create-event/create-event.tsx";
 
 const theme = createTheme(mantheme);
 
@@ -63,7 +62,7 @@ const App: React.FC = () => {
               doesUserHaveEvents ? (
                 <Navigate replace to="/overview" />
               ) : (
-                <Navigate replace to="/createEvent" />
+                <Navigate replace to="/event-details" />
               )
             ) : (
               <Home />
@@ -80,10 +79,6 @@ const App: React.FC = () => {
                 element={endpoint.element}
               />
             ))}
-            <Route
-              path="/createEvent"
-              element={<CreateEvent eventToEdit={null} />}
-            />
           </>
         ) : (
           <>
