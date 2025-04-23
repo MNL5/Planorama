@@ -23,11 +23,13 @@ import { EventType } from "../../types/event";
 import { fileToBase64 } from "../../utils/image-utils";
 import { useEventContext } from "../../contexts/event-context";
 import { toast } from "react-toastify";
+import InvitationModal from "../invitationModal/invitationModal";
 
 const CreateEvent: React.FC = () => {
   const navigate = useNavigate();
   const { currentEvent, setCurrentEvent } = useEventContext();
   const [invitationImage, setInvitationImage] = useState<File | null>(null);
+  const [preview, setPreview] = useState<EventType | null>(null);
   const fileInputRef = useRef(null);
 
   const form = useForm({
@@ -58,6 +60,18 @@ const CreateEvent: React.FC = () => {
   const handeImagePicker = () => {
     fileInputRef.current?.click()
   };
+
+  const getEventPreview = async (values, checkFields = false) => {
+    const image = (await getBase64Image()) ?? currentEvent?.invitationImg;
+    if (image && (!checkFields || (values.eventName && values.invitationText && values.eventDate))) {
+      return {
+        name: values.eventName,
+        invitationImg: image as string,
+        invitationText: values.invitationText,
+        time: values.eventDate,
+      }
+    }
+  } 
 
   const { mutate: mutateEvent } = useMutation<
     EventType,
@@ -107,14 +121,9 @@ const CreateEvent: React.FC = () => {
       </Flex>
       <form
         onSubmit={form.onSubmit(async (values) => {
-          const image = (await getBase64Image()) ?? currentEvent?.invitationImg;
-          if (image) {
-            mutateEvent({
-              name: values.eventName,
-              invitationImg: image as string,
-              invitationText: values.invitationText,
-              time: values.eventDate,
-            });
+          const preview = await getEventPreview(values);
+          if (preview) {
+            mutateEvent(preview);
           }
         })}
       >
@@ -150,6 +159,24 @@ const CreateEvent: React.FC = () => {
               p={0}
               size={"md"}
               radius={"md"}
+              mr={"xl"}
+              type={"button"}
+              onClick={async () => {
+                const preview = await getEventPreview(form.values, true);
+                if (preview) {
+                  setPreview(preview as EventType);
+                } else {
+                  toast.error("Please fill all the fields to preview the invitation");
+                }
+              }}
+              variant={"transparent"}
+            >
+              <Text size={"md"}>Preview</Text>
+            </Button>
+            <Button
+              p={0}
+              size={"md"}
+              radius={"md"}
               type={"submit"}
               variant={"transparent"}
             >
@@ -158,6 +185,9 @@ const CreateEvent: React.FC = () => {
           </Flex>
         </Stack>
       </form>
+      {preview && (
+        <InvitationModal event={preview} onClose={() => setPreview(null)} />
+      )}
     </Flex>
   );
 };

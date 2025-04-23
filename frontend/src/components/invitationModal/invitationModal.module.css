@@ -1,0 +1,31 @@
+.backdrop {
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    top: 0;
+    left: 0;
+}
+
+.modal {
+    position: absolute;
+    width: fit-content;
+    height: 95%;
+    overflow-y: scroll;
+    background-color: #F0EBD8;
+    top: 50%;
+    left: 50%;
+    background: linear-gradient(to right, #e9dbf1, #f7cccc);
+    transform: translate(-50%, -50%);
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.26);
+}
+
+.x {
+    position: absolute;
+    top: 0;
+    left: .1em;
+    cursor: pointer;
+    font-weight: bold;    
+    font-size: 1em;
+}
