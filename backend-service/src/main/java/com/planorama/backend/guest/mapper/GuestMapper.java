@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 @Mapper(componentModel = "spring")
 public interface GuestMapper {
     @Mapping(source = "status", target = "status", qualifiedByName = "statusToDTO")
-    @Mapping(source = "meal", target = "meal", qualifiedByName = "statusToDTO")
+    @Mapping(source = "meal", target = "meal", qualifiedByName = "mealToDTO")
     GuestDTO daoToDTO(GuestDAO guestDAO);
 
     @Named("statusToDTO")
@@ -22,7 +22,7 @@ public interface GuestMapper {
         return status != null ? RSVPStatusDTO.valueOf(status) : null;
     }
 
-    @Named("statusToDTO")
+    @Named("mealToDTO")
     default Set<MealDTO> mealToDTO(Set<String> meal) {
         return meal != null ? meal.stream().map(MealDTO::valueOf).collect(Collectors.toSet()) : null;
     }

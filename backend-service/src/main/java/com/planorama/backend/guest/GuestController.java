@@ -43,7 +43,7 @@ public class GuestController implements GuestAPI {
 
     @PutMapping("/{guestId}")
     public Mono<GuestDTO> updateGuest(@RequestBody UpdateGuestDTO updateGuestDTO,
-                                      @PathVariable("guestId") String guestId) {
+                                      @PathVariable("guestId") UUID guestId) {
         return guestService.updateGuest(updateGuestDTO, guestId)
                 .map(guestMapper::daoToDTO);
     }
