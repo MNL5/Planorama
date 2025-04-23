@@ -9,7 +9,6 @@ import org.mapstruct.Named;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
-import java.util.Base64;
 
 @Mapper(componentModel = "spring")
 public interface EventMapper {
@@ -19,7 +18,7 @@ public interface EventMapper {
 
     @Named("binaryToBase64")
     default String binaryToBase64(org.bson.types.Binary binary) {
-        return binary != null ? Base64.getEncoder().encodeToString(binary.getData()) : null;
+        return binary != null ? new String(binary.getData()) : null;
     }
 
     @Named("epochMillisToOffsetDateTime")
