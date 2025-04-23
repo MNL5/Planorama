@@ -1,6 +1,6 @@
 import { Box, Button, Drawer, NumberInput, Text } from '@mantine/core';
 import axios from 'axios';
-import { useRef, useState, useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Rnd } from 'react-rnd';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -55,6 +55,7 @@ const Element = ({
             fontWeight: 'bold',
             cursor: 'move',
             position: 'absolute',
+            boxShadow: 'rgb(0 0 0 / 16%) 0px 4px 16px',
         }}
     >
         <div
@@ -62,11 +63,15 @@ const Element = ({
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                gap: '4px',
+                gap: '8px',
             }}
         >
             {element.label}
-            <Button size="xs" color="red" onClick={() => onDelete(element.id)}>
+            <Button
+                size="xs"
+                color="#951818"
+                onClick={() => onDelete(element.id)}
+            >
                 x
             </Button>
         </div>
@@ -95,7 +100,7 @@ const TableArrangement = () => {
             height: 100,
             x: canvasRect.width / 2 - 50,
             y: canvasRect.height / 2 - 50,
-            color: '#a0f0ff',
+            color: '#d0b9e0',
             seatCount,
         };
 
@@ -142,14 +147,14 @@ const TableArrangement = () => {
     }, []);
 
     return (
-        <Box style={{ display: 'flex', height: '100vh', direction: 'rtl' }}>
+        <Box style={{ display: 'flex', direction: 'rtl', height: '100%' }}>
             <Box
                 ref={canvasRef}
                 style={{
                     flex: 1,
                     position: 'relative',
                     backgroundColor: '#fff',
-                    border: '2px solid black',
+                    border: '1px solid rgb(230, 229, 229)',
                 }}
             >
                 {elements.map((el) => (
@@ -164,29 +169,39 @@ const TableArrangement = () => {
 
             <Box
                 style={{
-                    width: 150,
-                    padding: '1rem',
+                    padding: '1.5rem',
                     backgroundColor: '#f8f8f8',
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
-                    gap: '1rem',
+                    textAlign: 'center',
+                    justifyContent: 'space-between',
                 }}
             >
-                <Text fw={700}>תפריט</Text>
-                {elementTypes.map((el) => (
-                    <Button
-                        key={el.type}
-                        fullWidth
-                        onClick={() => {
-                            setSelectedType(el.type);
-                            setDrawerOpened(true);
-                        }}
-                    >
-                        {el.label}
-                    </Button>
-                ))}
-                <Button color="grey" fullWidth onClick={handleSave}>
+                <div>
+                    <Text fw={700}>תפריט</Text>
+                    {elementTypes.map((el) => (
+                        <Button
+                            key={el.type}
+                            fullWidth
+                            className="primary-btn"
+                            style={{ fontSize: '14px' }}
+                            onClick={() => {
+                                setSelectedType(el.type);
+                                setDrawerOpened(true);
+                            }}
+                        >
+                            {el.label}
+                        </Button>
+                    ))}
+                </div>
+
+                <Button
+                    className="primary-btn"
+                    style={{ fontSize: '14px', background: '#d1bdd2' }}
+                    fullWidth
+                    onClick={handleSave}
+                >
                     שמור
                 </Button>
             </Box>
@@ -205,7 +220,7 @@ const TableArrangement = () => {
                         min={1}
                     />
                 )}
-                <Button fullWidth mt="md" onClick={addElement}>
+                <Button color="#6a0572" fullWidth mt="md" onClick={addElement}>
                     הוסף
                 </Button>
             </Drawer>
