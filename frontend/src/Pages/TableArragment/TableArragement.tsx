@@ -1,88 +1,155 @@
 import { Box, Button, Drawer, NumberInput, Text } from '@mantine/core';
-import { useState } from 'react';
+import axios from 'axios';
+import { useRef, useState, useEffect } from 'react';
 import { Rnd } from 'react-rnd';
 import { v4 as uuidv4 } from 'uuid';
+
+interface ElementType {
+    id: string;
+    type: 'square' | 'rectangle' | 'circle';
+    label: string;
+    width: number;
+    height: number;
+    x: number;
+    y: number;
+    color: string;
+    seatCount: number;
+}
 
 const elementTypes = [
     { type: 'square', label: 'שולחן מרובע' },
     { type: 'rectangle', label: 'שולחן מלבני' },
     { type: 'circle', label: 'שולחן עגול' },
-    { type: 'stage', label: 'רחבת ריקודים' },
-    { type: 'text', label: 'טקסט' },
-];
+] as const;
 
-const Element = ({ element, onUpdate }) => {
-    return (
-        <Rnd
-            bounds="parent"
-            size={{ width: element.width, height: element.height }}
-            position={{ x: element.x, y: element.y }}
-            onDragStop={(e, d) => onUpdate({ ...element, x: d.x, y: d.y })}
-            onResizeStop={(e, direction, ref, delta, position) => {
-                onUpdate({
-                    ...element,
-                    width: parseInt(ref.style.width),
-                    height: parseInt(ref.style.height),
-                    x: position.x,
-                    y: position.y,
-                });
-            }}
+const Element = ({
+    element,
+    onUpdate,
+    onDelete,
+}: {
+    element: ElementType;
+    onUpdate: (updated: ElementType) => void;
+    onDelete: (id: string) => void;
+}) => (
+    <Rnd
+        bounds="parent"
+        size={{ width: element.width, height: element.height }}
+        position={{ x: element.x, y: element.y }}
+        onDragStop={(_, d) => onUpdate({ ...element, x: d.x, y: d.y })}
+        onResizeStop={(_, __, ref, ___, position) =>
+            onUpdate({
+                ...element,
+                width: parseInt(ref.style.width),
+                height: parseInt(ref.style.height),
+                x: position.x,
+                y: position.y,
+            })
+        }
+        style={{
+            backgroundColor: element.color,
+            borderRadius: element.type === 'circle' ? '50%' : '8px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#000',
+            fontWeight: 'bold',
+            cursor: 'move',
+            position: 'absolute',
+        }}
+    >
+        <div
             style={{
-                backgroundColor: element.color,
-                borderRadius: element.type === 'circle' ? '50%' : '8px',
                 display: 'flex',
+                flexDirection: 'column',
                 alignItems: 'center',
-                justifyContent: 'center',
-                color: '#000',
-                fontWeight: 'bold',
-                cursor: 'move',
+                gap: '4px',
             }}
         >
             {element.label}
-        </Rnd>
-    );
-};
+            <Button size="xs" color="red" onClick={() => onDelete(element.id)}>
+                x
+            </Button>
+        </div>
+    </Rnd>
+);
 
 const TableArrangement = () => {
-    const [elements, setElements] = useState([]);
+    const canvasRef = useRef<HTMLDivElement>(null);
+    const [elements, setElements] = useState<ElementType[]>([]);
     const [drawerOpened, setDrawerOpened] = useState(false);
-    const [selectedType, setSelectedType] = useState(null);
-    const [seatCount, setSeatCount] = useState(8);
+    const [selectedType, setSelectedType] = useState<
+        ElementType['type'] | null
+    >(null);
+    const [seatCount, setSeatCount] = useState<number>(1);
 
     const addElement = () => {
-        if (!selectedType) return;
-        const newElement = {
+        if (!canvasRef.current || !selectedType) return;
+
+        const canvasRect = canvasRef.current.getBoundingClientRect();
+
+        const newElement: ElementType = {
             id: uuidv4(),
             type: selectedType,
-            label:
-                selectedType === 'stage'
-                    ? 'רחבת ריקודים'
-                    : `שולחן (${seatCount})`,
+            label: `(${seatCount})`,
             width: selectedType === 'rectangle' ? 160 : 100,
             height: 100,
-            x: 300,
-            y: 200,
-            color: selectedType === 'stage' ? '#4ccfff' : '#a0f0ff',
+            x: canvasRect.width / 2 - 50,
+            y: canvasRect.height / 2 - 50,
+            color: '#a0f0ff',
+            seatCount,
         };
+
         setElements((prev) => [...prev, newElement]);
         setDrawerOpened(false);
+        setSeatCount(1);
+        setSelectedType(null);
     };
 
-    const updateElement = (updated) => {
+    const updateElement = (updated: ElementType) => {
         setElements((prev) =>
             prev.map((el) => (el.id === updated.id ? updated : el))
         );
     };
 
+    const deleteElement = (id: string) => {
+        setElements((prev) => prev.filter((el) => el.id !== id));
+    };
+
+    const handleSave = async () => {
+        await axios.post('/api/layout/save', { elements });
+        alert('Layout saved');
+    };
+
+    const loadLayout = async () => {
+        try {
+            const response = await axios.get('/api/layout/load');
+            const loadedElements = response.data?.elements;
+
+            if (Array.isArray(loadedElements)) {
+                setElements(loadedElements);
+            } else {
+                console.warn('Invalid layout format:', loadedElements);
+                setElements([]);
+            }
+        } catch (error) {
+            console.error('Failed to load layout:', error);
+            setElements([]);
+        }
+    };
+
+    useEffect(() => {
+        loadLayout();
+    }, []);
+
     return (
         <Box style={{ display: 'flex', height: '100vh', direction: 'rtl' }}>
-            {/* Canvas */}
             <Box
+                ref={canvasRef}
                 style={{
                     flex: 1,
                     position: 'relative',
                     backgroundColor: '#fff',
-                    border: '4px solid black',
+                    border: '2px solid black',
                 }}
             >
                 {elements.map((el) => (
@@ -90,11 +157,11 @@ const TableArrangement = () => {
                         key={el.id}
                         element={el}
                         onUpdate={updateElement}
+                        onDelete={deleteElement}
                     />
                 ))}
             </Box>
 
-            {/* Side menu */}
             <Box
                 style={{
                     width: 150,
@@ -119,16 +186,18 @@ const TableArrangement = () => {
                         {el.label}
                     </Button>
                 ))}
+                <Button color="grey" fullWidth onClick={handleSave}>
+                    שמור
+                </Button>
             </Box>
 
-            {/* Drawer for settings */}
             <Drawer
                 opened={drawerOpened}
                 onClose={() => setDrawerOpened(false)}
                 title="הוספת שולחן"
                 position="left"
             >
-                {selectedType !== 'stage' && selectedType !== 'text' && (
+                {selectedType && (
                     <NumberInput
                         label="מספר מקומות"
                         value={seatCount}
