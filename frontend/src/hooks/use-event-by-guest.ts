@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { getEventByGuestId } from "../services/event-service/event-service";
 import { EventType } from '../types/event';
 
-const useEventBGuest = (guestId?: string) => {
+const useEventByGuest = (guestId?: string) => {
     const [event, setEvent] = useState<EventType | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -30,4 +30,4 @@ const useEventBGuest = (guestId?: string) => {
     return { isLoading, event };
 };
 
-export default useEventBGuest;
+export default useEventByGuest;

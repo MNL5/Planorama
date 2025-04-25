@@ -16,7 +16,7 @@ import SignUp from "./components/sign-up/sign-up.tsx";
 import Overview from "./components/overview/overview.tsx";
 import { useEventListener } from "./hooks/use-event-listener.ts";
 import { useFetchEventsList } from "./hooks/use-fetch-events-list.ts";
-import Invitation from "./components/invitation/invitation.tsx";
+import InvitationPage from "./components/invitationPage/invitationPage.tsx";
 
 const theme = createTheme(mantheme);
 
@@ -89,7 +89,7 @@ const App: React.FC = () => {
             <Route path="/signup" element={<SignUp />} />
           </>
         )}
-        <Route path="/rsvp/:id" element={<Invitation />} />
+        <Route path="/rsvp/:id" element={<InvitationPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </MantineProvider>
