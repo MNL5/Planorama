@@ -1,4 +1,5 @@
 import React from 'react';
+
 import style from './invitation.module.css';
 import rsvp from "../../assets/rsvp.svg";
 import { EventType } from '../../types/event';

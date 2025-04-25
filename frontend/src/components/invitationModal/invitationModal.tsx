@@ -1,9 +1,9 @@
 import React from 'react';
-import style from './invitationModal.module.css';
+import { createPortal } from 'react-dom';
 
+import style from './invitationModal.module.css';
 import Invitation from '../invitation/invitation';
 import { EventType } from '../../types/event';
-import { createPortal } from 'react-dom';
 
 const InvitationModal: React.FC<{event: EventType, onClose: () => void}> = ({event, onClose}) => {
   const onModalClick = (event: React.MouseEvent<HTMLDivElement>) => {

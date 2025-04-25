@@ -1,13 +1,14 @@
 import React from 'react';
-import style from './invitationPage.module.css';
-import { useParams } from 'react-router-dom';
-import useEventBGuest from '../../hooks/use-event-by-guest';
 import { CircularProgress } from '@mui/material';
+import { useParams } from 'react-router-dom';
+import { Title, Text, Stack } from '@mantine/core';
+
+import useEventByGuest from '../../hooks/use-event-by-guest';
 import Invitation from '../invitation/invitation';
 
 const InvitationPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
-    const {event, isLoading} = useEventBGuest(id);
+    const {event, isLoading} = useEventByGuest(id);
 
     if (!event) {
         if (isLoading) {
@@ -18,10 +19,10 @@ const InvitationPage: React.FC = () => {
                   />
                 );
         }
-        return <div className={style.container}>
-                <h1>Event not found</h1>
-                <p>Please check the link or contact the event organizer.</p>
-            </div> 
+        return <Stack align='center' justify='center' style={{color: '#420F0F', padding: '20px'}}>
+                <Title>Event not found</Title>
+                <Text>Please check the link or contact the event organizer.</Text>
+            </Stack> 
     }
 
     return <Invitation event={event} />;
