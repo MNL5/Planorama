@@ -1,6 +1,0 @@
-### Seating
-
-POST http://localhost:5000/seating/poc
-content-type: application/json
-
-{"A": 3, "B": 6, "C": 3, "D": 10, "E": 4, "F": 3, "G": 3, "H": 9, "I": 3, "J": 3}
