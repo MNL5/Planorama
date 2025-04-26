@@ -27,18 +27,47 @@ function AddRowModal<T>({
   lastId,
 }: AddRowModalProps<T>) {
   const [newRowData, setNewRowData] = useState<Partial<T>>({});
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const handleInputChange = (key: keyof T, value: string | string[]) => {
     setNewRowData((prev) => ({
       ...prev,
       [key]: value,
     }));
+    setErrors((prev) => ({
+      ...prev,
+      [key as string]: "",
+    }));
+  };
+
+  const validateForm = () => {
+    const newErrors: Record<string, string> = {};
+
+    columns.forEach((col) => {
+      const value = newRowData[col.key];
+      if (
+        value === undefined ||
+        (typeof value === "string" && value.trim() === "") ||
+        (Array.isArray(value) && value.length === 0)
+      ) {
+        newErrors[col.key as string] = `${col.label} is required`;
+      }
+    });
+
+    setErrors(newErrors);
+
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = () => {
+    if (!validateForm()) {
+      return;
+    }
+
     const newId = (lastId + 1).toString();
     onAddRow({ ...newRowData, id: newId } as T);
     setNewRowData({});
+    setErrors({});
   };
 
   return (
@@ -49,28 +78,31 @@ function AddRowModal<T>({
             <label>{col.label}</label>
             {isEmpty(col.values) ? (
               <TextInput
+                size={"sm"}
                 value={(newRowData[col.key] as string) || ""}
                 onChange={(e) =>
                   handleInputChange(col.key, e.currentTarget.value)
                 }
-                size="xs"
                 placeholder={`Enter ${col.label}`}
                 style={{ marginTop: "5px" }}
+                error={errors[col.key as string] || undefined}
               />
             ) : col.isMulti ? (
               <MultiSelect
+                size={"sm"}
                 data={col.values?.map((value) => ({
                   value,
                   label: value,
                 }))}
                 value={(newRowData[col.key] as string[]) || []}
                 onChange={(value) => handleInputChange(col.key, value)}
-                size="xs"
                 placeholder={`Select ${col.label}`}
                 style={{ marginTop: "5px" }}
+                error={errors[col.key as string] || undefined}
               />
             ) : (
               <Select
+                size={"sm"}
                 data={col.values?.map((value) => ({
                   value,
                   label: value,
@@ -81,9 +113,9 @@ function AddRowModal<T>({
                     handleInputChange(col.key, value);
                   }
                 }}
-                size={"xs"}
                 placeholder={`Select ${col.label}`}
                 style={{ marginTop: "5px" }}
+                error={errors[col.key as string] || undefined}
               />
             )}
           </div>
@@ -92,7 +124,7 @@ function AddRowModal<T>({
           <Button onClick={onClose} variant="outline">
             Cancel
           </Button>
-          <Button onClick={handleSubmit}>Add Row</Button>
+          <Button onClick={handleSubmit}>Add</Button>
         </Group>
       </form>
     </Modal>
