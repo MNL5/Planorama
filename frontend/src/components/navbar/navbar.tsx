@@ -22,13 +22,13 @@ const Navbar = () => {
   return (
     <nav className="navbar">
       <Flex align={'center'}>
-        {!isEmpty(currentEvent) && (
-          <Group>
-            <div className="navbar-logo">
+      <div className="navbar-logo">
               <Link to="/">
                 <img src={logo} alt="logo" className="logo" />
               </Link>
             </div>
+        {!isEmpty(currentEvent) && (
+          <Group>
             <ul className="navbar-links">
               {ENDPOINTS.map((endpoint) => (
                 <li key={endpoint.name}>

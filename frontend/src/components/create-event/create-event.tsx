@@ -10,7 +10,7 @@ import {
 } from "@mantine/core";
 import { isEmpty, isNil } from "lodash";
 import { useForm } from "@mantine/form";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { DateTimePicker } from "@mantine/dates";
 import { useMutation } from "@tanstack/react-query";
@@ -22,19 +22,21 @@ import {
 import { EventType } from "../../types/event";
 import { fileToBase64 } from "../../utils/image-utils";
 import { useEventContext } from "../../contexts/event-context";
+import { toast } from "react-toastify";
+import InvitationModal from "../invitationModal/invitationModal";
 
-const CreateEvent: React.FC<{ eventToEdit: EventType | null }> = ({
-  eventToEdit,
-}) => {
+const CreateEvent: React.FC = () => {
   const navigate = useNavigate();
-  const { setCurrentEvent } = useEventContext();
+  const { currentEvent, setCurrentEvent } = useEventContext();
   const [invitationImage, setInvitationImage] = useState<File | null>(null);
+  const [preview, setPreview] = useState<EventType | null>(null);
+  const fileInputRef = useRef(null);
 
   const form = useForm({
     initialValues: {
-      eventName: eventToEdit?.name ?? "",
-      invitationText: eventToEdit?.invitationText ?? "",
-      eventDate: eventToEdit?.time ?? new Date(),
+      eventName: currentEvent?.name ?? "",
+      invitationText: currentEvent?.invitationText ?? "",
+      eventDate: currentEvent?.time ? new Date(currentEvent?.time) : new Date(),
     },
     validate: {
       eventName: (value) => (value.trim() ? null : "event name is required"),
@@ -45,12 +47,8 @@ const CreateEvent: React.FC<{ eventToEdit: EventType | null }> = ({
   });
 
   const imageUrl = useMemo(() => {
-    if (!isEmpty(eventToEdit)) {
-      return eventToEdit.invitationImg;
-    } else if (invitationImage) {
-      return URL.createObjectURL(invitationImage);
-    }
-  }, [invitationImage, eventToEdit]);
+    return invitationImage ? URL.createObjectURL(invitationImage) : currentEvent?.invitationImg;
+  }, [invitationImage, currentEvent]);
 
   const getBase64Image = async () => {
     if (invitationImage) {
@@ -59,9 +57,21 @@ const CreateEvent: React.FC<{ eventToEdit: EventType | null }> = ({
     return null;
   };
 
-  const handeImageReset = () => {
-    setInvitationImage(null);
+  const handeImagePicker = () => {
+    fileInputRef.current?.click()
   };
+
+  const getEventPreview = async (values, checkFields = false) => {
+    const image = (await getBase64Image()) ?? currentEvent?.invitationImg;
+    if (image && (!checkFields || (values.eventName && values.invitationText && values.eventDate))) {
+      return {
+        name: values.eventName,
+        invitationImg: image as string,
+        invitationText: values.invitationText,
+        time: values.eventDate,
+      }
+    }
+  } 
 
   const { mutate: mutateEvent } = useMutation<
     EventType,
@@ -69,15 +79,19 @@ const CreateEvent: React.FC<{ eventToEdit: EventType | null }> = ({
     Omit<EventType, "id">
   >({
     mutationFn: async (newEvent) => {
-      if (!isEmpty(eventToEdit)) {
-        return updateEvent(newEvent, eventToEdit.id);
+      if (!isEmpty(currentEvent)) {
+        return updateEvent(newEvent, currentEvent.id);
       } else {
         return createEvent(newEvent);
       }
     },
     onSuccess: (event: EventType) => {
       setCurrentEvent(event);
-      navigate("/overview");
+      if (isEmpty(currentEvent)) {
+        navigate("/guests");
+      } else {
+        toast.success("Event updated successfully")
+      }
     },
   });
 
@@ -85,40 +99,31 @@ const CreateEvent: React.FC<{ eventToEdit: EventType | null }> = ({
     <Flex w={"100%"} align={"center"} justify={"space-evenly"} mt={"18vh"}>
       <Flex align={"center"} gap={"xl"}>
         <Image src={imageUrl} radius={"md"} maw={400} mah={360} />
-        {isNil(imageUrl) ? (
-          <FileInput
+        <FileInput
             size={"lg"}
-            placeholder={"Select event invitation image"}
+            style={{display: "none"}}
             value={invitationImage}
             accept={"image/*"}
+            ref={fileInputRef}
             onChange={(file) => {
               if (file) {
                 setInvitationImage(file);
               }
-            }}
-          />
-        ) : (
-          <Button
+            }} />
+            <Button
             size={"xl"}
             radius={"md"}
             variant={"light"}
-            onClick={handeImageReset}
+            onClick={handeImagePicker}
           >
-            <Text size={"xl"}>Remove Image</Text>
+            <Text size={"xl"}>{isNil(imageUrl) ? "Select event invitation image" : "Change event invitation image"}</Text>
           </Button>
-        )}
       </Flex>
       <form
         onSubmit={form.onSubmit(async (values) => {
-          const image = (await getBase64Image()) ?? eventToEdit?.invitationImg;
-          console.log(image);
-          if (image) {
-            mutateEvent({
-              name: values.eventName,
-              invitationImg: image as string,
-              invitationText: values.invitationText,
-              time: values.eventDate,
-            });
+          const preview = await getEventPreview(values);
+          if (preview) {
+            mutateEvent(preview);
           }
         })}
       >
@@ -154,6 +159,24 @@ const CreateEvent: React.FC<{ eventToEdit: EventType | null }> = ({
               p={0}
               size={"md"}
               radius={"md"}
+              mr={"xl"}
+              type={"button"}
+              onClick={async () => {
+                const preview = await getEventPreview(form.values, true);
+                if (preview) {
+                  setPreview(preview as EventType);
+                } else {
+                  toast.error("Please fill all the fields to preview the invitation");
+                }
+              }}
+              variant={"transparent"}
+            >
+              <Text size={"md"}>Preview</Text>
+            </Button>
+            <Button
+              p={0}
+              size={"md"}
+              radius={"md"}
               type={"submit"}
               variant={"transparent"}
             >
@@ -162,6 +185,9 @@ const CreateEvent: React.FC<{ eventToEdit: EventType | null }> = ({
           </Flex>
         </Stack>
       </form>
+      {preview && (
+        <InvitationModal event={preview} onClose={() => setPreview(null)} />
+      )}
     </Flex>
   );
 };

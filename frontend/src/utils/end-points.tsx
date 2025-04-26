@@ -1,10 +1,11 @@
+import { CreateEvent } from '../components/create-event/create-event';
 import Overview from '../components/overview/overview';
 
 export const ENDPOINTS = [
     {
         name: "Event Details",
         path: "/event-details",
-        element: <Overview />,
+        element: <CreateEvent />,
     },
     {
         name: "Guests",
@@ -14,11 +15,6 @@ export const ENDPOINTS = [
     {
         name: "Preferences",
         path: "/preferences",
-        element: <Overview />,
-    },
-    {
-        name: "Tasks",
-        path: "/tasks",
         element: <Overview />,
     },
     {

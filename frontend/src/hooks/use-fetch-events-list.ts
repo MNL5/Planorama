@@ -7,11 +7,11 @@ import { useEventContext } from "../contexts/event-context";
 import { getEventList } from "../services/event-service/event-service";
 
 const useFetchEventsList = (isLogged: boolean) => {
-  const { setCurrentEvent } = useEventContext();
+  const { currentEvent, setCurrentEvent } = useEventContext();
   const {
     data: eventsList,
     isSuccess,
-    isLoading: isLoadingEventsList,
+    isLoading,
   } = useQuery<EventType[], Error>({
     queryKey: ["fetchEventsList"],
     queryFn: () => getEventList(),
@@ -26,7 +26,7 @@ const useFetchEventsList = (isLogged: boolean) => {
     }
   }, [doesUserHaveEvents, eventsList, setCurrentEvent]);
 
-  return { eventsList, doesUserHaveEvents, isLoadingEventsList };
+  return { eventsList, doesUserHaveEvents, isLoadingEventsList: isLoading || !(doesUserHaveEvents && currentEvent)};
 };
 
 export { useFetchEventsList };
