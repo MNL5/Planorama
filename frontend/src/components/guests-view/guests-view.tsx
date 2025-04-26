@@ -5,6 +5,7 @@ import { MealType } from "../../types/meal";
 import { RsvpStatus } from "../../types/rsvp-status";
 import { guestColumns } from "../../utils/guest-columns";
 import { CustomTable } from "../custom-table/custom-table";
+import { Flex } from "@mantine/core";
 
 const GuestsView: React.FC = () => {
   const [guests] = useState<Guest[]>([
@@ -21,9 +22,9 @@ const GuestsView: React.FC = () => {
   ]);
 
   return (
-    <>
+    <Flex style={{ flex: "1 1", overflowY: "scroll" }}>
       <CustomTable<Guest> data={guests} columns={guestColumns} />
-    </>
+    </Flex>
   );
 };
 
