@@ -10,9 +10,17 @@ import {
 } from "@mantine/core";
 import { useState } from "react";
 import { isEmpty } from "lodash";
-import { IconPencil, IconTrash, IconCheck, IconX } from "@tabler/icons-react";
+import { useDisclosure } from "@mantine/hooks";
+import {
+  IconX,
+  IconPlus,
+  IconTrash,
+  IconCheck,
+  IconPencil,
+} from "@tabler/icons-react";
 
 import { Column } from "../../types/column";
+import { AddRowModal } from "./add-row-modal";
 
 interface CustomTableProps<T> {
   data: T[];
@@ -23,9 +31,17 @@ function CustomTable<T extends { id: string }>({
   data: initialData,
   columns,
 }: CustomTableProps<T>) {
+  const [opened, { open, close }] = useDisclosure();
   const [data, setData] = useState<T[]>(initialData);
   const [editRowId, setEditRowId] = useState<string | null>(null);
   const [editFormData, setEditFormData] = useState<Partial<T>>({});
+  const [lastId, setLastId] = useState<number>(initialData.length);
+
+  const handleAddRow = (newRow: T) => {
+    setData((prev) => [...prev, newRow]);
+    setLastId(lastId + 1);
+    close();
+  };
 
   const handleEditClick = (row: T) => {
     setEditRowId(row.id);
@@ -63,6 +79,23 @@ function CustomTable<T extends { id: string }>({
   return (
     <Container size={"md"} mt={"xl"}>
       <Paper shadow={"md"} radius={"md"} p={"md"} withBorder>
+        <Group justify={"flex-end"} mb={"md"}>
+          <ActionIcon
+            size={40}
+            onClick={open}
+            variant={"light"}
+            color={"primary"}
+          >
+            <IconPlus size={24} />
+          </ActionIcon>
+        </Group>
+        <AddRowModal
+          opened={opened}
+          onClose={close}
+          onAddRow={handleAddRow}
+          columns={columns}
+          lastId={lastId}
+        />
         <Table
           withTableBorder
           highlightOnHover
