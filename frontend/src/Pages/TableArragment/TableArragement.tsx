@@ -7,9 +7,9 @@ import SeatingService from '../../Services/Seating/SeatingService';
 import Element from '../../types/Element';
 
 const elementTypes = [
-    { type: 'square', label: 'שולחן מרובע' },
-    { type: 'rectangle', label: 'שולחן מלבני' },
-    { type: 'circle', label: 'שולחן עגול' },
+    { type: 'square', label: 'Square Table' },
+    { type: 'rectangle', label: 'Rectangle Table' },
+    { type: 'circle', label: 'Circular Table' },
 ] as const;
 
 const TableArrangement = () => {
@@ -87,7 +87,7 @@ const TableArrangement = () => {
     }, []);
 
     return (
-        <Box style={{ display: 'flex', direction: 'rtl', height: '100%' }}>
+        <Box style={{ display: 'flex', direction: 'rtl' }}>
             <Box
                 ref={canvasRef}
                 style={{
@@ -142,7 +142,7 @@ const TableArrangement = () => {
                     fullWidth
                     onClick={handleSave}
                 >
-                    שמור
+                    Save
                 </Button>
             </Box>
 
