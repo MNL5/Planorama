@@ -1,5 +1,6 @@
-import { CreateEvent } from '../components/create-event/create-event';
 import Overview from '../components/overview/overview';
+import { GuestsView } from '../components/guests-view/guests-view';
+import { CreateEvent } from '../components/create-event/create-event';
 
 export const ENDPOINTS = [
     {
@@ -10,7 +11,7 @@ export const ENDPOINTS = [
     {
         name: "Guests",
         path: "/guests",
-        element: <Overview />,
+        element: <GuestsView />,
     },
     {
         name: "Preferences",

@@ -15,7 +15,7 @@
     background-color: #F0EBD8;
     top: 50%;
     left: 50%;
-    background: linear-gradient(to right, #e9dbf1, #f7cccc);
+    background: linear-gradient(to right, #e9dbf1, #e6c8fa);
     transform: translate(-50%, -50%);
     border-radius: 10px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.26);
