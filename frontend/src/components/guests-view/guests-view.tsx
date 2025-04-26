@@ -13,7 +13,7 @@ const GuestsView: React.FC = () => {
       name: "Matan Leibovich Dromi",
       gender: "Male",
       group: "Ha Magnivim",
-      meal: MealType.GLUTEN_FREE,
+      meal: [MealType.GLUTEN_FREE],
       phoneNumber: "050-2349994",
       status: RsvpStatus.ACCEPTED,
       table: 1,

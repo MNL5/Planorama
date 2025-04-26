@@ -8,7 +8,7 @@ type Guest = {
   gender: string;
   group: string;
   status: RsvpStatus;
-  meal: MealType;
+  meal: MealType[];
   table: number;
 };
 

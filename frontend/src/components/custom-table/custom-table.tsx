@@ -2,10 +2,11 @@ import {
   Table,
   Group,
   Paper,
+  Select,
   Container,
   TextInput,
   ActionIcon,
-  Select,
+  MultiSelect,
 } from "@mantine/core";
 import { useState } from "react";
 import { isEmpty } from "lodash";
@@ -36,7 +37,7 @@ function CustomTable<T extends { id: string }>({
     setEditFormData({});
   };
 
-  const handleInputChange = (field: keyof T, value: string) => {
+  const handleInputChange = (field: keyof T, value: string | string[]) => {
     setEditFormData((prev) => ({
       ...prev,
       [field]: value,
@@ -91,8 +92,33 @@ function CustomTable<T extends { id: string }>({
                             handleInputChange(col.key, e.currentTarget.value)
                           }
                         />
+                      ) : col.isMulti ? (
+                        <MultiSelect
+                          w={200}
+                          value={(editFormData[col.key] as string[]) || ""}
+                          data={col.values?.map((value) => ({
+                            value,
+                            label: value,
+                          }))}
+                          onChange={(value) => {
+                            if (value) {
+                              handleInputChange(col.key, value);
+                            }
+                          }}
+                          styles={{
+                            dropdown: {
+                              overflowX: "hidden",
+                            },
+                            option: {
+                              whiteSpace: "nowrap",
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                            },
+                          }}
+                        />
                       ) : (
                         <Select
+                          w={200}
                           value={(editFormData[col.key] as string) || ""}
                           data={col.values?.map((value) => ({
                             value,
@@ -104,6 +130,9 @@ function CustomTable<T extends { id: string }>({
                             }
                           }}
                           styles={{
+                            dropdown: {
+                              overflowX: "hidden",
+                            },
                             option: {
                               whiteSpace: "nowrap",
                               overflow: "hidden",
@@ -112,6 +141,8 @@ function CustomTable<T extends { id: string }>({
                           }}
                         />
                       )
+                    ) : col.isMulti ? (
+                      (row[col.key] as string[]).join(", ")
                     ) : (
                       String(row[col.key])
                     )}

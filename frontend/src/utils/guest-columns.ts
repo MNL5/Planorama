@@ -8,9 +8,10 @@ const guestColumns: Column<Guest>[] = [
     key: "name",
     label: "Name",
     isEdit: true,
+    isMulti: false,
   },
-  { key: "group", label: "Group", isEdit: true },
-  { key: "phoneNumber", label: "Phone Number", isEdit: true },
+  { key: "group", label: "Group", isEdit: true, isMulti: false },
+  { key: "phoneNumber", label: "Phone Number", isEdit: true, isMulti: false },
   {
     key: "meal",
     label: "Meal Type",
@@ -22,13 +23,15 @@ const guestColumns: Column<Guest>[] = [
       MealType.VEGETARIAN,
       MealType.GLUTEN_FREE,
     ],
+    isMulti: true,
   },
-  { key: "table", label: "Table Number", isEdit: true },
+  { key: "table", label: "Table Number", isEdit: true, isMulti: false },
   {
     key: "status",
     label: "RSVP",
     isEdit: true,
     values: [RsvpStatus.ACCEPTED, RsvpStatus.TENTATIVE, RsvpStatus.DECLINE],
+    isMulti: false,
   },
 ];
 
