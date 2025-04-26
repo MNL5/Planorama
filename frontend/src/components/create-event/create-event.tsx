@@ -30,7 +30,7 @@ const CreateEvent: React.FC = () => {
   const { currentEvent, setCurrentEvent } = useEventContext();
   const [invitationImage, setInvitationImage] = useState<File | null>(null);
   const [preview, setPreview] = useState<EventType | null>(null);
-  const fileInputRef = useRef(null);
+  const fileInputRef = useRef<HTMLButtonElement>(null);
 
   const form = useForm({
     initialValues: {
@@ -47,7 +47,9 @@ const CreateEvent: React.FC = () => {
   });
 
   const imageUrl = useMemo(() => {
-    return invitationImage ? URL.createObjectURL(invitationImage) : currentEvent?.invitationImg;
+    return invitationImage
+      ? URL.createObjectURL(invitationImage)
+      : currentEvent?.invitationImg;
   }, [invitationImage, currentEvent]);
 
   const getBase64Image = async () => {
@@ -58,20 +60,27 @@ const CreateEvent: React.FC = () => {
   };
 
   const handeImagePicker = () => {
-    fileInputRef.current?.click()
+    fileInputRef.current?.click();
   };
 
-  const getEventPreview = async (values, checkFields = false) => {
+  const getEventPreview = async (
+    values: { eventName: string; invitationText: string; eventDate: Date },
+    checkFields = false
+  ) => {
     const image = (await getBase64Image()) ?? currentEvent?.invitationImg;
-    if (image && (!checkFields || (values.eventName && values.invitationText && values.eventDate))) {
+    if (
+      image &&
+      (!checkFields ||
+        (values.eventName && values.invitationText && values.eventDate))
+    ) {
       return {
         name: values.eventName,
         invitationImg: image as string,
         invitationText: values.invitationText,
         time: values.eventDate,
-      }
+      };
     }
-  } 
+  };
 
   const { mutate: mutateEvent } = useMutation<
     EventType,
@@ -90,7 +99,7 @@ const CreateEvent: React.FC = () => {
       if (isEmpty(currentEvent)) {
         navigate("/guests");
       } else {
-        toast.success("Event updated successfully")
+        toast.success("Event updated successfully");
       }
     },
   });
@@ -100,24 +109,29 @@ const CreateEvent: React.FC = () => {
       <Flex align={"center"} gap={"xl"}>
         <Image src={imageUrl} radius={"md"} maw={400} mah={360} />
         <FileInput
-            size={"lg"}
-            style={{display: "none"}}
-            value={invitationImage}
-            accept={"image/*"}
-            ref={fileInputRef}
-            onChange={(file) => {
-              if (file) {
-                setInvitationImage(file);
-              }
-            }} />
-            <Button
-            size={"xl"}
-            radius={"md"}
-            variant={"light"}
-            onClick={handeImagePicker}
-          >
-            <Text size={"xl"}>{isNil(imageUrl) ? "Select event invitation image" : "Change event invitation image"}</Text>
-          </Button>
+          size={"lg"}
+          style={{ display: "none" }}
+          value={invitationImage}
+          accept={"image/*"}
+          ref={fileInputRef}
+          onChange={(file) => {
+            if (file) {
+              setInvitationImage(file);
+            }
+          }}
+        />
+        <Button
+          size={"xl"}
+          radius={"md"}
+          variant={"light"}
+          onClick={handeImagePicker}
+        >
+          <Text size={"xl"}>
+            {isNil(imageUrl)
+              ? "Select event invitation image"
+              : "Change event invitation image"}
+          </Text>
+        </Button>
       </Flex>
       <form
         onSubmit={form.onSubmit(async (values) => {
@@ -166,7 +180,9 @@ const CreateEvent: React.FC = () => {
                 if (preview) {
                   setPreview(preview as EventType);
                 } else {
-                  toast.error("Please fill all the fields to preview the invitation");
+                  toast.error(
+                    "Please fill all the fields to preview the invitation"
+                  );
                 }
               }}
               variant={"transparent"}
