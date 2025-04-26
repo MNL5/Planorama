@@ -6,9 +6,8 @@ import style from './invitation.module.css';
 import rsvp from "../../assets/rsvp.svg";
 import { EventType } from '../../types/event';
 import mealOptions from '../../utils/meal-options';
-import { toast } from 'react-toastify';
 
-const Invitation: React.FC<{event: EventType}> = ({event}) => {
+const Invitation: React.FC<{event: EventType, guestId?: string}> = ({event, guestId}) => {
     const [isFormMode, setIsFormMode] = useState(false);
     const [chosenMeals, setChosenMeals] = useState<Set<string>>(new Set());
 
@@ -23,7 +22,7 @@ const Invitation: React.FC<{event: EventType}> = ({event}) => {
     }
 
     const handleSubmit = (status: string) => {
-        toast.info(`RSVP Data: ${status}, ${JSON.stringify([...chosenMeals])}`);
+        // TODO: Implement the submit logic here
     }
 
     return (
@@ -95,7 +94,7 @@ const Invitation: React.FC<{event: EventType}> = ({event}) => {
                         <p className={style.text}>
                             {event.invitationText}
                         </p>
-                        <div className={style.rsvpContainer} onClick={() => setIsFormMode(true)}>
+                        <div className={classnames(style.rsvpContainer, {[style.disabled]: !guestId})} onClick={() => guestId && setIsFormMode(true)}>
                             <img
                                 src={rsvp}
                                 alt="RSVP"

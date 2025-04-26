@@ -1,7 +1,7 @@
-import { CreateEvent } from '../components/create-event/create-event';
 import Overview from '../components/overview/overview';
 import TableArrangement from '../Pages/TableArragment/TableArragement';
-
+import { GuestsView } from '../components/guests-view/guests-view';
+import { CreateEvent } from '../components/create-event/create-event';
 
 export const ENDPOINTS = [
     {
@@ -10,9 +10,9 @@ export const ENDPOINTS = [
         element: <CreateEvent />,
     },
     {
-        name: 'Guests',
-        path: '/guests',
-        element: <Overview />,
+        name: "Guests",
+        path: "/guests",
+        element: <GuestsView />,
     },
     {
         name: 'Preferences',
