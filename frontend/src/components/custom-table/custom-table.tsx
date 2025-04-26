@@ -1,18 +1,17 @@
-import { useState } from "react";
 import {
   Table,
-  TextInput,
-  ActionIcon,
   Group,
   Paper,
   Container,
+  TextInput,
+  ActionIcon,
+  Select,
 } from "@mantine/core";
+import { useState } from "react";
+import { isEmpty } from "lodash";
 import { IconPencil, IconTrash, IconCheck, IconX } from "@tabler/icons-react";
 
-interface Column<T> {
-  key: keyof T;
-  label: string;
-}
+import { Column } from "../../types/column";
 
 interface CustomTableProps<T> {
   data: T[];
@@ -83,14 +82,36 @@ function CustomTable<T extends { id: string }>({
               <Table.Tr key={row.id} bg={"gray.0"}>
                 {columns.map((col) => (
                   <Table.Td key={String(col.key)}>
-                    {editRowId === row.id ? (
-                      <TextInput
-                        value={(editFormData[col.key] as string) || ""}
-                        onChange={(e) =>
-                          handleInputChange(col.key, e.currentTarget.value)
-                        }
-                        size="xs"
-                      />
+                    {editRowId === row.id && col.isEdit ? (
+                      isEmpty(col.values) ? (
+                        <TextInput
+                          size={"xs"}
+                          value={(editFormData[col.key] as string) || ""}
+                          onChange={(e) =>
+                            handleInputChange(col.key, e.currentTarget.value)
+                          }
+                        />
+                      ) : (
+                        <Select
+                          value={(editFormData[col.key] as string) || ""}
+                          data={col.values?.map((value) => ({
+                            value,
+                            label: value,
+                          }))}
+                          onChange={(value) => {
+                            if (value) {
+                              handleInputChange(col.key, value);
+                            }
+                          }}
+                          styles={{
+                            option: {
+                              whiteSpace: "nowrap",
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                            },
+                          }}
+                        />
+                      )
                     ) : (
                       String(row[col.key])
                     )}
@@ -98,20 +119,20 @@ function CustomTable<T extends { id: string }>({
                 ))}
 
                 <Table.Td>
-                  <Group gap="xs" align="center" justify="center">
+                  <Group gap={"xs"} align={"center"} justify={"center"}>
                     {editRowId === row.id ? (
                       <>
                         <ActionIcon
-                          color="green"
+                          color={"green"}
                           onClick={handleSaveClick}
-                          variant="light"
+                          variant={"transparent"}
                         >
                           <IconCheck size={18} />
                         </ActionIcon>
                         <ActionIcon
-                          color="red"
+                          color={"red"}
                           onClick={handleCancelClick}
-                          variant="light"
+                          variant={"transparent"}
                         >
                           <IconX size={18} />
                         </ActionIcon>
