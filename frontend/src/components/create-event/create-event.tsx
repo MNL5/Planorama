@@ -105,7 +105,7 @@ const CreateEvent: React.FC = () => {
   });
 
   return (
-    <Flex w={"100%"} align={"center"} justify={"space-evenly"} mt={"18vh"}>
+    <Flex w={"100%"} align={"center"} justify={"space-evenly"} style={{ flex: "1 1" }}>
       <Flex align={"center"} gap={"xl"}>
         <Image src={imageUrl} radius={"md"} maw={400} mah={360} />
         <FileInput

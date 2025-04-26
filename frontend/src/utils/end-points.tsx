@@ -1,4 +1,5 @@
 import Overview from '../components/overview/overview';
+import TableArrangement from '../Pages/TableArragment/TableArragement';
 import { GuestsView } from '../components/guests-view/guests-view';
 import { CreateEvent } from '../components/create-event/create-event';
 
@@ -14,23 +15,18 @@ export const ENDPOINTS = [
         element: <GuestsView />,
     },
     {
-        name: "Preferences",
-        path: "/preferences",
+        name: 'Preferences',
+        path: '/preferences',
         element: <Overview />,
     },
     {
         name: "Venue Seats",
         path: "/venue-seats",
-        element: <Overview />,
+        element: <TableArrangement />,
     },
     {
-        name: "Seating",
-        path: "/seating",
+        name: 'To Do',
+        path: '/notes',
         element: <Overview />,
     },
-    {
-        name: "To Do",
-        path: "/notes",
-        element: <Overview />,
-    }
-]
+];
