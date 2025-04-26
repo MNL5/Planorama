@@ -177,7 +177,7 @@ function CustomTable<T extends { id: string }>({
                     ) : col.isMulti ? (
                       (row[col.key] as string[]).join(", ")
                     ) : (
-                      String(row[col.key])
+                      String(row[col.key] ?? "")
                     )}
                   </Table.Td>
                 ))}
