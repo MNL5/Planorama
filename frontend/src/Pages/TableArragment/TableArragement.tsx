@@ -87,7 +87,7 @@ const TableArrangement = () => {
     }, []);
 
     return (
-        <Box style={{ display: 'flex', direction: 'rtl' }}>
+        <Box style={{ display: 'flex', direction: 'rtl', flex: "1 1" }}>
             <Box
                 ref={canvasRef}
                 style={{
@@ -119,7 +119,7 @@ const TableArrangement = () => {
                 }}
             >
                 <div>
-                    <Text fw={700}>תפריט</Text>
+                    <Text fw={700}>Menu</Text>
                     {elementTypes.map((el) => (
                         <Button
                             key={el.type}

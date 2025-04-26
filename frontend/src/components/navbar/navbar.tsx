@@ -21,12 +21,11 @@ const Navbar = () => {
 
   return (
     <nav className="navbar">
-      <Flex align={'center'}>
-      <div className="navbar-logo">
-              <Link to="/">
-                <img src={logo} alt="logo" className="logo" />
-              </Link>
-            </div>
+        <div className="navbar-logo">
+          <Link to="/">
+            <img src={logo} alt="logo" className="logo" />
+          </Link>
+        </div>
         {!isEmpty(currentEvent) && (
           <Group>
             <ul className="navbar-links">
@@ -39,20 +38,16 @@ const Navbar = () => {
           </Group>
         )}
 
-        <Flex
-          className="navbar-actions"
-          ml={!isEmpty(currentEvent) ? "52vw" : "90vw"}
+        <Button
+          size={"s"}
+          radius={"md"}
+          variant={"light"}
+          className={"logout-button"}
+          onClick={handleLogout}
+          style={{marginLeft: "auto", order: 2, alignSelf: "center"}}
         >
-          <Button
-            size={"md"}
-            radius={"md"}
-            variant={"light"}
-            onClick={handleLogout}
-          >
-            <Text size={"md"}>Log Out</Text>
-          </Button>
-        </Flex>
-      </Flex>
+          <Text size={"md"}>Log Out</Text>
+        </Button>
     </nav>
   );
 };
