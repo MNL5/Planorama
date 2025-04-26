@@ -25,7 +25,7 @@ const InvitationPage: React.FC = () => {
             </Stack> 
     }
 
-    return <Invitation event={event} />;
+    return <Invitation event={event} guestId={id} />;
 };
 
 export default InvitationPage;
