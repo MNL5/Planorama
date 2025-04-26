@@ -46,9 +46,10 @@ function AddRowModal<T>({
     columns.forEach((col) => {
       const value = newRowData[col.key];
       if (
-        value === undefined ||
-        (typeof value === "string" && value.trim() === "") ||
-        (Array.isArray(value) && value.length === 0)
+        !col.isNullable &&
+        (value === undefined ||
+          (typeof value === "string" && value.trim() === "") ||
+          (Array.isArray(value) && value.length === 0))
       ) {
         newErrors[col.key as string] = `${col.label} is required`;
       }
@@ -85,7 +86,7 @@ function AddRowModal<T>({
                 }
                 placeholder={`Enter ${col.label}`}
                 style={{ marginTop: "5px" }}
-                error={errors[col.key as string] || undefined}
+                error={!col.isNullable ? errors[col.key as string] : undefined}
               />
             ) : col.isMulti ? (
               <MultiSelect
@@ -98,7 +99,7 @@ function AddRowModal<T>({
                 onChange={(value) => handleInputChange(col.key, value)}
                 placeholder={`Select ${col.label}`}
                 style={{ marginTop: "5px" }}
-                error={errors[col.key as string] || undefined}
+                error={!col.isNullable ? errors[col.key as string] : undefined}
               />
             ) : (
               <Select
@@ -115,7 +116,7 @@ function AddRowModal<T>({
                 }}
                 placeholder={`Select ${col.label}`}
                 style={{ marginTop: "5px" }}
-                error={errors[col.key as string] || undefined}
+                error={!col.isNullable ? errors[col.key as string] : undefined}
               />
             )}
           </div>

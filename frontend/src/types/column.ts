@@ -3,6 +3,7 @@ interface Column<T> {
   label: string;
   isEdit: boolean;
   isMulti: boolean;
+  isNullable: boolean;
   values?: string[];
 }
 
