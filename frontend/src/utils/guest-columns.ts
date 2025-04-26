@@ -16,7 +16,7 @@ const guestColumns: Column<Guest>[] = [
     label: "Group",
     isEdit: true,
     isMulti: false,
-    isNullable: false,
+    isNullable: true,
   },
   {
     key: "phoneNumber",
@@ -24,6 +24,8 @@ const guestColumns: Column<Guest>[] = [
     isEdit: true,
     isMulti: false,
     isNullable: false,
+    validationFunction: (value: unknown) =>
+      /^[+\d]?(?:[\d-.\s()]*)$/.test(value as string),
   },
   {
     key: "meal",

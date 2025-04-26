@@ -5,6 +5,7 @@ interface Column<T> {
   isMulti: boolean;
   isNullable: boolean;
   values?: string[];
+  validationFunction?: (value: unknown) => boolean;
 }
 
 export type { Column };

@@ -52,6 +52,12 @@ function AddRowModal<T>({
           (Array.isArray(value) && value.length === 0))
       ) {
         newErrors[col.key as string] = `${col.label} is required`;
+      } else if (
+        !isEmpty(value) &&
+        col.validationFunction &&
+        !col.validationFunction(value)
+      ) {
+        newErrors[col.key as string] = `${col.label} is invalid`;
       }
     });
 
