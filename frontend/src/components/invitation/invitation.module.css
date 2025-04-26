@@ -17,6 +17,10 @@
     cursor: pointer;
 }
 
+.option img, .rsvpContainer img {
+    filter: brightness(0) saturate(100%) invert(4%) sepia(44%) saturate(7373%) hue-rotate(354deg) brightness(94%) contrast(91%);
+}
+
 .img {
     width: 100%;
     max-width: 400px;
@@ -41,4 +45,17 @@
 
 .text {
     white-space: pre-wrap;
+}
+
+.option {
+    cursor: pointer;
+}
+
+.option .selected {
+    background-color: #420F0F;
+    border-radius: 50%;
+}
+
+.option .selected img {
+    filter: brightness(0) saturate(100%) invert(100%) sepia(88%) saturate(1094%) hue-rotate(185deg) brightness(96%) contrast(96%);
 }
