@@ -26,7 +26,7 @@ const useFetchEventsList = (isLogged: boolean) => {
     }
   }, [doesUserHaveEvents, eventsList, setCurrentEvent]);
 
-  return { eventsList, doesUserHaveEvents, isLoadingEventsList: isLoading || !(doesUserHaveEvents && currentEvent)};
+  return { eventsList, doesUserHaveEvents, isLoadingEventsList: isLoading || (doesUserHaveEvents && !currentEvent)};
 };
 
 export { useFetchEventsList };
