@@ -11,5 +11,5 @@ public record EventDTO(@NotNull UUID id,
                        @Nullable String invitationText,
                        @Nullable String invitationImg,
                        @Nullable OffsetDateTime time,
-                       @Nullable String diagram) {
+                       @Nullable DiagramDTO diagram) {
 }

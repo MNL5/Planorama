@@ -8,5 +8,5 @@ public record UpdateEventDTO(@Nullable String name,
                              @Nullable String invitationText,
                              @Nullable String invitationImg,
                              @Nullable OffsetDateTime time,
-                             @Nullable String diagram) {
+                             @Nullable DiagramDTO diagram) {
 }

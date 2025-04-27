@@ -1,6 +1,7 @@
 package com.planorama.backend.user;
 
 import com.planorama.backend.common.JWTUtil;
+import com.planorama.backend.common.exceptions.EntityNotFoundException;
 import com.planorama.backend.user.api.CreateUserAction;
 import com.planorama.backend.user.entity.UserAccess;
 import com.planorama.backend.user.entity.UserDAO;
@@ -62,12 +63,12 @@ public class UserService {
         final Query findUser = Query.query(where("email").is(email));
         return reactiveMongoTemplate.findOne(findUser, UserDAO.class)
                 .filter(user -> passwordUtil.verifyPassword(password, user.password()))
-                .switchIfEmpty(Mono.error(new RuntimeException("email / password is incorrect")))
+                .switchIfEmpty(Mono.error(new EntityNotFoundException("email / password is incorrect")))
                 .flatMap(user -> {
                     final String refreshToken = createToken(user.id(), refreshExpirationTime);
                     final Update pushNewRefreshTokenUpdate = new Update().push("refreshTokens").value(refreshToken);
                     return reactiveMongoTemplate.findAndModify(findUser, pushNewRefreshTokenUpdate, UserDAO.class)
-                            .switchIfEmpty(Mono.error(new RuntimeException("Failed to update user")))
+                            .onErrorResume(error -> Mono.error(new RuntimeException("Failed to update user", error)))
                             .map(updatedUser -> new UserAccess(updatedUser, createToken(updatedUser.id(), expirationTime), refreshToken));
                 });
     }
@@ -82,7 +83,7 @@ public class UserService {
                 .flatMap(user -> {
                     final Set<String> updatedTokens = filterExpireTokens(user.refreshTokens().stream(), currentTime, Set.of(refreshToken));
                     return reactiveMongoTemplate.findAndModify(findByIdQuery(id), replaceRefreshTokenUpdate(updatedTokens), UserDAO.class)
-                            .switchIfEmpty(Mono.error(new RuntimeException("Failed to logout user")))
+                            .onErrorResume(error -> Mono.error(new RuntimeException("Failed to logout user", error)))
                             .map(updatedUser -> "Successfully log out user");
                 });
     }
@@ -99,7 +100,7 @@ public class UserService {
                             currentTime,
                             Set.of(refreshToken));
                     return reactiveMongoTemplate.findAndModify(findByIdQuery(id), replaceRefreshTokenUpdate(updatedTokens), UserDAO.class)
-                            .switchIfEmpty(Mono.error(new RuntimeException("Failed to update user")))
+                            .onErrorResume(error -> Mono.error(new RuntimeException("Failed to update user", error)))
                             .map(updatedUser -> new UserAccess(updatedUser,
                                     createToken(updatedUser.id(), expirationTime),
                                     newRefreshToken)
@@ -125,7 +126,7 @@ public class UserService {
 
     private Mono<UserDAO> findUserByID(UUID id) {
         return reactiveMongoTemplate.findById(id, UserDAO.class)
-                .switchIfEmpty(Mono.error(new RuntimeException("user is not exist")));
+                .switchIfEmpty(Mono.error(new EntityNotFoundException("User is not exist")));
     }
 
     private String createToken(UUID id, Duration expirationTime) {

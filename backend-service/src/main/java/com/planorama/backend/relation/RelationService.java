@@ -1,12 +1,16 @@
 package com.planorama.backend.relation;
 
+import com.planorama.backend.event.api.DeleteEvent;
+import com.planorama.backend.guest.api.DeleteGuest;
 import com.planorama.backend.relation.api.CreateRelationDTO;
 import com.planorama.backend.relation.api.UpdateRelationDTO;
 import com.planorama.backend.relation.entity.RelationDAO;
+import org.springframework.context.event.EventListener;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -25,6 +29,27 @@ public class RelationService {
     public RelationService(ReactiveMongoTemplate reactiveMongoTemplate) {
         this.reactiveMongoTemplate = reactiveMongoTemplate;
         this.updateFields = Map.of(RelationDAO.RELATION_FIELD, u -> u.relation() != null ? u.relation().name() : null);
+    }
+
+    @Async
+    @EventListener
+    public void removeEvent(DeleteEvent deleteEvent) {
+        reactiveMongoTemplate.remove(Query.query(Criteria.where(RelationDAO.EVENT_ID_FIELD)
+                        .is(deleteEvent.getEventId())))
+                .retry()
+                .subscribe();
+    }
+
+    @Async
+    @EventListener
+    public void removeGuest(DeleteGuest deleteGuest) {
+        reactiveMongoTemplate.remove(Query.query(Criteria.where(RelationDAO.FIRST_GUEST_ID_FIELD)
+                        .is(deleteGuest.getGuestId()).orOperator(
+                                Criteria.where(RelationDAO.SECOND_GUEST_ID_FIELD)
+                                        .is(deleteGuest.getGuestId()
+                                        ))))
+                .retry()
+                .subscribe();
     }
 
     public Flux<RelationDAO> findAllByEventId(String eventId) {

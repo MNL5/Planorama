@@ -1,15 +1,19 @@
 package com.planorama.backend.guest;
 
+import com.planorama.backend.event.api.DeleteEvent;
 import com.planorama.backend.guest.api.CreateGuestDTO;
 import com.planorama.backend.guest.api.RSVPStatusDTO;
 import com.planorama.backend.guest.api.UpdateGuestDTO;
 import com.planorama.backend.guest.entity.GuestDAO;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.event.EventListener;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -23,10 +27,12 @@ import java.util.stream.Collectors;
 @Service
 public class GuestService {
     private final ReactiveMongoTemplate reactiveMongoTemplate;
+    private final ApplicationEventPublisher eventPublisher;
     private final Map<String, Function<UpdateGuestDTO, Object>> updateFields;
 
-    public GuestService(ReactiveMongoTemplate reactiveMongoTemplate) {
+    public GuestService(ReactiveMongoTemplate reactiveMongoTemplate, ApplicationEventPublisher eventPublisher) {
         this.reactiveMongoTemplate = reactiveMongoTemplate;
+        this.eventPublisher = eventPublisher;
         this.updateFields = Map.of(
                 GuestDAO.NAME_FIELD, UpdateGuestDTO::name,
                 GuestDAO.PHONE_NUMBER_FIELD, UpdateGuestDTO::phoneNumber,
@@ -36,6 +42,15 @@ public class GuestService {
                 GuestDAO.STATUS_FIELD, u -> u.status() != null ? u.status().name() : null,
                 GuestDAO.TABLE_FIELD, UpdateGuestDTO::table
         );
+    }
+
+    @Async
+    @EventListener
+    public void removeEvent(DeleteEvent deleteEvent) {
+        reactiveMongoTemplate.remove(Query.query(Criteria.where(GuestDAO.EVENT_ID_FIELD)
+                        .is(deleteEvent.getEventId())))
+                .retry()
+                .subscribe();
     }
 
     public Mono<GuestDAO> getGuest(UUID guestId) {
@@ -78,6 +93,7 @@ public class GuestService {
     }
 
     public Mono<GuestDAO> deleteGuest(@Valid @NotNull UUID guestId) {
-        return reactiveMongoTemplate.findAndRemove(Query.query(Criteria.where(GuestDAO.ID_FIELD).is(guestId)), GuestDAO.class);
+        return reactiveMongoTemplate.findAndRemove(Query.query(Criteria.where(GuestDAO.ID_FIELD).is(guestId)), GuestDAO.class)
+                .doOnNext(dao -> eventPublisher.publishEvent(new DeleteEvent(this, guestId.toString())));
     }
 }
