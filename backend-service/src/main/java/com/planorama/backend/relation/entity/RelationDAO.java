@@ -16,5 +16,7 @@ public record RelationDAO(@Id UUID id,
                           RelationStatus relation) {
     public static final String ID_FIELD = "id";
     public static final String EVENT_ID_FIELD = "eventId";
+    public static final String FIRST_GUEST_ID_FIELD = "firstGuestId";
+    public static final String SECOND_GUEST_ID_FIELD = "secondGuestId";
     public static final String RELATION_FIELD = "relation";
 }

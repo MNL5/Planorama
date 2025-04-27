@@ -4,8 +4,6 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
-import java.util.List;
-
 public record DiagramTableDTO(@NotEmpty String color,
                               @NotNull @Positive Double height,
                               @NotEmpty String id,
@@ -14,6 +12,5 @@ public record DiagramTableDTO(@NotEmpty String color,
                               @NotEmpty String type,
                               @NotNull @Positive Double width,
                               @NotNull Double x,
-                              @NotNull Double y,
-                              @NotNull List<String> guestList) implements DiagramObjectDTO {
+                              @NotNull Double y) implements DiagramObjectDTO {
 }

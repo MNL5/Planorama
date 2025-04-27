@@ -5,6 +5,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.List;
 import java.util.UUID;
 
 @Document("events")
@@ -14,7 +15,7 @@ public record EventDAO(@Id UUID id,
                        String invitationText,
                        Binary invitationImg,
                        Long time,
-                       String diagram) {
+                       List<DiagramObjectDAO> diagram) {
     public static final String ID_FIELD = "id";
     public static final String OWNER_ID_FIELD = "ownerID";
     public static final String NAME_FIELD = "name";
