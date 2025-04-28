@@ -3,8 +3,9 @@ import { useEffect, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 import { v4 as uuidv4 } from 'uuid';
 import RndElement from '../../components/RndElement/RndElement';
-import SeatingService from '../../Services/Seating/SeatingService';
 import Element from '../../types/Element';
+import { useEventContext } from '../../contexts/event-context';
+import { updateEvent } from '../../services/event-service/event-service';
 
 const elementTypes = [
     { type: 'square', label: 'Square Table' },
@@ -20,6 +21,7 @@ const TableArrangement = () => {
     const [selectedType, setSelectedType] = useState<Element['type'] | null>(
         null
     );
+    const { currentEvent, setCurrentEvent } = useEventContext();
 
     const addElement = () => {
         if (!canvasRef.current || !selectedType) return;
@@ -57,8 +59,17 @@ const TableArrangement = () => {
 
     const handleSave = async () => {
         try {
-            await SeatingService.save(elements).request;
-            toast.success('Seating arrangement saved');
+            if (currentEvent?.id) {
+                setCurrentEvent(
+                    await updateEvent(
+                        { ...currentEvent, diagram: { elements } },
+                        currentEvent.id
+                    )
+                );
+                toast.success('Seating arrangement saved');
+            } else {
+                console.error('no current event id');
+            }
         } catch (error) {
             console.error(error);
             const innerError = error as {
@@ -73,8 +84,7 @@ const TableArrangement = () => {
 
     const loadLayout = async () => {
         try {
-            const response = await SeatingService.load();
-            const loadedElements = response.data?.elements;
+            const loadedElements = currentEvent?.diagram?.elements;
             setElements(loadedElements || []);
         } catch (error) {
             console.error('Failed to load layout:', error);
@@ -87,7 +97,7 @@ const TableArrangement = () => {
     }, []);
 
     return (
-        <Box style={{ display: 'flex', direction: 'rtl', flex: "1 1" }}>
+        <Box style={{ display: 'flex', direction: 'rtl', flex: '1 1' }}>
             <Box
                 ref={canvasRef}
                 style={{
