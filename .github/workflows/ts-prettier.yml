@@ -1,0 +1,48 @@
+name: Prettify TypeScript Code
+
+on:
+  pull_request:
+    paths:
+      - 'frontend/**/*.ts'
+      - 'frontend/**/*.tsx'
+
+jobs:
+  prettify:
+    name: Prettier Format Check
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # required to push changes
+      pull-requests: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: |
+          cd frontend
+          npm ci
+
+      - name: Run Prettier
+        run: |
+          cd frontend
+          npx prettier --write .
+
+      - name: Commit changes if any
+        run: |
+          git config --global user.name 'github-actions'
+          git config --global user.email 'github-actions@github.com'
+          git add .
+          if ! git diff --cached --quiet; then
+            git commit -m "style: prettify TypeScript code"
+            git push
+          else
+            echo "No changes to commit"
+          fi
