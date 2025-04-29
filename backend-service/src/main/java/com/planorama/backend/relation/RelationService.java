@@ -6,6 +6,7 @@ import com.planorama.backend.relation.api.CreateRelationDTO;
 import com.planorama.backend.relation.api.UpdateRelationDTO;
 import com.planorama.backend.relation.entity.RelationDAO;
 import org.springframework.context.event.EventListener;
+import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -75,6 +76,7 @@ public class RelationService {
     public Mono<RelationDAO> updateRelation(UpdateRelationDTO updateRelationDTO, UUID relationId) {
         return reactiveMongoTemplate.findAndModify(Query.query(Criteria.where(RelationDAO.ID_FIELD).is(relationId)),
                 createUpdateCommand(updateRelationDTO),
+                FindAndModifyOptions.options().returnNew(true),
                 RelationDAO.class);
     }
 
