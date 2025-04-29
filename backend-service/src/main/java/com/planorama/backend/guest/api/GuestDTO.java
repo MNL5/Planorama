@@ -11,5 +11,5 @@ public record GuestDTO(UUID id,
                        String group,
                        RSVPStatusDTO status,
                        Set<MealDTO> meal,
-                       Integer table) {
+                       String tableId) {
 }
