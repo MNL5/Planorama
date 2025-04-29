@@ -11,7 +11,7 @@ const listToMap = (list: {label:string, value: string}[]) => {
 }
 
 const guestColumns: (event: Event) => Column<Guest>[] = (event: Event) => {
-  const tables = event.diagram.elements.map((table, index) => ({label: `${index + 1}`, value: table.id}));
+  const tables = event.diagram?.elements?.map((table, index) => ({label: `${index + 1}`, value: table.id})) || [];
 
   return [
     {
