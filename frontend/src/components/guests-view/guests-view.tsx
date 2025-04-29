@@ -8,6 +8,7 @@ import {
   createGuest,
   updateGuest,
   getAllGuests,
+  deleteGuest,
 } from "../../Services/guest-service/guest-service";
 import { guestColumns } from "../../utils/guest-columns";
 import { CustomTable } from "../custom-table/custom-table";
@@ -26,7 +27,7 @@ const GuestsView: React.FC = () => {
     queryFn: () => getAllGuests(currentEvent?.id as string),
   });
 
-  const { mutate: mutateCreateGuest } = useMutation<
+  const { mutateAsync: mutateCreateGuest } = useMutation<
     Guest,
     Error,
     Omit<Guest, "id">
@@ -35,18 +36,39 @@ const GuestsView: React.FC = () => {
     onSuccess: () => {
       toast.success("Guest created successfully");
     },
+    onError: () => {
+      toast.error("Failed to create guest");
+    }
   });
 
-  const { mutate: mutateUpdateGuest } = useMutation<
+  const { mutateAsync: mutateUpdateGuest } = useMutation<
     Guest,
     Error,
-    { guestId: string } & Omit<Guest, "id">
+    Guest
   >({
-    mutationFn: ({ guestId, ...updatedGuest }) =>
-      updateGuest(currentEvent?.id as string, updatedGuest, guestId),
+    mutationFn: (updatedGuest) =>
+      updateGuest(currentEvent?.id as string, updatedGuest, updatedGuest.id),
     onSuccess: () => {
       toast.success("Guest updated successfully");
     },
+    onError: () => {
+      toast.error("Failed to update guest");
+    }
+  });
+
+  const { mutateAsync: mutateDeleteGuest } = useMutation<
+    Guest,
+    Error,
+    string
+  >({
+    mutationFn: (guestId) =>
+      deleteGuest(guestId),
+    onSuccess: () => {
+      toast.success("Guest deleted successfully");
+    },
+    onError: () => {
+      toast.error("Failed to delete guest");
+    }
   });
 
   return isSuccess && !isNil(guests) ? (
@@ -54,8 +76,9 @@ const GuestsView: React.FC = () => {
       <CustomTable<Guest>
         data={guests}
         columns={guestColumns}
+        deleteRow={mutateDeleteGuest}
         createRow={mutateCreateGuest}
-        updateRow={(row) => mutateUpdateGuest({ ...row, guestId: row.id })}
+        updateRow={mutateUpdateGuest}
       />
     </Flex>
   ) : isLoading ? (

@@ -25,8 +25,9 @@ import { AddRowModal } from "./add-row-modal";
 interface CustomTableProps<T> {
   data: T[];
   columns: Column<T>[];
-  createRow: (row: T) => void;
-  updateRow: (row: T) => void;
+  createRow: (row: T) => Promise<T>;
+  updateRow: (row: T) => Promise<T>;
+  deleteRow: (id: string) => Promise<T>;
 }
 
 function CustomTable<T extends { id: string }>({
@@ -34,16 +35,15 @@ function CustomTable<T extends { id: string }>({
   columns,
   createRow,
   updateRow,
+  deleteRow,
 }: CustomTableProps<T>) {
   const [opened, { open, close }] = useDisclosure();
   const [data, setData] = useState<T[]>(initialData);
   const [editRowId, setEditRowId] = useState<string | null>(null);
   const [editFormData, setEditFormData] = useState<Partial<T>>({});
-  const [lastId, setLastId] = useState<number>(initialData.length);
 
   const handleAddRow = (newRow: T) => {
     setData((prev) => [...prev, newRow]);
-    setLastId(lastId + 1);
     close();
   };
 
@@ -64,20 +64,19 @@ function CustomTable<T extends { id: string }>({
     }));
   };
 
-  const handleSaveClick = () => {
+  const handleSaveClick = async () => {
     if (editRowId !== null) {
+      const guest = await updateRow({ ...editFormData, id: editRowId } as T);
       setData((prev: T[]) =>
-        prev.map((row: T) =>
-          row.id === editRowId ? { ...row, ...editFormData } : row
-        )
+        prev.map((row: T) => (row.id === guest.id ? guest : row))
       );
-      updateRow({ ...editFormData, id: editRowId } as T);
       setEditRowId(null);
       setEditFormData({});
     }
   };
 
-  const handleDeleteClick = (id: string) => {
+  const handleDeleteClick = async (id: string) => {
+    await deleteRow(id);
     setData((prev: T[]) => prev.filter((row: T) => row.id !== id));
   };
 
@@ -99,7 +98,6 @@ function CustomTable<T extends { id: string }>({
           onClose={close}
           onAddRow={handleAddRow}
           columns={columns}
-          lastId={lastId}
           createRow={createRow}
         />
         <Table
