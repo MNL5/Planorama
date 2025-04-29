@@ -3,6 +3,7 @@ package com.planorama.backend.guest;
 import com.planorama.backend.event.api.DeleteEvent;
 import com.planorama.backend.guest.api.CreateGuestDTO;
 import com.planorama.backend.guest.api.RSVPStatusDTO;
+import com.planorama.backend.guest.api.SeatGuests;
 import com.planorama.backend.guest.api.UpdateGuestDTO;
 import com.planorama.backend.guest.entity.GuestDAO;
 import jakarta.validation.Valid;
@@ -40,7 +41,7 @@ public class GuestService {
                 GuestDAO.GROUP_FIELD, UpdateGuestDTO::group,
                 GuestDAO.MEAL_FIELD, u -> u.meal() != null ? u.meal().stream().map(Enum::name).collect(Collectors.toSet()) : null,
                 GuestDAO.STATUS_FIELD, u -> u.status() != null ? u.status().name() : null,
-                GuestDAO.TABLE_FIELD, UpdateGuestDTO::table
+                GuestDAO.TABLE_FIELD, UpdateGuestDTO::tableId
         );
     }
 
@@ -49,6 +50,15 @@ public class GuestService {
     public void removeEvent(DeleteEvent deleteEvent) {
         reactiveMongoTemplate.remove(Query.query(Criteria.where(GuestDAO.EVENT_ID_FIELD)
                         .is(deleteEvent.getEventId())))
+                .retry()
+                .subscribe();
+    }
+
+    @Async
+    @EventListener
+    public void updateGuestSeat(SeatGuests seatGuests) {
+        reactiveMongoTemplate.updateMulti(Query.query(Criteria.where(GuestDAO.ID_FIELD).in(seatGuests.getGuestIds())),
+                        new Update().set(GuestDAO.TABLE_FIELD, seatGuests.getTableId()), GuestDAO.class)
                 .retry()
                 .subscribe();
     }
