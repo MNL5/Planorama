@@ -1,0 +1,49 @@
+name: Validate TypeScript (Strict)
+
+on:
+  pull_request:
+    paths:
+      - 'frontend/**.ts'
+      - 'frontend/**.tsx'
+
+jobs:
+  validate-typescript:
+    name: Type Check (Strict)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Run tsc and capture output
+        id: typecheck
+        working-directory: frontend
+        run: |
+          set -o pipefail
+          npx tsc --noEmit --strict 2>&1 | tee ../tsc_output.txt
+        continue-on-error: true
+
+      - name: Post comment on PR if there are type errors
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const output = fs.readFileSync('tsc_output.txt', 'utf8');
+            const commentBody = `## ❌ TypeScript type errors found\n\`\`\`\n${output.slice(0, 6500)}\n\`\`\`\nPlease fix the type errors to proceed.`;
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: commentBody
+            });
