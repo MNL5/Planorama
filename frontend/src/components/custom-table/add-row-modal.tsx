@@ -17,6 +17,7 @@ interface AddRowModalProps<T> {
   onAddRow: (newRow: T) => void;
   columns: Column<T>[];
   lastId: number;
+  createRow: (row: T) => void;
 }
 
 function AddRowModal<T>({
@@ -25,6 +26,7 @@ function AddRowModal<T>({
   onAddRow,
   columns,
   lastId,
+  createRow,
 }: AddRowModalProps<T>) {
   const [newRowData, setNewRowData] = useState<Partial<T>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -73,6 +75,7 @@ function AddRowModal<T>({
 
     const newId = (lastId + 1).toString();
     onAddRow({ ...newRowData, id: newId } as T);
+    createRow({ ...newRowData } as T);
     setNewRowData({});
     setErrors({});
   };

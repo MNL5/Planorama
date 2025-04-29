@@ -1,5 +1,5 @@
 import Overview from '../components/overview/overview';
-import TableArrangement from '../Pages/TableArragment/TableArragement';
+import TableArrangement from '../components/table-arragment/table-arragement';
 import { GuestsView } from '../components/guests-view/guests-view';
 import { CreateEvent } from '../components/create-event/create-event';
 

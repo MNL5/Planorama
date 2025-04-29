@@ -1,3 +1,5 @@
+import { AxiosResponse } from "axios";
+
 import {
     abortableGetRequest,
     abortablePutRequest,
