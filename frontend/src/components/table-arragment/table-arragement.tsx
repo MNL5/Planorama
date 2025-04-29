@@ -3,9 +3,10 @@ import { toast } from 'react-toastify';
 import { useEffect, useRef, useState } from 'react';
 import { Box, Button, Drawer, NumberInput, Text } from '@mantine/core';
 
-import Element from '../../types/element';
+import Element from '../../types/Element';
 import RndElement from '../RndElement/RndElement';
-import SeatingService from '../../services/seating/seating-service';
+import { useEventContext } from '../../contexts/event-context';
+import { updateEvent } from '../../Services/event-service/event-service';
 
 const elementTypes = [
     { type: 'square', label: 'Square Table' },
@@ -21,6 +22,7 @@ const TableArrangement = () => {
     const [selectedType, setSelectedType] = useState<Element['type'] | null>(
         null
     );
+    const { currentEvent, setCurrentEvent } = useEventContext();
 
     const addElement = () => {
         if (!canvasRef.current || !selectedType) return;
@@ -58,8 +60,17 @@ const TableArrangement = () => {
 
     const handleSave = async () => {
         try {
-            await SeatingService.save(elements).request;
-            toast.success('Seating arrangement saved');
+            if (currentEvent?.id) {
+                setCurrentEvent(
+                    await updateEvent(
+                        { ...currentEvent, diagram: { elements } },
+                        currentEvent.id
+                    )
+                );
+                toast.success('Seating arrangement saved');
+            } else {
+                console.error('no current event id');
+            }
         } catch (error) {
             console.error(error);
             const innerError = error as {
@@ -74,8 +85,7 @@ const TableArrangement = () => {
 
     const loadLayout = async () => {
         try {
-            const response = await SeatingService.load();
-            const loadedElements = response.data?.elements;
+            const loadedElements = currentEvent?.diagram?.elements;
             setElements(loadedElements || []);
         } catch (error) {
             console.error('Failed to load layout:', error);
@@ -88,7 +98,7 @@ const TableArrangement = () => {
     }, []);
 
     return (
-        <Box style={{ display: 'flex', direction: 'rtl', flex: "1 1" }}>
+        <Box style={{ display: 'flex', direction: 'rtl', flex: '1 1' }}>
             <Box
                 ref={canvasRef}
                 style={{
@@ -98,10 +108,11 @@ const TableArrangement = () => {
                     border: '1px solid rgb(230, 229, 229)',
                 }}
             >
-                {elements.map((el) => (
+                {elements.map((el, index) => (
                     <RndElement
                         key={el.id}
                         element={el}
+                        tableNumber={index + 1}
                         onUpdate={updateElement}
                         onDelete={deleteElement}
                     />
@@ -139,7 +150,7 @@ const TableArrangement = () => {
 
                 <Button
                     className="primary-btn"
-                    style={{ fontSize: '14px', background: '#d1bdd2' }}
+                    style={{ fontSize: '14px' }}
                     fullWidth
                     onClick={handleSave}
                 >

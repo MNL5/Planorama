@@ -16,8 +16,7 @@ interface AddRowModalProps<T> {
   onClose: () => void;
   onAddRow: (newRow: T) => void;
   columns: Column<T>[];
-  lastId: number;
-  createRow: (row: T) => void;
+  createRow: (row: T) => Promise<T>;
 }
 
 function AddRowModal<T>({
@@ -25,7 +24,6 @@ function AddRowModal<T>({
   onClose,
   onAddRow,
   columns,
-  lastId,
   createRow,
 }: AddRowModalProps<T>) {
   const [newRowData, setNewRowData] = useState<Partial<T>>({});
@@ -68,14 +66,12 @@ function AddRowModal<T>({
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!validateForm()) {
       return;
     }
 
-    const newId = (lastId + 1).toString();
-    onAddRow({ ...newRowData, id: newId } as T);
-    createRow({ ...newRowData } as T);
+    onAddRow(await createRow({ ...newRowData } as T));
     setNewRowData({});
     setErrors({});
   };
@@ -86,7 +82,7 @@ function AddRowModal<T>({
         {columns.map((col) => (
           <div key={String(col.key)} style={{ marginBottom: "10px" }}>
             <label>{col.label}</label>
-            {isEmpty(col.values) ? (
+            {!col.values ? (
               <TextInput
                 size={"sm"}
                 value={(newRowData[col.key] as string) || ""}
@@ -100,10 +96,7 @@ function AddRowModal<T>({
             ) : col.isMulti ? (
               <MultiSelect
                 size={"sm"}
-                data={col.values?.map((value) => ({
-                  value,
-                  label: value,
-                }))}
+                data={col.values}
                 value={(newRowData[col.key] as string[]) || []}
                 onChange={(value) => handleInputChange(col.key, value)}
                 placeholder={`Select ${col.label}`}
@@ -113,10 +106,7 @@ function AddRowModal<T>({
             ) : (
               <Select
                 size={"sm"}
-                data={col.values?.map((value) => ({
-                  value,
-                  label: value,
-                }))}
+                data={col.values}
                 value={(newRowData[col.key] as string) || ""}
                 onChange={(value) => {
                   if (value) {

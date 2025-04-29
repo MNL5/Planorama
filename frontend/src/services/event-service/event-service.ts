@@ -1,39 +1,38 @@
 import { AxiosResponse } from "axios";
 
 import {
-  abortableGetRequest,
-  abortablePutRequest,
-  abortablePostRequest,
-} from "../abortable-request";
-import { EventType } from "../../types/event";
+    abortableGetRequest,
+    abortablePutRequest,
+    abortablePostRequest,
+} from '../abortable-request';
+import { CreateEvent, Event } from '../../types/event';
+import { AxiosResponse } from 'axios';
 
-const createEvent = async (event: Omit<EventType, "id">) => {
-  const response = await abortablePostRequest<EventType>(
-    "events",
-    event
-  ).request;
-  return response.data;
+const createEvent = async (event: CreateEvent) => {
+    const response = await abortablePostRequest<Event>('events', event).request;
+    return response.data;
 };
 
-const updateEvent = async (eventToEdit: Omit<EventType, "id">, id: string) => {
-  const response = await abortablePutRequest<EventType>(
-    `events/${id}`,
-    eventToEdit
-  ).request;
-  return response.data;
+const updateEvent = async (
+    eventToEdit: Partial<Omit<Event, 'id'>>,
+    id: string
+) => {
+    const response = await abortablePutRequest<Event>(
+        `events/${id}`,
+        eventToEdit
+    ).request;
+    return response.data;
 };
 
 const getEventList = async () => {
-  const response: AxiosResponse<EventType[]> = await abortableGetRequest<
-    EventType[]
-  >("events/list").request;
-  return response.data;
+    const response: AxiosResponse<Event[]> = await abortableGetRequest<Event[]>(
+        'events/list'
+    ).request;
+    return response.data;
 };
 
 const getEventByGuestId = (guestId: string) => {
-  return abortableGetRequest<
-    EventType
-  >(`events?guest=${guestId}`);
+    return abortableGetRequest<Event>(`events?guest=${guestId}`);
 };
 
 export { createEvent, updateEvent, getEventList, getEventByGuestId };

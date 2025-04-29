@@ -1,14 +1,15 @@
 import { Button } from '@mantine/core';
 import { Rnd } from 'react-rnd';
-import Element from '../../types/element';
+import Element from '../../types/Element';
 
 interface RndElementProps {
     element: Element;
+    tableNumber: number;
     onUpdate: (updated: Element) => void;
     onDelete: (id: string) => void;
 }
 
-const RndElement = ({ element, onUpdate, onDelete }: RndElementProps) => (
+const RndElement = ({ element, tableNumber, onUpdate, onDelete }: RndElementProps) => (
     <Rnd
         bounds="parent"
         size={{ width: element.width, height: element.height }}
@@ -40,17 +41,20 @@ const RndElement = ({ element, onUpdate, onDelete }: RndElementProps) => (
             style={{
                 display: 'flex',
                 flexDirection: 'column',
-                alignItems: 'center',
-                gap: '8px',
+                alignItems: 'center'
             }}
         >
-            {element.label}
+            <span style={{fontSize: "1.3rem"}}>{tableNumber}</span>
+            <span>{`(${element.seatCount})`}</span>
             <Button
                 size="xs"
                 color="#951818"
+                h={"20px"}
+                p={"5px"}
+                style={{position: 'absolute', top: '5px', left: '5px', fontSize: '0.8rem'}}
                 onClick={() => onDelete(element.id)}
             >
-                x
+                ×
             </Button>
         </div>
     </Rnd>

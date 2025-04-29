@@ -1,9 +1,15 @@
-type EventType = {
-  id: string;
-  name: string;
-  invitationText: string;
-  invitationImg: string;
-  time: Date;
+import Element from './Element';
+
+interface CreateEvent {
+    name: string;
+    invitationText: string;
+    invitationImg: string;
+    time: Date;
+}
+
+type Event = CreateEvent & {
+    id: string;
+    diagram: { elements: Element[] };
 };
 
-export type { EventType };
+export type { CreateEvent, Event };
