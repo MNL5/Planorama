@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
+import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -83,13 +84,16 @@ public class GuestService {
                 createGuestDTO.phoneNumber(),
                 createGuestDTO.gender(),
                 createGuestDTO.group(),
-                RSVPStatusDTO.TENTATIVE.name(),
-                Set.of(),
-                null);
+                createGuestDTO.status() != null ? createGuestDTO.status().name() : RSVPStatusDTO.TENTATIVE.name(),
+                createGuestDTO.meal() != null ? createGuestDTO.meal().stream().map(Enum::name).collect(Collectors.toSet()) : Set.of(),
+                createGuestDTO.tableId());
     }
 
     public Mono<GuestDAO> updateGuest(UpdateGuestDTO updateGuestDTO, UUID guestId) {
-        return reactiveMongoTemplate.findAndModify(Query.query(Criteria.where(GuestDAO.ID_FIELD).is(guestId)), createUpdateCommand(updateGuestDTO), GuestDAO.class);
+        return reactiveMongoTemplate.findAndModify(Query.query(Criteria.where(GuestDAO.ID_FIELD).is(guestId)),
+                createUpdateCommand(updateGuestDTO),
+                FindAndModifyOptions.options().returnNew(true),
+                GuestDAO.class);
     }
 
     private Update createUpdateCommand(UpdateGuestDTO updateGuestDTO) {
