@@ -8,7 +8,7 @@ import {
   createGuest,
   updateGuest,
   getAllGuests,
-} from "../../services/guest-service/guest-service";
+} from "../../Services/guest-service/guest-service";
 import { guestColumns } from "../../utils/guest-columns";
 import { CustomTable } from "../custom-table/custom-table";
 import { useEventContext } from "../../contexts/event-context";
