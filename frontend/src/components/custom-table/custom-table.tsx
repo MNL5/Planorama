@@ -127,7 +127,7 @@ function CustomTable<T extends { id: string }>({
                         <TextInput
                           w={120}
                           size={"xs"}
-                          value={(editFormData[col.key] as string) || ""}
+                          value={(editFormData[col.key] as string) ?? ""}
                           onChange={(e) =>
                             handleInputChange(col.key, e.currentTarget.value)
                           }
@@ -135,7 +135,11 @@ function CustomTable<T extends { id: string }>({
                       ) : col.isMulti ? (
                         <MultiSelect
                           w={120}
-                          value={(editFormData[col.key] as string[]) || ""}
+                          value={
+                            Array.isArray(editFormData[col.key])
+                              ? (editFormData[col.key] as string[])
+                              : []
+                          }
                           data={col.values?.map((value) => ({
                             value,
                             label: value,
@@ -159,7 +163,7 @@ function CustomTable<T extends { id: string }>({
                       ) : (
                         <Select
                           w={120}
-                          value={(editFormData[col.key] as string) || ""}
+                          value={(editFormData[col.key] as string) ?? ""}
                           data={col.values?.map((value) => ({
                             value,
                             label: value,
