@@ -1,10 +1,11 @@
+import { AxiosResponse } from "axios";
+
 import {
   abortableGetRequest,
   abortablePutRequest,
   abortablePostRequest,
 } from "../abortable-request";
 import { EventType } from "../../types/event";
-import { AxiosResponse } from "axios";
 
 const createEvent = async (event: Omit<EventType, "id">) => {
   const response = await abortablePostRequest<EventType>(

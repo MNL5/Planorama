@@ -1,31 +1,68 @@
-import { useState } from "react";
+import { isNil } from "lodash";
+import { Flex, Loader, Text } from "@mantine/core";
+import { toast } from "react-toastify";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
 import { Guest } from "../../types/guest";
-import { MealType } from "../../types/meal";
-import { RsvpStatus } from "../../types/rsvp-status";
+import {
+  createGuest,
+  updateGuest,
+  getAllGuests,
+} from "../../services/guest-service/guest-service";
 import { guestColumns } from "../../utils/guest-columns";
 import { CustomTable } from "../custom-table/custom-table";
-import { Flex } from "@mantine/core";
+import { useEventContext } from "../../contexts/event-context";
 
 const GuestsView: React.FC = () => {
-  const [guests] = useState<Guest[]>([
-    {
-      id: "1",
-      name: "Matan Leibovich Dromi",
-      gender: "Male",
-      group: "Ha Magnivim",
-      meal: [MealType.GLUTEN_FREE],
-      phoneNumber: "050-2349994",
-      status: RsvpStatus.ACCEPTED,
-      table: 1,
-    },
-  ]);
+  const { currentEvent } = useEventContext();
 
-  return (
+  const {
+    data: guests,
+    isSuccess,
+    isLoading,
+    isError,
+  } = useQuery<Guest[], Error>({
+    queryKey: ["fetchEventsList"],
+    queryFn: () => getAllGuests(currentEvent?.id as string),
+  });
+
+  const { mutate: mutateCreateGuest } = useMutation<
+    Guest,
+    Error,
+    Omit<Guest, "id">
+  >({
+    mutationFn: (newGuest) => createGuest(currentEvent?.id as string, newGuest),
+    onSuccess: () => {
+      toast.success("Guest created successfully");
+    },
+  });
+
+  const { mutate: mutateUpdateGuest } = useMutation<
+    Guest,
+    Error,
+    { guestId: string } & Omit<Guest, "id">
+  >({
+    mutationFn: ({ guestId, ...updatedGuest }) =>
+      updateGuest(currentEvent?.id as string, updatedGuest, guestId),
+    onSuccess: () => {
+      toast.success("Guest updated successfully");
+    },
+  });
+
+  return isSuccess && !isNil(guests) ? (
     <Flex style={{ flex: "1 1", overflowY: "scroll" }}>
-      <CustomTable<Guest> data={guests} columns={guestColumns} />
+      <CustomTable<Guest>
+        data={guests}
+        columns={guestColumns}
+        createRow={mutateCreateGuest}
+        updateRow={(row) => mutateUpdateGuest({ ...row, guestId: row.id })}
+      />
     </Flex>
-  );
+  ) : isLoading ? (
+    <Loader size="lg" color="primary" />
+  ) : isError ? (
+    <Text>Oops! Something went wrong. Please try again later.</Text>
+  ) : null;
 };
 
 export { GuestsView };

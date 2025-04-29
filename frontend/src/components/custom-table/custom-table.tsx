@@ -25,11 +25,15 @@ import { AddRowModal } from "./add-row-modal";
 interface CustomTableProps<T> {
   data: T[];
   columns: Column<T>[];
+  createRow: (row: T) => void;
+  updateRow: (row: T) => void;
 }
 
 function CustomTable<T extends { id: string }>({
   data: initialData,
   columns,
+  createRow,
+  updateRow,
 }: CustomTableProps<T>) {
   const [opened, { open, close }] = useDisclosure();
   const [data, setData] = useState<T[]>(initialData);
@@ -67,6 +71,7 @@ function CustomTable<T extends { id: string }>({
           row.id === editRowId ? { ...row, ...editFormData } : row
         )
       );
+      updateRow({ ...editFormData, id: editRowId } as T);
       setEditRowId(null);
       setEditFormData({});
     }
@@ -95,6 +100,7 @@ function CustomTable<T extends { id: string }>({
           onAddRow={handleAddRow}
           columns={columns}
           lastId={lastId}
+          createRow={createRow}
         />
         <Table
           withTableBorder

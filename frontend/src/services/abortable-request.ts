@@ -41,10 +41,28 @@ const abortableGetRequest = <T>(url: string) => {
   };
 };
 
+const abortableDeleteRequest = <T>(url: string) => {
+  const abortController = new AbortController();
+
+  const request = httpClient.delete<T>(url, {
+    signal: abortController.signal,
+  });
+
+  return {
+    request,
+    abort: () => abortController.abort(),
+  };
+};
+
 type AbortableRequestReturnType<T> = {
   request: Promise<AxiosResponse<T>>;
   abort: () => void;
 };
 
 export type { AbortableRequestReturnType };
-export { abortablePostRequest, abortableGetRequest, abortablePutRequest };
+export {
+  abortablePostRequest,
+  abortableGetRequest,
+  abortablePutRequest,
+  abortableDeleteRequest,
+};
