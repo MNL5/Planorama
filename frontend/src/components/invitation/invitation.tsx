@@ -6,6 +6,10 @@ import style from './invitation.module.css';
 import rsvp from '../../assets/rsvp.svg';
 import { Event } from '../../types/event';
 import mealOptions from '../../utils/meal-options';
+import { useMutation } from '@tanstack/react-query';
+import { Guest } from '../../types/guest';
+import { updateGuest } from '../../Services/guest-service/guest-service';
+import { toast } from 'react-toastify';
 
 const Invitation: React.FC<{ event: Event; guestId?: string }> = ({
     event,
@@ -24,8 +28,28 @@ const Invitation: React.FC<{ event: Event; guestId?: string }> = ({
         });
     };
 
+    const { mutateAsync: mutateUpdateGuest } = useMutation<
+        Guest,
+        Error,
+        Guest
+    >({
+        mutationFn: (updatedGuest) =>
+        updateGuest(event.id as string, updatedGuest, updatedGuest.id),
+        onSuccess: () => {
+        toast.success("Your RSVP has been updated successfully");
+        },
+        onError: () => {
+        toast.error("Failed to update your RSVP");
+        }
+    });
+
+
     const handleSubmit = (status: string) => {
-        // TODO: Implement the submit logic here
+        mutateUpdateGuest({
+            id: guestId as string,
+            status,
+            meal: Array.from(chosenMeals),
+        } as Guest);
     };
 
     return (
