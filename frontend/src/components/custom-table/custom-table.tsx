@@ -9,7 +9,6 @@ import {
   MultiSelect,
 } from "@mantine/core";
 import { useState } from "react";
-import { isEmpty } from "lodash";
 import { useDisclosure } from "@mantine/hooks";
 import {
   IconX,
@@ -121,7 +120,7 @@ function CustomTable<T extends { id: string }>({
                 {columns.map((col) => (
                   <Table.Td key={String(col.key)}>
                     {editRowId === row.id && col.isEdit ? (
-                      isEmpty(col.values) ? (
+                      !col.values ? (
                         <TextInput
                           w={120}
                           size={"xs"}
@@ -138,10 +137,7 @@ function CustomTable<T extends { id: string }>({
                               ? (editFormData[col.key] as string[])
                               : []
                           }
-                          data={col.values?.map((value) => ({
-                            value,
-                            label: value,
-                          }))}
+                          data={col.values}
                           onChange={(value) => {
                             if (value) {
                               handleInputChange(col.key, value);
@@ -162,10 +158,7 @@ function CustomTable<T extends { id: string }>({
                         <Select
                           w={120}
                           value={(editFormData[col.key] as string) ?? ""}
-                          data={col.values?.map((value) => ({
-                            value,
-                            label: value,
-                          }))}
+                          data={col.values}
                           onChange={(value) => {
                             if (value) {
                               handleInputChange(col.key, value);
@@ -184,9 +177,9 @@ function CustomTable<T extends { id: string }>({
                         />
                       )
                     ) : col.isMulti ? (
-                      (row[col.key] as string[])?.join(", ") ?? ""
+                      (row[col.key] as string[])?.map(val => col.alt ? col.alt[val] : val).join(", ") ?? ""
                     ) : (
-                      String(row[col.key] ?? "")
+                      String(row[col.key] ? (col.alt ? col.alt[row[col.key]] : row[col.key]) : "")
                     )}
                   </Table.Td>
                 ))}

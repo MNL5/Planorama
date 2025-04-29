@@ -73,7 +73,7 @@ const Invitation: React.FC<{ event: Event; guestId?: string }> = ({
                                             h={'15px'}
                                         />
                                     </Flex>
-                                    <span>{option.name}</span>
+                                    <span>{option.label}</span>
                                 </Flex>
                             ))}
                         </Stack>

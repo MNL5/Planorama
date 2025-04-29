@@ -7,27 +7,27 @@ import { MealType } from "../types/meal";
 
 export default [
   {
-    name: "Vegetarian",
+    label: "Vegetarian",
     value: MealType.VEGETARIAN,
     image: VegetarianImage,
   },
   {
-    name: "Vegan",
+    label: "Vegan",
     value: MealType.VEGAN,
     image: VeganImage,
   },
   {
-    name: "Gluten Free",
+    label: "Gluten Free",
     value: MealType.GLUTEN_FREE,
     image: GlutenImage,
   },
   {
-    name: "Kosher",
+    label: "Kosher",
     value: MealType.KOSHER,
     image: KosherImage,
   },
   {
-    name: "Kid Friendly",
+    label: "Kid Friendly",
     value: MealType.KID,
     image: KidImage,
   },

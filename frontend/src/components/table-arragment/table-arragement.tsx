@@ -108,10 +108,11 @@ const TableArrangement = () => {
                     border: '1px solid rgb(230, 229, 229)',
                 }}
             >
-                {elements.map((el) => (
+                {elements.map((el, index) => (
                     <RndElement
                         key={el.id}
                         element={el}
+                        tableNumber={index + 1}
                         onUpdate={updateElement}
                         onDelete={deleteElement}
                     />
@@ -149,7 +150,7 @@ const TableArrangement = () => {
 
                 <Button
                     className="primary-btn"
-                    style={{ fontSize: '14px', background: '#d1bdd2' }}
+                    style={{ fontSize: '14px' }}
                     fullWidth
                     onClick={handleSave}
                 >

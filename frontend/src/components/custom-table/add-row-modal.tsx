@@ -82,7 +82,7 @@ function AddRowModal<T>({
         {columns.map((col) => (
           <div key={String(col.key)} style={{ marginBottom: "10px" }}>
             <label>{col.label}</label>
-            {isEmpty(col.values) ? (
+            {!col.values ? (
               <TextInput
                 size={"sm"}
                 value={(newRowData[col.key] as string) || ""}
@@ -96,10 +96,7 @@ function AddRowModal<T>({
             ) : col.isMulti ? (
               <MultiSelect
                 size={"sm"}
-                data={col.values?.map((value) => ({
-                  value,
-                  label: value,
-                }))}
+                data={col.values}
                 value={(newRowData[col.key] as string[]) || []}
                 onChange={(value) => handleInputChange(col.key, value)}
                 placeholder={`Select ${col.label}`}
@@ -109,10 +106,7 @@ function AddRowModal<T>({
             ) : (
               <Select
                 size={"sm"}
-                data={col.values?.map((value) => ({
-                  value,
-                  label: value,
-                }))}
+                data={col.values}
                 value={(newRowData[col.key] as string) || ""}
                 onChange={(value) => {
                   if (value) {

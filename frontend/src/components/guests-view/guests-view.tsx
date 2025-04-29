@@ -13,9 +13,18 @@ import {
 import { guestColumns } from "../../utils/guest-columns";
 import { CustomTable } from "../custom-table/custom-table";
 import { useEventContext } from "../../contexts/event-context";
+import { useEffect, useState } from "react";
+import { Column } from "../../types/column";
 
 const GuestsView: React.FC = () => {
   const { currentEvent } = useEventContext();
+  const [columns, setColumns] = useState<Column<Guest>[] | null>(null);
+
+  useEffect(() => {
+    if (currentEvent) {
+      setColumns(guestColumns(currentEvent));
+    }
+  }, [currentEvent]);
 
   const {
     data: guests,
@@ -71,11 +80,11 @@ const GuestsView: React.FC = () => {
     }
   });
 
-  return isSuccess && !isNil(guests) ? (
+  return isSuccess && !isNil(guests) && columns ? (
     <Flex style={{ flex: "1 1", overflowY: "scroll" }}>
       <CustomTable<Guest>
         data={guests}
-        columns={guestColumns}
+        columns={columns}
         deleteRow={mutateDeleteGuest}
         createRow={mutateCreateGuest}
         updateRow={mutateUpdateGuest}

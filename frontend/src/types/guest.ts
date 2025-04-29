@@ -9,7 +9,7 @@ type Guest = {
   group: string;
   status: RsvpStatus;
   meal: MealType[];
-  table: number;
+  tableId: string;
 };
 
 export type { Guest };
