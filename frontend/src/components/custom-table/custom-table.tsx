@@ -25,11 +25,15 @@ import { AddRowModal } from "./add-row-modal";
 interface CustomTableProps<T> {
   data: T[];
   columns: Column<T>[];
+  createRow: (row: T) => void;
+  updateRow: (row: T) => void;
 }
 
 function CustomTable<T extends { id: string }>({
   data: initialData,
   columns,
+  createRow,
+  updateRow,
 }: CustomTableProps<T>) {
   const [opened, { open, close }] = useDisclosure();
   const [data, setData] = useState<T[]>(initialData);
@@ -67,6 +71,7 @@ function CustomTable<T extends { id: string }>({
           row.id === editRowId ? { ...row, ...editFormData } : row
         )
       );
+      updateRow({ ...editFormData, id: editRowId } as T);
       setEditRowId(null);
       setEditFormData({});
     }
@@ -95,6 +100,7 @@ function CustomTable<T extends { id: string }>({
           onAddRow={handleAddRow}
           columns={columns}
           lastId={lastId}
+          createRow={createRow}
         />
         <Table
           withTableBorder
@@ -121,7 +127,7 @@ function CustomTable<T extends { id: string }>({
                         <TextInput
                           w={120}
                           size={"xs"}
-                          value={(editFormData[col.key] as string) || ""}
+                          value={(editFormData[col.key] as string) ?? ""}
                           onChange={(e) =>
                             handleInputChange(col.key, e.currentTarget.value)
                           }
@@ -129,7 +135,11 @@ function CustomTable<T extends { id: string }>({
                       ) : col.isMulti ? (
                         <MultiSelect
                           w={120}
-                          value={(editFormData[col.key] as string[]) || ""}
+                          value={
+                            Array.isArray(editFormData[col.key])
+                              ? (editFormData[col.key] as string[])
+                              : []
+                          }
                           data={col.values?.map((value) => ({
                             value,
                             label: value,
@@ -153,7 +163,7 @@ function CustomTable<T extends { id: string }>({
                       ) : (
                         <Select
                           w={120}
-                          value={(editFormData[col.key] as string) || ""}
+                          value={(editFormData[col.key] as string) ?? ""}
                           data={col.values?.map((value) => ({
                             value,
                             label: value,

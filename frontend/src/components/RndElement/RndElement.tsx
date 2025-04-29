@@ -1,6 +1,6 @@
 import { Button } from '@mantine/core';
 import { Rnd } from 'react-rnd';
-import Element from '../../types/Element';
+import Element from '../../types/element';
 
 interface RndElementProps {
     element: Element;

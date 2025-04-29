@@ -1,6 +1,6 @@
-import { abortablePostRequest } from '../abortable-request';
 import httpClient from '../http-client';
-import Element from '../../types/Element';
+import Element from '../../types/element';
+import { abortablePostRequest } from '../abortable-request';
 
 const load = () => httpClient.get<{elements: Element[]}>('/seating/load');
 const save = (elements: Element[]) =>
