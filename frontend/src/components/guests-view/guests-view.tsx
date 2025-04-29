@@ -22,7 +22,7 @@ const GuestsView: React.FC = () => {
     isLoading,
     isError,
   } = useQuery<Guest[], Error>({
-    queryKey: ["fetchEventsList"],
+    queryKey: ["fetchGuests", currentEvent?.id],
     queryFn: () => getAllGuests(currentEvent?.id as string),
   });
 

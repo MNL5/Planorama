@@ -1,10 +1,11 @@
-import { Box, Button, Drawer, NumberInput, Text } from '@mantine/core';
-import { useEffect, useRef, useState } from 'react';
-import { toast } from 'react-toastify';
 import { v4 as uuidv4 } from 'uuid';
-import RndElement from '../../components/RndElement/RndElement';
-import SeatingService from '../../Services/Seating/SeatingService';
-import Element from '../../types/Element';
+import { toast } from 'react-toastify';
+import { useEffect, useRef, useState } from 'react';
+import { Box, Button, Drawer, NumberInput, Text } from '@mantine/core';
+
+import Element from '../../types/element';
+import RndElement from '../RndElement/RndElement';
+import SeatingService from '../../services/seating/seating-service';
 
 const elementTypes = [
     { type: 'square', label: 'Square Table' },
@@ -16,7 +17,7 @@ const TableArrangement = () => {
     const canvasRef = useRef<HTMLDivElement>(null);
     const [elements, setElements] = useState<Element[]>([]);
     const [drawerOpened, setDrawerOpened] = useState(false);
-    const [seatCount, setSeatCount] = useState<number>(1);
+    const [seatCount, setSeatCount] = useState<number | string>(1);
     const [selectedType, setSelectedType] = useState<Element['type'] | null>(
         null
     );
