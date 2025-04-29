@@ -31,6 +31,7 @@ const GuestsView: React.FC = () => {
     isSuccess,
     isLoading,
     isError,
+    isFetching
   } = useQuery<Guest[], Error>({
     queryKey: ["fetchGuests", currentEvent?.id],
     queryFn: () => getAllGuests(currentEvent?.id as string),
@@ -80,7 +81,7 @@ const GuestsView: React.FC = () => {
     }
   });
 
-  return isSuccess && !isNil(guests) && columns ? (
+  return isSuccess && !isFetching && !isNil(guests) && columns ? (
     <Flex style={{ flex: "1 1", overflowY: "scroll" }}>
       <CustomTable<Guest>
         data={guests}
