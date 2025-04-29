@@ -12,6 +12,7 @@ import jakarta.validation.constraints.NotNull;
 import org.bson.BsonBinarySubType;
 import org.bson.types.Binary;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
@@ -87,6 +88,7 @@ public class EventService {
                 .map(this::createUpdateCommand)
                 .flatMap(updateCommand -> reactiveMongoTemplate.findAndModify(Query.query(where(EventDAO.ID_FIELD).is(eventID).and(EventDAO.OWNER_ID_FIELD).is(userID)),
                         updateCommand,
+                        FindAndModifyOptions.options().returnNew(true),
                         EventDAO.class));
     }
 

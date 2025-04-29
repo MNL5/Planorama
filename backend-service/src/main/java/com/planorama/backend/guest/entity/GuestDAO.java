@@ -16,7 +16,7 @@ public record GuestDAO(@Id UUID id,
                        String group,
                        String status,
                        Set<String> meal,
-                       Integer table) {
+                       String tableId) {
     public static final String ID_FIELD = "id";
     public static final String EVENT_ID_FIELD = "eventID";
     public static final String NAME_FIELD = "name";
@@ -25,5 +25,5 @@ public record GuestDAO(@Id UUID id,
     public static final String GROUP_FIELD = "group";
     public static final String STATUS_FIELD = "status";
     public static final String MEAL_FIELD = "meal";
-    public static final String TABLE_FIELD = "table";
+    public static final String TABLE_FIELD = "tableId";
 }

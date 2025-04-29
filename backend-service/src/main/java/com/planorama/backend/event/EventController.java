@@ -1,6 +1,9 @@
-package com.planorama.backend.event.api;
+package com.planorama.backend.event;
 
-import com.planorama.backend.event.EventService;
+import com.planorama.backend.event.api.CreateEventDTO;
+import com.planorama.backend.event.api.EventAPI;
+import com.planorama.backend.event.api.EventDTO;
+import com.planorama.backend.event.api.UpdateEventDTO;
 import com.planorama.backend.event.mapper.EventMapper;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -12,7 +15,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("events")
-public class EventController {
+public class EventController implements EventAPI {
     private final EventService eventService;
     private final EventMapper eventMapper;
 
@@ -23,6 +26,7 @@ public class EventController {
     }
 
     @GetMapping("/{eventId}")
+    @Override
     public Mono<EventDTO> getEventByID(@PathVariable("eventId") UUID eventUUID) {
         return eventService.findByID(eventUUID)
                 .map(eventMapper::daoToDTO);

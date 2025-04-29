@@ -10,5 +10,5 @@ public record UpdateGuestDTO(@Nullable String name,
                              @Nullable String group,
                              @Nullable RSVPStatusDTO status,
                              @Nullable Set<MealDTO> meal,
-                             @Nullable Integer table) {
+                             @Nullable String tableId) {
 }

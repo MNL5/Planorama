@@ -1,6 +1,7 @@
 package com.planorama.backend.relation;
 
 import com.planorama.backend.relation.api.CreateRelationDTO;
+import com.planorama.backend.relation.api.RelationAPI;
 import com.planorama.backend.relation.api.RelationDTO;
 import com.planorama.backend.relation.api.UpdateRelationDTO;
 import com.planorama.backend.relation.mapper.RelationMapper;
@@ -12,7 +13,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/relations")
-public class RelationController {
+public class RelationController implements RelationAPI {
     private final RelationService relationService;
     private final RelationMapper mapper;
 
@@ -23,6 +24,7 @@ public class RelationController {
     }
 
     @GetMapping
+    @Override
     public Flux<RelationDTO> getAllRelationsByEventID(@RequestParam("event") String eventId) {
         return relationService.findAllByEventId(eventId)
                 .map(mapper::daoToDTO);
