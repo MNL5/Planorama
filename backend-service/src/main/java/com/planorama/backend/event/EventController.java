@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @RestController
@@ -41,6 +42,13 @@ public class EventController implements EventAPI {
     @GetMapping
     public Mono<EventDTO> getEventByGuestID(@RequestParam("guest") UUID guestID) {
         return eventService.findEventByGuestID(guestID)
+                .map(eventMapper::daoToDTO);
+    }
+
+    @Override
+    public Flux<EventDTO> getEventBetweenDates(@NotNull OffsetDateTime from,
+                                               @NotNull OffsetDateTime to) {
+        return eventService.findEventsBetweenDates(from, to)
                 .map(eventMapper::daoToDTO);
     }
 
