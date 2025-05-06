@@ -1,14 +1,12 @@
 package com.planorama.backend.guest;
 
-import com.planorama.backend.guest.api.CreateGuestDTO;
-import com.planorama.backend.guest.api.GuestAPI;
-import com.planorama.backend.guest.api.GuestDTO;
-import com.planorama.backend.guest.api.UpdateGuestDTO;
+import com.planorama.backend.guest.api.*;
 import com.planorama.backend.guest.mapper.GuestMapper;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Set;
 import java.util.UUID;
 
 @RestController
@@ -32,6 +30,12 @@ public class GuestController implements GuestAPI {
     @GetMapping
     public Flux<GuestDTO> getAllGuestByEventID(@RequestParam("event") String eventId) {
         return guestService.findAllByEventId(eventId)
+                .map(guestMapper::daoToDTO);
+    }
+
+    @Override
+    public Flux<GuestDTO> getAllGuestsByEventIDAndRsvpStatus(String eventId, Set<RSVPStatusDTO> rsvpStatus) {
+        return guestService.findAllByEventIdAndRsvpStatus(eventId, rsvpStatus)
                 .map(guestMapper::daoToDTO);
     }
 
