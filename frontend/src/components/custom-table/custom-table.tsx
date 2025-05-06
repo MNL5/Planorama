@@ -24,9 +24,9 @@ import { AddRowModal } from "./add-row-modal";
 interface CustomTableProps<T> {
   data: T[];
   columns: Column<T>[];
-  createRow: (row: T) => Promise<T>;
-  updateRow: (row: T) => Promise<T>;
-  deleteRow: (id: string) => Promise<T>;
+  createRow?: (row: T) => Promise<T>;
+  updateRow?: (row: T) => Promise<T>;
+  deleteRow?: (id: string) => Promise<T>;
 }
 
 function CustomTable<T extends { id: string }>({
@@ -64,7 +64,7 @@ function CustomTable<T extends { id: string }>({
   };
 
   const handleSaveClick = async () => {
-    if (editRowId !== null) {
+    if (editRowId !== null && updateRow) {
       const guest = await updateRow({ ...editFormData, id: editRowId } as T);
       setData((prev: T[]) =>
         prev.map((row: T) => (row.id === guest.id ? guest : row))
@@ -75,30 +75,36 @@ function CustomTable<T extends { id: string }>({
   };
 
   const handleDeleteClick = async (id: string) => {
+    if (!deleteRow) return;
     await deleteRow(id);
     setData((prev: T[]) => prev.filter((row: T) => row.id !== id));
   };
 
   return (
-    <Container size={"md"} mt={"xl"}>
+    <Container size={"xl"} mt={"xl"}>
       <Paper shadow={"md"} radius={"md"} p={"md"} withBorder>
-        <Group justify={"flex-end"} mb={"md"}>
-          <ActionIcon
-            size={40}
-            onClick={open}
-            variant={"light"}
-            color={"primary"}
-          >
-            <IconPlus size={24} />
-          </ActionIcon>
-        </Group>
-        <AddRowModal
-          opened={opened}
-          onClose={close}
-          onAddRow={handleAddRow}
-          columns={columns}
-          createRow={createRow}
-        />
+        {
+          createRow && 
+          <>
+            <Group justify={"flex-end"} mb={"md"}>
+              <ActionIcon
+                size={40}
+                onClick={open}
+                variant={"light"}
+                color={"primary"}
+              >
+                <IconPlus size={24} />
+              </ActionIcon>
+            </Group>
+            <AddRowModal
+              opened={opened}
+              onClose={close}
+              onAddRow={handleAddRow}
+              columns={columns}
+              createRow={createRow}
+            />
+          </>
+        }
         <Table
           withTableBorder
           highlightOnHover
@@ -118,7 +124,7 @@ function CustomTable<T extends { id: string }>({
             {data.map((row) => (
               <Table.Tr key={row.id} bg={"gray.0"}>
                 {columns.map((col) => (
-                  <Table.Td key={String(col.key)}>
+                  <Table.Td key={String(col.key)} style={{whiteSpace: "pre-wrap"}}>
                     {editRowId === row.id && col.isEdit ? (
                       !col.values ? (
                         <TextInput
@@ -179,7 +185,7 @@ function CustomTable<T extends { id: string }>({
                     ) : col.isMulti ? (
                       (row[col.key] as string[])?.map(val => col.alt ? col.alt[val] : val).join(", ") ?? ""
                     ) : (
-                      String(row[col.key] ? (col.alt ? col.alt[row[col.key]] : row[col.key]) : "")
+                      String(row[col.key] ? (col.alt ? col.alt[row[col.key] as string] : row[col.key]) : "")
                     )}
                   </Table.Td>
                 ))}
@@ -205,20 +211,25 @@ function CustomTable<T extends { id: string }>({
                       </>
                     ) : (
                       <>
-                        <ActionIcon
-                          color={"blue"}
-                          variant={"transparent"}
-                          onClick={() => handleEditClick(row)}
-                        >
-                          <IconPencil size={18} />
-                        </ActionIcon>
-                        <ActionIcon
-                          color={"red"}
-                          variant={"transparent"}
-                          onClick={() => handleDeleteClick(row.id)}
-                        >
-                          <IconTrash size={18} />
-                        </ActionIcon>
+                        { updateRow && 
+                          <ActionIcon
+                            color={"blue"}
+                            variant={"transparent"}
+                            onClick={() => handleEditClick(row)}
+                          >
+                            <IconPencil size={18} />
+                          </ActionIcon>
+                        }
+                        {
+                          deleteRow &&
+                            <ActionIcon
+                              color={"red"}
+                              variant={"transparent"}
+                              onClick={() => handleDeleteClick(row.id)}
+                            >
+                              <IconTrash size={18} />
+                            </ActionIcon>
+                        }
                       </>
                     )}
                   </Group>
