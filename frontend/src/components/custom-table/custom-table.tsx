@@ -3,10 +3,10 @@ import {
   Group,
   Paper,
   Select,
-  Container,
   TextInput,
   ActionIcon,
   MultiSelect,
+  Flex,
 } from "@mantine/core";
 import { useState } from "react";
 import { useDisclosure } from "@mantine/hooks";
@@ -81,37 +81,37 @@ function CustomTable<T extends { id: string }>({
   };
 
   return (
-    <Container size={"xl"} mt={"xl"}>
-      <Paper shadow={"md"} radius={"md"} p={"md"} withBorder>
-        {
-          createRow && 
-          <>
-            <Group justify={"flex-end"} mb={"md"}>
-              <ActionIcon
-                size={40}
-                onClick={open}
-                variant={"light"}
-                color={"primary"}
-              >
-                <IconPlus size={24} />
-              </ActionIcon>
-            </Group>
-            <AddRowModal
-              opened={opened}
-              onClose={close}
-              onAddRow={handleAddRow}
-              columns={columns}
-              createRow={createRow}
-            />
-          </>
-        }
+    <Paper mah={"100%"} display={"flex"} shadow={"md"} radius={"md"} p={"md"} withBorder style={{ overflowY: "hidden", flexDirection: "column" }}>
+      {
+        createRow && 
+        <>
+          <Group justify={"flex-end"} mb={"xs"}>
+            <ActionIcon
+              size={40}
+              onClick={open}
+              variant={"light"}
+              color={"primary"}
+            >
+              <IconPlus size={24} />
+            </ActionIcon>
+          </Group>
+          <AddRowModal
+            opened={opened}
+            onClose={close}
+            onAddRow={handleAddRow}
+            columns={columns}
+            createRow={createRow}
+          />
+        </>
+      }
+      <Flex style={{ flex: "1 1 auto", overflowY: "auto" }}>
         <Table
           withTableBorder
           highlightOnHover
           striped={false}
           withColumnBorders
         >
-          <Table.Thead>
+          <Table.Thead pos={"sticky"} top={0} style={{backgroundColor: "white"}}>
             <Table.Tr>
               {columns.map((col) => (
                 <Table.Th key={String(col.key)}>{col.label}</Table.Th>
@@ -237,9 +237,20 @@ function CustomTable<T extends { id: string }>({
               </Table.Tr>
             ))}
           </Table.Tbody>
+
+          {columns.some((col) => col.footer) && (
+            <Table.Tfoot pos={"sticky"} bottom={0} style={{backgroundColor: "white"}}>
+              <Table.Tr>
+                {columns.map((col) => (
+                  <Table.Td key={String(col.key)} fw={"bold"}>{col.footer ? col.footer(data) : ""}</Table.Td>
+                ))}
+                <Table.Td />
+              </Table.Tr>
+            </Table.Tfoot>
+          )}
         </Table>
-      </Paper>
-    </Container>
+      </Flex>
+    </Paper>
   );
 }
 

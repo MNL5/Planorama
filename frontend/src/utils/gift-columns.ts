@@ -23,6 +23,9 @@ const giftsColumns: (guests: Guest[]) => Column<Gift>[] = (guests: Guest[]) => {
       isEdit: false,
       isMulti: false,
       isNullable: false,
+      footer: (gift: Gift[]) => {
+        return "Total Gifts: " + gift.length;
+      }
     },
     {
       key: "amount",
@@ -30,6 +33,9 @@ const giftsColumns: (guests: Guest[]) => Column<Gift>[] = (guests: Guest[]) => {
       isEdit: false,
       isMulti: false,
       isNullable: false,
+      footer: (gifts: Gift[]) => {
+        return `${gifts?.reduce((acc, gift) => acc + gift.amount, 0) || 0}`;
+      },
     },
   ]
 };

@@ -1,5 +1,5 @@
 import { isNil } from "lodash";
-import { Flex, Loader, Text } from "@mantine/core";
+import { Container, Loader, Text } from "@mantine/core";
 import { toast } from "react-toastify";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
@@ -82,7 +82,7 @@ const GuestsView: React.FC = () => {
   });
 
   return isSuccess && !isFetching && !isNil(guests) && columns ? (
-    <Flex style={{ flex: "1 1", overflowY: "scroll" }}>
+    <Container size={"xl"} mt={"xl"} mb={"xl"} style={{ flex: "1 1", overflow: "hidden" }}>
       <CustomTable<Guest>
         data={guests}
         columns={columns}
@@ -90,7 +90,7 @@ const GuestsView: React.FC = () => {
         createRow={mutateCreateGuest}
         updateRow={mutateUpdateGuest}
       />
-    </Flex>
+    </Container>
   ) : isLoading ? (
     <Loader size="lg" color="primary" />
   ) : isError ? (
