@@ -21,8 +21,8 @@ public class MessagingUtil {
     private static final String REMINDER_TEXT = """
             Dear %s,
             We are excited to party for %s today at %s.
-            You are table number is %d
-            You can bring present using the following link:
+            Your seat is at table number %s
+            You can bring a present using the following link:
             %s
             """;
 
@@ -67,9 +67,9 @@ public class MessagingUtil {
         send(guest.phoneNumber(), message);
     }
 
-    public void sendReminder(EventDTO event, GuestDTO guest) {
+    public void sendReminder(EventDTO event, GuestDTO guest, Integer tableNumber) {
         String link = clientDNS + "gift/" + guest.id();
-        String message = REMINDER_TEXT.formatted(guest.name(), event.name(), event.time().format(timeFormatter), guest.table(), link);
+        String message = REMINDER_TEXT.formatted(guest.name(), event.name(), event.time().format(timeFormatter), tableNumber, link);
         send(guest.phoneNumber(), message);
     }
 }
