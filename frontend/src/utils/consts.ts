@@ -1,3 +1,3 @@
-const multipleEventPages = ["/event-list"];
+const multipleEventPages = ["/", "/event-list"];
 
 export { multipleEventPages };

@@ -19,6 +19,7 @@ import { useEventListener } from "./hooks/use-event-listener.ts";
 import { EventList } from "./components/event-list/event-list.tsx";
 import { useFetchEventsList } from "./hooks/use-fetch-events-list.ts";
 import InvitationPage from "./components/invitationPage/invitationPage.tsx";
+import { CreateEvent } from "./components/create-event/create-event.tsx";
 
 const theme = createTheme(mantheme);
 
@@ -29,7 +30,7 @@ const App: React.FC = () => {
   const isGuest = pathname.startsWith("/rsvp");
   const [isLogged, setLogged] = useState<boolean>(false);
   const { isLoading } = useRefresh(isGuest);
-  const { doesUserHaveEvents, isLoadingEventsList, isSingleEvent } =
+  const { doesUserHaveEvents, isLoadingEventsList } =
     useFetchEventsList(isLogged);
 
   useEventListener(LOGIN_EVENT, (event: CustomEvent) =>
@@ -66,7 +67,7 @@ const App: React.FC = () => {
           path="/"
           element={
             isLogged ? (
-              doesUserHaveEvents && !isSingleEvent ? (
+              doesUserHaveEvents ? (
                 <Navigate replace to="/event-list" />
               ) : (
                 <Navigate replace to="/event-details" />
@@ -87,6 +88,7 @@ const App: React.FC = () => {
               />
             ))}
             <Route path="/event-list" element={<EventList />} />
+            <Route path="/create-event" element={<CreateEvent />} />
           </>
         ) : (
           <>

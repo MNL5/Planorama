@@ -22,10 +22,11 @@ const EventList: React.FC = () => {
 
   const handleSelectEvent = (event: Event) => {
     setCurrentEvent(event);
-    navigate("event-details");
+    navigate("/event-details");
   };
 
   const handleCreateNewEvent = () => {
+    setCurrentEvent(null);
     navigate("/create-event");
   };
 
