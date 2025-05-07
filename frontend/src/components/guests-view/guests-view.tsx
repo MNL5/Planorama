@@ -2,7 +2,7 @@ import { isNil } from "lodash";
 import { toast } from "react-toastify";
 import { useEffect, useState } from "react";
 import { Flex, Loader, Text } from "@mantine/core";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 
 import { Guest } from "../../types/guest";
 import { Column } from "../../types/column";
@@ -10,11 +10,11 @@ import {
   createGuest,
   updateGuest,
   deleteGuest,
-  getAllGuests,
 } from "../../services/guest-service/guest-service";
 import { guestColumns } from "../../utils/guest-columns";
 import { CustomTable } from "../custom-table/custom-table";
 import { useEventContext } from "../../contexts/event-context";
+import { useFetchAllGuests } from "../../hooks/use-fetch-all-guests";
 
 const GuestsView: React.FC = () => {
   const { currentEvent } = useEventContext();
@@ -27,15 +27,12 @@ const GuestsView: React.FC = () => {
   }, [currentEvent]);
 
   const {
-    data: guests,
+    guestsData: guests,
     isSuccess,
     isLoading,
     isError,
     isFetching,
-  } = useQuery<Guest[], Error>({
-    queryKey: ["fetchGuests", currentEvent?.id],
-    queryFn: () => getAllGuests(currentEvent?.id as string),
-  });
+  } = useFetchAllGuests(true);
 
   const { mutateAsync: mutateCreateGuest } = useMutation<
     Guest,

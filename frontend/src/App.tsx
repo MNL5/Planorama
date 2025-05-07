@@ -13,7 +13,7 @@ import { ENDPOINTS } from "./utils/end-points.tsx";
 import Navbar from "./components/navbar/navbar.tsx";
 import SignIn from "./components/sign-in/sign-in.tsx";
 import SignUp from "./components/sign-up/sign-up.tsx";
-import { multipleEventPages } from "./utils/consts.ts";
+import { multipleEventPages } from "./utils/consts.tsx";
 import Overview from "./components/overview/overview.tsx";
 import { useEventListener } from "./hooks/use-event-listener.ts";
 import { EventList } from "./components/event-list/event-list.tsx";
