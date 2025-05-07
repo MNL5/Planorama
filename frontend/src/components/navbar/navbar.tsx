@@ -22,7 +22,7 @@ const Navbar = () => {
   };
 
   const handleSwitchToEvent = () => {
-    setCurrentEvent(undefined);
+    setCurrentEvent(null);
     navigate("/event-list");
   };
 
