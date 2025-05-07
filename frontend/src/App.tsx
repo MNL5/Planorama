@@ -47,8 +47,6 @@ const App: React.FC = () => {
       />
     );
 
-    console.log(doesUserHaveEvents);
-
   return (
     <MantineProvider theme={theme}>
       <ToastContainer

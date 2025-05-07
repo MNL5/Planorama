@@ -67,7 +67,7 @@ const EventList: React.FC = () => {
             withBorder
           >
             <Card.Section>
-              <Image mah={240} src={eventItem.invitationImg} />
+              <Image h={240} src={eventItem.invitationImg} />
             </Card.Section>
             <Group justify="space-between" mt="md" mb="xs">
               <Title size="xl">{eventItem.name}</Title>
