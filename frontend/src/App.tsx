@@ -13,8 +13,8 @@ import { ENDPOINTS } from "./utils/end-points.tsx";
 import Navbar from "./components/navbar/navbar.tsx";
 import SignIn from "./components/sign-in/sign-in.tsx";
 import SignUp from "./components/sign-up/sign-up.tsx";
+import { multipleEventPages } from "./utils/consts.ts";
 import Overview from "./components/overview/overview.tsx";
-import { useEventContext } from "./contexts/event-context.tsx";
 import { useEventListener } from "./hooks/use-event-listener.ts";
 import { EventList } from "./components/event-list/event-list.tsx";
 import { useFetchEventsList } from "./hooks/use-fetch-events-list.ts";
@@ -31,11 +31,12 @@ const App: React.FC = () => {
   const { isLoading } = useRefresh(isGuest);
   const { doesUserHaveEvents, isLoadingEventsList, isSingleEvent } =
     useFetchEventsList(isLogged);
-  const { currentEvent } = useEventContext();
 
   useEventListener(LOGIN_EVENT, (event: CustomEvent) =>
     setLogged(event.detail)
   );
+
+  const shouldShowNavbar = isLogged && !multipleEventPages.includes(pathname);
 
   if (isLoading || (isLogged && isLoadingEventsList))
     return (
@@ -59,7 +60,7 @@ const App: React.FC = () => {
         theme={"colored"}
         style={{ zIndex: "999999999999" }}
       />
-      {isLogged && currentEvent && <Navbar />}
+      {shouldShowNavbar && <Navbar />}
       <Routes>
         <Route
           path="/"

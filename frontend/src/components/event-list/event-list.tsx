@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import { Flex, Card, Group, Image, Text, Badge, Button } from "@mantine/core";
 
 import { useEventContext } from "../../contexts/event-context";
@@ -7,9 +8,11 @@ import { Event } from "../../types/event";
 const EventList: React.FC = () => {
   const { setCurrentEvent } = useEventContext();
   const { eventsList } = useFetchEventsList(true);
+  const navigate = useNavigate();
 
   const handleSelectEvent = (event: Event) => {
     setCurrentEvent(event);
+    navigate("event-details");
   };
 
   return (
