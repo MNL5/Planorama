@@ -19,17 +19,19 @@ const useFetchEventsList = (isLogged: boolean) => {
   });
 
   const doesUserHaveEvents = isSuccess && !isEmpty(eventsList);
+  const isSingleEvent = doesUserHaveEvents && eventsList.length === 1;
 
   useEffect(() => {
-    if (doesUserHaveEvents && eventsList.length === 1) {
+    if (isSingleEvent) {
       setCurrentEvent(eventsList[0]);
     }
-  }, [doesUserHaveEvents, eventsList, setCurrentEvent]);
+  }, [isSingleEvent, eventsList, setCurrentEvent]);
 
   return {
     eventsList,
     doesUserHaveEvents,
     isLoadingEventsList: isLoading,
+    isSingleEvent,
   };
 };
 

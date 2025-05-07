@@ -103,37 +103,10 @@ const CreateEvent: React.FC = () => {
   return (
     <Flex
       w={"100%"}
-      align={"center"}
+      align={"flex-start"}
       justify={"space-evenly"}
-      style={{ flex: "1 1" }}
+      style={{ marginTop: "16vh" }}
     >
-      <Flex align={"center"} gap={"xl"}>
-        <Image src={imageUrl} radius={"md"} maw={400} mah={360} />
-        <FileInput
-          size={"lg"}
-          style={{ display: "none" }}
-          value={invitationImage}
-          accept={"image/*"}
-          ref={fileInputRef}
-          onChange={(file) => {
-            if (file) {
-              setInvitationImage(file);
-            }
-          }}
-        />
-        <Button
-          size={"xl"}
-          radius={"md"}
-          variant={"light"}
-          onClick={handeImagePicker}
-        >
-          <Text size={"xl"}>
-            {isNil(imageUrl)
-              ? "Select event invitation image"
-              : "Change event invitation image"}
-          </Text>
-        </Button>
-      </Flex>
       <form
         onSubmit={form.onSubmit(async (values) => {
           const preview = await getEventPreview(values);
@@ -202,6 +175,33 @@ const CreateEvent: React.FC = () => {
           </Flex>
         </Stack>
       </form>
+      <Flex align={"center"} gap={"xl"}>
+        <Image src={imageUrl} radius={"md"} maw={400} mah={360} />
+        <FileInput
+          size={"lg"}
+          style={{ display: "none" }}
+          value={invitationImage}
+          accept={"image/*"}
+          ref={fileInputRef}
+          onChange={(file) => {
+            if (file) {
+              setInvitationImage(file);
+            }
+          }}
+        />
+        <Button
+          size={"xl"}
+          radius={"md"}
+          variant={"light"}
+          onClick={handeImagePicker}
+        >
+          <Text size={"xl"}>
+            {isNil(imageUrl)
+              ? "Select Invitation Image"
+              : "Change Invitation Image"}
+          </Text>
+        </Button>
+      </Flex>
       {preview && (
         <InvitationModal event={preview} onClose={() => setPreview(null)} />
       )}

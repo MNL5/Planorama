@@ -29,7 +29,7 @@ const App: React.FC = () => {
   const isGuest = pathname.startsWith("/rsvp");
   const [isLogged, setLogged] = useState<boolean>(false);
   const { isLoading } = useRefresh(isGuest);
-  const { doesUserHaveEvents, isLoadingEventsList } =
+  const { doesUserHaveEvents, isLoadingEventsList, isSingleEvent } =
     useFetchEventsList(isLogged);
   const { currentEvent } = useEventContext();
 
@@ -65,7 +65,7 @@ const App: React.FC = () => {
           path="/"
           element={
             isLogged ? (
-              doesUserHaveEvents ? (
+              doesUserHaveEvents && !isSingleEvent ? (
                 <Navigate replace to="/event-list" />
               ) : (
                 <Navigate replace to="/event-details" />
