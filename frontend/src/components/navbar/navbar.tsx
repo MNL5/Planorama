@@ -1,6 +1,6 @@
 import { isEmpty } from "lodash";
-import { Link } from "react-router-dom";
-import { Group, Button, Text } from "@mantine/core";
+import { Link, useNavigate } from "react-router-dom";
+import { Group, Button, Text, Divider } from "@mantine/core";
 
 import "./navbar.css";
 import logo from "../../assets/logo.png";
@@ -10,7 +10,8 @@ import AuthService from "../../services/auth-service/auth-service";
 import { useEventContext } from "../../contexts/event-context";
 
 const Navbar = () => {
-  const { currentEvent } = useEventContext();
+  const navigate = useNavigate();
+  const { currentEvent, setCurrentEvent } = useEventContext();
 
   const handleLogout = async () => {
     const refreshToken = localStorage.getItem("refreshToken");
@@ -20,7 +21,10 @@ const Navbar = () => {
     }
   };
 
-  const handleSwitchToEvent = () => {};
+  const handleSwitchToEvent = () => {
+    setCurrentEvent(undefined);
+    navigate("/event-list");
+  };
 
   return (
     <nav className="navbar">
@@ -47,18 +51,19 @@ const Navbar = () => {
           radius={"md"}
           variant={"light"}
           className={"navbar-button"}
-          onClick={handleLogout}
+          onClick={handleSwitchToEvent}
         >
-          <Text size={"md"}>Log Out</Text>
+          <Text size={"md"}>Switch Event</Text>
         </Button>
+        <Divider orientation="vertical" />
         <Button
           size={"s"}
           radius={"md"}
           variant={"light"}
           className={"navbar-button"}
-          onClick={handleSwitchToEvent}
+          onClick={handleLogout}
         >
-          <Text size={"md"}>Switch Event</Text>
+          <Text size={"md"}>Log Out</Text>
         </Button>
       </Group>
     </nav>

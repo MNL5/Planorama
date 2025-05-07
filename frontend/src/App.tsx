@@ -14,6 +14,7 @@ import Navbar from "./components/navbar/navbar.tsx";
 import SignIn from "./components/sign-in/sign-in.tsx";
 import SignUp from "./components/sign-up/sign-up.tsx";
 import Overview from "./components/overview/overview.tsx";
+import { useEventContext } from "./contexts/event-context.tsx";
 import { useEventListener } from "./hooks/use-event-listener.ts";
 import { EventList } from "./components/event-list/event-list.tsx";
 import { useFetchEventsList } from "./hooks/use-fetch-events-list.ts";
@@ -30,6 +31,7 @@ const App: React.FC = () => {
   const { isLoading } = useRefresh(isGuest);
   const { doesUserHaveEvents, isLoadingEventsList } =
     useFetchEventsList(isLogged);
+  const { currentEvent } = useEventContext();
 
   useEventListener(LOGIN_EVENT, (event: CustomEvent) =>
     setLogged(event.detail)
@@ -57,7 +59,7 @@ const App: React.FC = () => {
         theme={"colored"}
         style={{ zIndex: "999999999999" }}
       />
-      {isLogged && <Navbar />}
+      {isLogged && currentEvent && <Navbar />}
       <Routes>
         <Route
           path="/"
