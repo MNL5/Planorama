@@ -23,7 +23,7 @@ const InvitationPage: React.FC = () => {
       <Stack
         align="center"
         justify="center"
-        style={{ color: "#420F0F", padding: "20px" }}
+        style={{ color: "#50147c", padding: "20px" }}
       >
         <Title>Event not found</Title>
         <Text>Please check the link or contact the event organizer.</Text>
