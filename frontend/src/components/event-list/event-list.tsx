@@ -16,9 +16,9 @@ import { useEventContext } from "../../contexts/event-context";
 import { useFetchEventsList } from "../../hooks/use-fetch-events-list";
 
 const EventList: React.FC = () => {
+  const navigate = useNavigate();
   const { setCurrentEvent } = useEventContext();
   const { eventsList } = useFetchEventsList(true);
-  const navigate = useNavigate();
 
   const handleSelectEvent = (event: Event) => {
     setCurrentEvent(event);
@@ -39,7 +39,9 @@ const EventList: React.FC = () => {
         align={"center"}
         justify={"center"}
       >
-        <Title order={1}>Your Events</Title>
+        <Title order={1} c={"primary"}>
+          Your Events
+        </Title>
         <Button
           size={"md"}
           radius={"md"}
