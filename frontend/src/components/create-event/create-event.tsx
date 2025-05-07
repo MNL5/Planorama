@@ -13,7 +13,7 @@ import { isEmpty, isNil } from "lodash";
 import { useForm } from "@mantine/form";
 import { useNavigate } from "react-router-dom";
 import { DateTimePicker } from "@mantine/dates";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 
 import {
@@ -34,9 +34,9 @@ const CreateEvent: React.FC = () => {
 
   const form = useForm({
     initialValues: {
-      eventName: "",
-      invitationText: "",
-      eventDate: new Date(),
+      eventName: currentEvent?.name ?? "",
+      invitationText: currentEvent?.invitationText ?? "",
+      eventDate: currentEvent?.time ? new Date(currentEvent?.time) : new Date(),
     },
     validate: {
       eventName: (value) => (value.trim() ? null : "event name is required"),
@@ -45,18 +45,6 @@ const CreateEvent: React.FC = () => {
       eventDate: (value) => (value ? null : "Please select a date and time"),
     },
   });
-
-  useEffect(() => {
-    if (currentEvent) {
-      form.setValues({
-        eventName: currentEvent.name ?? "",
-        invitationText: currentEvent.invitationText ?? "",
-        eventDate: currentEvent.time ? new Date(currentEvent.time) : new Date(),
-      });
-    } else {
-      form.reset();
-    }
-  }, [currentEvent, form]);
 
   const imageUrl = useMemo(() => {
     return invitationImage
