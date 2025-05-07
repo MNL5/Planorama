@@ -11,6 +11,7 @@ import { useEventContext } from "../../contexts/event-context";
 
 const Navbar = () => {
   const { currentEvent } = useEventContext();
+
   const handleLogout = async () => {
     const refreshToken = localStorage.getItem("refreshToken");
     if (refreshToken) {
@@ -18,6 +19,8 @@ const Navbar = () => {
       clearCache();
     }
   };
+
+  const handleSwitchToEvent = () => {};
 
   return (
     <nav className="navbar">
@@ -38,16 +41,26 @@ const Navbar = () => {
         </Group>
       )}
 
-      <Button
-        size={"s"}
-        radius={"md"}
-        variant={"light"}
-        className={"logout-button"}
-        onClick={handleLogout}
-        style={{ marginLeft: "auto", order: 2, alignSelf: "center" }}
-      >
-        <Text size={"md"}>Log Out</Text>
-      </Button>
+      <Group ml={"auto"} gap={"sm"} style={{ order: 2, alignSelf: "center" }}>
+        <Button
+          size={"s"}
+          radius={"md"}
+          variant={"light"}
+          className={"navbar-button"}
+          onClick={handleLogout}
+        >
+          <Text size={"md"}>Log Out</Text>
+        </Button>
+        <Button
+          size={"s"}
+          radius={"md"}
+          variant={"light"}
+          className={"navbar-button"}
+          onClick={handleSwitchToEvent}
+        >
+          <Text size={"md"}>Switch Event</Text>
+        </Button>
+      </Group>
     </nav>
   );
 };
