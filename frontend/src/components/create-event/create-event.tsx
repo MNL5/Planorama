@@ -8,6 +8,7 @@ import {
   Textarea,
   TextInput,
 } from "@mantine/core";
+import { toast } from "react-toastify";
 import { isEmpty, isNil } from "lodash";
 import { useForm } from "@mantine/form";
 import { useNavigate } from "react-router-dom";
@@ -15,12 +16,14 @@ import { DateTimePicker } from "@mantine/dates";
 import { useMemo, useRef, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 
-import { toast } from "react-toastify";
+import {
+  createEvent,
+  updateEvent,
+} from "../../services/event-service/event-service";
 import { fileToBase64 } from "../../utils/image-utils";
 import { useEventContext } from "../../contexts/event-context";
 import InvitationModal from "../invitationModal/invitationModal";
 import { Event, CreateEvent as EventToCreate } from "../../types/event";
-import { createEvent, updateEvent } from "../../Services/event-service/event-service";
 
 const CreateEvent: React.FC = () => {
   const navigate = useNavigate();

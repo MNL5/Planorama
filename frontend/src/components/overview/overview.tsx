@@ -1,11 +1,11 @@
-import React from 'react';
+import React from "react";
 
 const Overview: React.FC = () => {
-    return (
-        <>
-            <div>{/* Your main content goes here */}</div>
-        </>
-    );
+  return (
+    <>
+      <div>{/* Your main content goes here */}</div>
+    </>
+  );
 };
 
-export default  Overview;
+export default Overview;

@@ -15,6 +15,7 @@ import SignIn from "./components/sign-in/sign-in.tsx";
 import SignUp from "./components/sign-up/sign-up.tsx";
 import Overview from "./components/overview/overview.tsx";
 import { useEventListener } from "./hooks/use-event-listener.ts";
+import { EventList } from "./components/event-list/event-list.tsx";
 import { useFetchEventsList } from "./hooks/use-fetch-events-list.ts";
 import InvitationPage from "./components/invitationPage/invitationPage.tsx";
 
@@ -63,7 +64,7 @@ const App: React.FC = () => {
           element={
             isLogged ? (
               doesUserHaveEvents ? (
-                <Navigate replace to="/overview" />
+                <Navigate replace to="/event-list" />
               ) : (
                 <Navigate replace to="/event-details" />
               )
@@ -82,6 +83,7 @@ const App: React.FC = () => {
                 element={endpoint.element}
               />
             ))}
+            <Route path="/event-list" element={<EventList />} />
           </>
         ) : (
           <>

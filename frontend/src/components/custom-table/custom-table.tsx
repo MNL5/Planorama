@@ -177,9 +177,17 @@ function CustomTable<T extends { id: string }>({
                         />
                       )
                     ) : col.isMulti ? (
-                      (row[col.key] as string[])?.map(val => col.alt ? col.alt[val] : val).join(", ") ?? ""
+                      (row[col.key] as string[])
+                        ?.map((val) => (col.alt ? col.alt[val] : val))
+                        .join(", ") ?? ""
                     ) : (
-                      String(row[col.key] ? (col.alt ? col.alt[row[col.key]] : row[col.key]) : "")
+                      String(
+                        row[col.key]
+                          ? col.alt
+                            ? col.alt[String(row[col.key])]
+                            : row[col.key]
+                          : ""
+                      )
                     )}
                   </Table.Td>
                 ))}
