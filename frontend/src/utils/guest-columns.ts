@@ -1,17 +1,21 @@
 import { Guest } from "../types/guest";
 import { Column } from "../types/column";
-import {Event} from "../types/event";
+import { Event } from "../types/event";
 import mealOptions from "./meal-options";
 import rsvpOptions from "./rsvp-options";
 
-const listToMap = (list: {label:string, value: string}[]) => {
-  const result: {[key: string]: string} = {};
-  list.forEach((item) => result[item.value] = item.label);
+const listToMap = (list: { label: string; value: string }[]) => {
+  const result: { [key: string]: string } = {};
+  list.forEach((item) => (result[item.value] = item.label));
   return result;
-}
+};
 
 const guestColumns: (event: Event) => Column<Guest>[] = (event: Event) => {
-  const tables = event.diagram?.elements?.map((table, index) => ({label: `${index + 1}`, value: table.id})) || [];
+  const tables =
+    event.diagram?.elements?.map((table, index) => ({
+      label: `${index + 1}`,
+      value: table.id,
+    })) || [];
 
   return [
     {
@@ -64,7 +68,7 @@ const guestColumns: (event: Event) => Column<Guest>[] = (event: Event) => {
       isNullable: true,
       alt: listToMap(rsvpOptions),
     },
-  ]
+  ];
 };
 
 export { guestColumns };
