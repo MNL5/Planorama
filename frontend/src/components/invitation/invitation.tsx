@@ -51,7 +51,7 @@ const Invitation: React.FC<{ event: Event; guestId?: string }> = ({
     <div className={style.container}>
       <h1 className={style.title}>Save The Date</h1>
       <span className={style.date}>
-        {new Date(event.time).toLocaleString()}
+        {new Date(event.time).toLocaleDateString()}
       </span>
       <img className={style.img} src={event.invitationImg} alt="Event" />
       <h2 className={style.name}>{event?.name}</h2>

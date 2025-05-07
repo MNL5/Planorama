@@ -17,6 +17,7 @@
     margin-top: 20px;
     border-radius: 10px;
     background-color: rgba(93, 26, 145, 0.1);
+    cursor: pointer;
 }
 
 .rsvpContainer:not(.disabled) {
