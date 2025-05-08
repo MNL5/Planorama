@@ -78,7 +78,7 @@ const Preferences: React.FC = () => {
   };
 
   return (
-    <Stack w={"100%"} h={"100vh"} p={100} align={"center"} gap={100}>
+    <Stack w={"100%"} h={"100vh"} p={100} align={"center"} gap={40}>
       <Stack align={"flex-end"} gap={20}>
         <Flex align={"center"} gap={100} justify={"center"}>
           <Autocomplete
