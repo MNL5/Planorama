@@ -30,7 +30,7 @@ const updateGuest = async (
 
 const getAllGuests = async (eventId: string) => {
   const response: AxiosResponse<Guest[]> = await abortableGetRequest<Guest[]>(
-    `guests?event=${eventId}  `
+    `guests?event=${eventId}`
   ).request;
   return response.data;
 };

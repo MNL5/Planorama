@@ -1,16 +1,16 @@
 import { Column } from "../types/column";
 import { listToMap } from "./list-to-map";
 import { preferenceOptions } from "./preference-options";
-import { SeatingPreference } from "../types/seating-preference";
+import { GuestRelation } from "../types/seating-preference";
 import { OptionType } from "../types/option-type";
 
 const seatingPreferenceColumns = (
   firstGuestOptions: OptionType[],
   secondGuestOptions: OptionType[]
-): Column<SeatingPreference>[] => {
+): Column<GuestRelation>[] => {
   return [
     {
-      key: "firstGuest",
+      key: "firstGuestId",
       label: "Guest",
       isEdit: true,
       isMulti: false,
@@ -19,7 +19,7 @@ const seatingPreferenceColumns = (
       alt: listToMap(firstGuestOptions),
     },
     {
-      key: "preference",
+      key: "relation",
       label: "Preference",
       isEdit: true,
       isMulti: false,
@@ -28,7 +28,7 @@ const seatingPreferenceColumns = (
       alt: listToMap(preferenceOptions),
     },
     {
-      key: "secondGuest",
+      key: "secondGuestId",
       label: "Guest",
       isEdit: true,
       isMulti: false,

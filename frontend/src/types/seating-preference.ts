@@ -1,8 +1,10 @@
-type SeatingPreference = {
+import { Relation } from "./relation";
+
+type GuestRelation = {
   id: string;
-  firstGuest: string;
-  preference: string;
-  secondGuest: string;
+  firstGuestId: string;
+  relation: Relation;
+  secondGuestId: string;
 };
 
-export type { SeatingPreference };
+export type { GuestRelation };

@@ -16,7 +16,7 @@ import {
 import { useMemo, useState } from "react";
 
 import { CustomTable } from "../custom-table/custom-table";
-import { SeatingPreference } from "../../types/seating-preference";
+import { GuestRelation } from "../../types/seating-preference";
 import { preferenceOptions } from "../../utils/preference-options";
 import { useFetchAllGuests } from "../../hooks/use-fetch-all-guests";
 import { seatingPreferenceColumns } from "../../utils/seating-preference-columns";
@@ -64,11 +64,11 @@ const Preferences: React.FC = () => {
   });
 
   const updateSeatingPreference = async () => {
-    return {} as SeatingPreference;
+    return {} as GuestRelation;
   };
 
   const deleteSeatingPreference = async () => {
-    return {} as SeatingPreference;
+    return {} as GuestRelation;
   };
 
   const onCancel = () => {
@@ -114,6 +114,7 @@ const Preferences: React.FC = () => {
             <Combobox
               store={combobox}
               onOptionSubmit={(preference) => {
+                console.log(preference)
                 setSelectedPreference(preference);
                 combobox.closeDropdown();
               }}
@@ -161,7 +162,7 @@ const Preferences: React.FC = () => {
         <Title order={1} c={"primary"}>
           Your Seating Preferences
         </Title>
-        <CustomTable<SeatingPreference>
+        <CustomTable<GuestRelation>
           data={seatingPreferenceData}
           columns={seatingPreferenceColumns(
             guestOptionList,

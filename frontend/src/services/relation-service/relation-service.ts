@@ -7,37 +7,42 @@ import {
   abortableDeleteRequest,
 } from "../abortable-request";
 import { Guest } from "../../types/guest";
+import { GuestRelation } from "../../types/seating-preference";
 
-const createGuest = async (eventId: string, guest: Omit<Guest, "id">) => {
-  const response = await abortablePostRequest<Guest>("guests", {
+const createRelation = async (
+  eventId: string,
+  guestRelation: Omit<GuestRelation, "id">
+) => {
+  const response = await abortablePostRequest<Guest>("relations", {
     eventId,
-    ...guest,
+    ...guestRelation,
   }).request;
   return response.data;
 };
 
-const updateGuest = async (
+const updateRelation = async (
   eventId: string,
-  guestToEdit: Omit<Guest, "id">,
+  relationToEdit: Omit<GuestRelation, "id">,
   id: string
 ) => {
-  const response = await abortablePutRequest<Guest>(`guests/${id}`, {
+  const response = await abortablePutRequest<Guest>(`relations/${id}`, {
     eventId,
-    ...guestToEdit,
+    ...relationToEdit,
   }).request;
   return response.data;
 };
 
-const getAllGuests = async (eventId: string) => {
-  const response: AxiosResponse<Guest[]> = await abortableGetRequest<Guest[]>(
-    `guests?event=${eventId}  `
-  ).request;
+const getAllRelations = async (eventId: string) => {
+  const response: AxiosResponse<GuestRelation[]> = await abortableGetRequest<
+    GuestRelation[]
+  >(`relations?event=${eventId}`).request;
   return response.data;
 };
 
-const deleteGuest = async (id: string) => {
-  const response: AxiosResponse<Guest> = await abortableDeleteRequest<Guest>(`guests/${id}`).request;
-  return response.data
+const deleteRelation = async (id: string) => {
+  const response: AxiosResponse<GuestRelation> =
+    await abortableDeleteRequest<GuestRelation>(`relations/${id}`).request;
+  return response.data;
 };
 
-export { createGuest, updateGuest, getAllGuests, deleteGuest };
+export { createRelation, updateRelation, getAllRelations, deleteRelation };
