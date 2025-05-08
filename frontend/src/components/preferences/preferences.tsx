@@ -77,6 +77,24 @@ const Preferences: React.FC = () => {
     setSelectedPreference(null);
   };
 
+  const handleGuestChange = (guestName: string) => {
+    const selectedGuest = guestOptionList.find(
+      (guest) => guest.label === guestName
+    );
+    if (selectedGuest) {
+      setSelectedGuest(selectedGuest.value);
+    }
+  };
+
+  const handleSecondGuestChange = (guestName: string) => {
+    const selectedGuest = secondGuestOptionList.find(
+      (guest) => guest.label === guestName
+    );
+    if (selectedGuest) {
+      setSecondSelectedGuest(selectedGuest.value);
+    }
+  };
+
   return (
     <Stack w={"100%"} h={"100vh"} p={100} align={"center"} gap={40}>
       <Stack align={"flex-end"} gap={20}>
@@ -86,7 +104,7 @@ const Preferences: React.FC = () => {
             label={"Guest Name"}
             value={selectedGuest}
             data={guestOptionList}
-            onChange={setSelectedGuest}
+            onChange={handleGuestChange}
             placeholder={"Select a guest"}
             error={isError ? "Error fetching guests" : undefined}
             rightSection={isLoading ? <Loader size={"xs"} /> : null}
@@ -127,7 +145,7 @@ const Preferences: React.FC = () => {
             value={secondSelectedGuest}
             data={secondGuestOptionList}
             placeholder={"Select a guest"}
-            onChange={setSecondSelectedGuest}
+            onChange={handleSecondGuestChange}
             error={isError ? "Error fetching guests" : undefined}
             rightSection={isLoading ? <Loader size={"xs"} /> : null}
           />
