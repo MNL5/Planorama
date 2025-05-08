@@ -17,6 +17,7 @@ import { CustomTable } from "../custom-table/custom-table";
 import { SeatingPreference } from "../../types/seating-preference";
 import { preferenceOptions } from "../../utils/preference-options";
 import { useFetchAllGuests } from "../../hooks/use-fetch-all-guests";
+import { seatingPreferenceColumns } from "../../utils/seating-preference-columns";
 
 const Preferences: React.FC = () => {
   const { guestsData: guests, isLoading, isError } = useFetchAllGuests(true);
@@ -73,7 +74,7 @@ const Preferences: React.FC = () => {
   };
 
   return (
-    <Stack w={"100%"} h={"100vh"} p={100}>
+    <Stack w={"100%"} h={"100vh"} p={100} align={"center"} gap={100}>
       <Flex w={"100%"} align={"center"} gap={100} justify={"center"}>
         <Autocomplete
           w={400}
@@ -132,7 +133,10 @@ const Preferences: React.FC = () => {
         </Title>
         <CustomTable<SeatingPreference>
           data={seatingPreferenceData}
-          columns={[]}
+          columns={seatingPreferenceColumns(
+            guestOptionList,
+            secondGuestOptionList
+          )}
           createRow={createSeatingPreference}
           updateRow={updateSeatingPreference}
           deleteRow={deleteSeatingPreference}

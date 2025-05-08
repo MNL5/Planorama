@@ -4,10 +4,10 @@ import { preferenceOptions } from "./preference-options";
 import { SeatingPreference } from "../types/seating-preference";
 import { OptionType } from "../types/option-type";
 
-const seatingPreferenceColumns: (
+const seatingPreferenceColumns = (
   firstGuestOptions: OptionType[],
   secondGuestOptions: OptionType[]
-) => Column<SeatingPreference>[] = () => {
+): Column<SeatingPreference>[] => {
   return [
     {
       key: "firstGuest",
@@ -15,8 +15,8 @@ const seatingPreferenceColumns: (
       isEdit: true,
       isMulti: false,
       isNullable: false,
-      values: preferenceOptions,
-      alt: listToMap(preferenceOptions),
+      values: firstGuestOptions,
+      alt: listToMap(firstGuestOptions),
     },
     {
       key: "preference",
@@ -33,8 +33,8 @@ const seatingPreferenceColumns: (
       isEdit: true,
       isMulti: false,
       isNullable: false,
-      values: preferenceOptions,
-      alt: listToMap(preferenceOptions),
+      values: secondGuestOptions,
+      alt: listToMap(secondGuestOptions),
     },
   ];
 };
