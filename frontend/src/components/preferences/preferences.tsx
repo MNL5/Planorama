@@ -13,17 +13,27 @@ import {
   Group,
   Button,
 } from "@mantine/core";
+import { toast } from "react-toastify";
 import { useMemo, useState } from "react";
+import { useMutation } from "@tanstack/react-query";
 
+import { Relation } from "../../types/relation";
 import { CustomTable } from "../custom-table/custom-table";
 import { GuestRelation } from "../../types/seating-preference";
+import { useEventContext } from "../../contexts/event-context";
 import { preferenceOptions } from "../../utils/preference-options";
 import { useFetchAllGuests } from "../../hooks/use-fetch-all-guests";
 import { seatingPreferenceColumns } from "../../utils/seating-preference-columns";
+import {
+  createRelation,
+  deleteRelation,
+  updateRelation,
+} from "../../services/relation-service/relation-service";
 
 const Preferences: React.FC = () => {
+  const { currentEvent } = useEventContext();
   const { guestsData: guests, isLoading, isError } = useFetchAllGuests(true);
-  const [selectedPreference, setSelectedPreference] = useState<string | null>(
+  const [selectedPreference, setSelectedPreference] = useState<Relation | null>(
     null
   );
   const [selectedGuest, setSelectedGuest] = useState<string | undefined>();
@@ -63,18 +73,20 @@ const Preferences: React.FC = () => {
     onDropdownClose: () => combobox.resetSelectedOption(),
   });
 
-  const updateSeatingPreference = async () => {
-    return {} as GuestRelation;
-  };
-
-  const deleteSeatingPreference = async () => {
-    return {} as GuestRelation;
-  };
-
   const onCancel = () => {
     setSelectedGuest(undefined);
     setSecondSelectedGuest(undefined);
     setSelectedPreference(null);
+  };
+
+  const onAdd = () => {
+    if (selectedGuest && secondSelectedGuest && selectedPreference) {
+      mutateCreateRelation({
+        firstGuestId: selectedGuest,
+        relation: selectedPreference,
+        secondGuestId: secondSelectedGuest,
+      });
+    }
   };
 
   const handleGuestChange = (guestName: string) => {
@@ -95,6 +107,54 @@ const Preferences: React.FC = () => {
     }
   };
 
+  const { mutateAsync: mutateCreateRelation } = useMutation<
+    GuestRelation,
+    Error,
+    Omit<GuestRelation, "id">
+  >({
+    mutationFn: (newRelation) =>
+      createRelation(currentEvent?.id as string, newRelation),
+    onSuccess: () => {
+      toast.success("Preference added successfully");
+    },
+    onError: () => {
+      toast.error("Failed to add Preference");
+    },
+  });
+
+  const { mutateAsync: mutateUpdateGuest } = useMutation<
+    GuestRelation,
+    Error,
+    GuestRelation
+  >({
+    mutationFn: (updatedRelation) =>
+      updateRelation(
+        currentEvent?.id as string,
+        updatedRelation,
+        updatedRelation.id
+      ),
+    onSuccess: () => {
+      toast.success("Guest updated successfully");
+    },
+    onError: () => {
+      toast.error("Failed to update guest");
+    },
+  });
+
+  const { mutateAsync: mutateDeleteGuest } = useMutation<
+    GuestRelation,
+    Error,
+    string
+  >({
+    mutationFn: (guestId) => deleteRelation(guestId),
+    onSuccess: () => {
+      toast.success("Guest deleted successfully");
+    },
+    onError: () => {
+      toast.error("Failed to delete guest");
+    },
+  });
+
   return (
     <Stack w={"100%"} h={"100vh"} p={100} align={"center"} gap={40}>
       <Stack align={"flex-end"} gap={20}>
@@ -114,8 +174,8 @@ const Preferences: React.FC = () => {
             <Combobox
               store={combobox}
               onOptionSubmit={(preference) => {
-                console.log(preference)
-                setSelectedPreference(preference);
+                console.log(preference);
+                setSelectedPreference(preference as Relation);
                 combobox.closeDropdown();
               }}
             >
@@ -155,7 +215,7 @@ const Preferences: React.FC = () => {
           <Button onClick={onCancel} variant={"outline"}>
             Cancel
           </Button>
-          <Button onClick={() => {}}>Add</Button>
+          <Button onClick={onAdd}>Add</Button>
         </Group>
       </Stack>
       <Stack>
@@ -168,8 +228,8 @@ const Preferences: React.FC = () => {
             guestOptionList,
             secondGuestOptionList
           )}
-          updateRow={updateSeatingPreference}
-          deleteRow={deleteSeatingPreference}
+          updateRow={mutateUpdateGuest}
+          deleteRow={mutateDeleteGuest}
         />
       </Stack>
     </Stack>

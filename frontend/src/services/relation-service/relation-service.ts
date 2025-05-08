@@ -6,14 +6,13 @@ import {
   abortablePostRequest,
   abortableDeleteRequest,
 } from "../abortable-request";
-import { Guest } from "../../types/guest";
 import { GuestRelation } from "../../types/seating-preference";
 
 const createRelation = async (
   eventId: string,
   guestRelation: Omit<GuestRelation, "id">
 ) => {
-  const response = await abortablePostRequest<Guest>("relations", {
+  const response = await abortablePostRequest<GuestRelation>("relations", {
     eventId,
     ...guestRelation,
   }).request;
@@ -25,7 +24,7 @@ const updateRelation = async (
   relationToEdit: Omit<GuestRelation, "id">,
   id: string
 ) => {
-  const response = await abortablePutRequest<Guest>(`relations/${id}`, {
+  const response = await abortablePutRequest<GuestRelation>(`relations/${id}`, {
     eventId,
     ...relationToEdit,
   }).request;

@@ -36,8 +36,10 @@ const getAllGuests = async (eventId: string) => {
 };
 
 const deleteGuest = async (id: string) => {
-  const response: AxiosResponse<Guest> = await abortableDeleteRequest<Guest>(`guests/${id}`).request;
-  return response.data
+  const response: AxiosResponse<Guest> = await abortableDeleteRequest<Guest>(
+    `guests/${id}`
+  ).request;
+  return response.data;
 };
 
 export { createGuest, updateGuest, getAllGuests, deleteGuest };
