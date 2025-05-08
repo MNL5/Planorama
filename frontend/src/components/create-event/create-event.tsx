@@ -118,7 +118,7 @@ const CreateEvent: React.FC = () => {
         <Stack gap={"xl"}>
           <TextInput
             w={400}
-            size={"xl"}
+            size={"lg"}
             label="Event name"
             placeholder="What's your event?"
             key={form.key("eventName")}
@@ -135,7 +135,7 @@ const CreateEvent: React.FC = () => {
           />
           <Textarea
             w={400}
-            size={"xl"}
+            size={"lg"}
             label="Event invitation text"
             placeholder="We’d be honored to have you celebrate our special day with us."
             key={form.key("invitationText")}
