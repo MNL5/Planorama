@@ -24,6 +24,7 @@ import { AddRowModal } from "./add-row-modal";
 interface CustomTableProps<T> {
   data: T[];
   columns: Column<T>[];
+  isAddable: boolean;
   createRow: (row: T) => Promise<T>;
   updateRow: (row: T) => Promise<T>;
   deleteRow: (id: string) => Promise<T>;
@@ -32,6 +33,7 @@ interface CustomTableProps<T> {
 function CustomTable<T extends { id: string }>({
   data: initialData,
   columns,
+  isAddable,
   createRow,
   updateRow,
   deleteRow,
@@ -82,23 +84,27 @@ function CustomTable<T extends { id: string }>({
   return (
     <Container size={"md"} mt={"xl"}>
       <Paper shadow={"md"} radius={"md"} p={"md"} withBorder>
-        <Group justify={"flex-end"} mb={"md"}>
-          <ActionIcon
-            size={40}
-            onClick={open}
-            variant={"light"}
-            color={"primary"}
-          >
-            <IconPlus size={24} />
-          </ActionIcon>
-        </Group>
-        <AddRowModal
-          opened={opened}
-          onClose={close}
-          onAddRow={handleAddRow}
-          columns={columns}
-          createRow={createRow}
-        />
+        {isAddable && (
+          <>
+            <Group justify={"flex-end"} mb={"md"}>
+              <ActionIcon
+                size={40}
+                onClick={open}
+                variant={"light"}
+                color={"primary"}
+              >
+                <IconPlus size={24} />
+              </ActionIcon>
+            </Group>
+            <AddRowModal
+              opened={opened}
+              onClose={close}
+              onAddRow={handleAddRow}
+              columns={columns}
+              createRow={createRow}
+            />
+          </>
+        )}
         <Table
           withTableBorder
           highlightOnHover

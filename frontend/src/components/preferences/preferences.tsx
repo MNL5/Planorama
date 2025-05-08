@@ -137,6 +137,7 @@ const Preferences: React.FC = () => {
             guestOptionList,
             secondGuestOptionList
           )}
+          isAddable={false}
           createRow={createSeatingPreference}
           updateRow={updateSeatingPreference}
           deleteRow={deleteSeatingPreference}
