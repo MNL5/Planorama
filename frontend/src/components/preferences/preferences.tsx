@@ -27,11 +27,13 @@ const Preferences: React.FC = () => {
 
   const guestOptionList = useMemo(
     () =>
-      guests?.map((guest) => ({
-        label: guest.name,
-        value: guest.id,
-      })) || [],
-    [guests]
+      guests
+        ?.map((guest) => ({
+          label: guest.name,
+          value: guest.id,
+        }))
+        .filter((option) => option.label !== secondSelectedGuest) || [],
+    [guests, secondSelectedGuest]
   );
 
   const secondGuestOptionList = useMemo(
