@@ -10,6 +10,8 @@ import {
   useCombobox,
   Autocomplete,
   Title,
+  Group,
+  Button,
 } from "@mantine/core";
 import { useMemo, useState } from "react";
 
@@ -75,58 +77,66 @@ const Preferences: React.FC = () => {
 
   return (
     <Stack w={"100%"} h={"100vh"} p={100} align={"center"} gap={100}>
-      <Flex w={"100%"} align={"center"} gap={100} justify={"center"}>
-        <Autocomplete
-          w={400}
-          label={"Guest Name"}
-          value={selectedGuest}
-          data={guestOptionList}
-          onChange={setSelectedGuest}
-          placeholder={"Select a guest"}
-          error={isError ? "Error fetching guests" : undefined}
-          rightSection={isLoading ? <Loader size={"xs"} /> : null}
-        />
-        <Stack align={"flex-start"} gap={2}>
-          <InputLabel>Preference</InputLabel>
-          <Combobox
-            store={combobox}
-            onOptionSubmit={(preference) => {
-              setSelectedPreference(preference);
-              combobox.closeDropdown();
-            }}
-          >
-            <Combobox.Target>
-              <InputBase
-                w={400}
-                component={"button"}
-                type={"button"}
-                pointer
-                rightSection={<Combobox.Chevron />}
-                rightSectionPointerEvents={"none"}
-                onClick={() => combobox.toggleDropdown()}
-              >
-                {selectedPreference || (
-                  <Input.Placeholder>Select preference</Input.Placeholder>
-                )}
-              </InputBase>
-            </Combobox.Target>
+      <Stack align={"flex-end"} gap={20}>
+        <Flex align={"center"} gap={100} justify={"center"}>
+          <Autocomplete
+            w={400}
+            label={"Guest Name"}
+            value={selectedGuest}
+            data={guestOptionList}
+            onChange={setSelectedGuest}
+            placeholder={"Select a guest"}
+            error={isError ? "Error fetching guests" : undefined}
+            rightSection={isLoading ? <Loader size={"xs"} /> : null}
+          />
+          <Stack align={"flex-start"} gap={2}>
+            <InputLabel>Preference</InputLabel>
+            <Combobox
+              store={combobox}
+              onOptionSubmit={(preference) => {
+                setSelectedPreference(preference);
+                combobox.closeDropdown();
+              }}
+            >
+              <Combobox.Target>
+                <InputBase
+                  w={400}
+                  component={"button"}
+                  type={"button"}
+                  pointer
+                  rightSection={<Combobox.Chevron />}
+                  rightSectionPointerEvents={"none"}
+                  onClick={() => combobox.toggleDropdown()}
+                >
+                  {selectedPreference || (
+                    <Input.Placeholder>Select preference</Input.Placeholder>
+                  )}
+                </InputBase>
+              </Combobox.Target>
 
-            <Combobox.Dropdown w={400}>
-              <Combobox.Options>{preferenceOptionList}</Combobox.Options>
-            </Combobox.Dropdown>
-          </Combobox>
-        </Stack>
-        <Autocomplete
-          w={400}
-          label={"Guest Name"}
-          value={secondSelectedGuest}
-          data={secondGuestOptionList}
-          placeholder={"Select a guest"}
-          onChange={setSecondSelectedGuest}
-          error={isError ? "Error fetching guests" : undefined}
-          rightSection={isLoading ? <Loader size={"xs"} /> : null}
-        />
-      </Flex>
+              <Combobox.Dropdown w={400}>
+                <Combobox.Options>{preferenceOptionList}</Combobox.Options>
+              </Combobox.Dropdown>
+            </Combobox>
+          </Stack>
+          <Autocomplete
+            w={400}
+            label={"Guest Name"}
+            value={secondSelectedGuest}
+            data={secondGuestOptionList}
+            placeholder={"Select a guest"}
+            onChange={setSecondSelectedGuest}
+            error={isError ? "Error fetching guests" : undefined}
+            rightSection={isLoading ? <Loader size={"xs"} /> : null}
+          />
+        </Flex>
+        <Group mt={"md"}>
+          <Button onClick={() => {}} variant={"outline"}>
+            Cancel
+          </Button>
+          <Button onClick={() => {}}>Add</Button>
+        </Group>
+      </Stack>
       <Stack>
         <Title order={1} c={"primary"}>
           Your Seating Preferences
