@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -33,7 +34,6 @@ public class EventService {
     private final ApplicationEventPublisher eventPublisher;
     private final GuestAPI guestAPI;
     private final Map<String, Function<UpdateEventDTO, Object>> updateFields;
-
 
     public EventService(ReactiveMongoTemplate reactiveMongoTemplate,
                         ApplicationEventPublisher eventPublisher,
@@ -112,5 +112,13 @@ public class EventService {
         return guest.flatMap(guestDTO ->
                 reactiveMongoTemplate.findById(UUID.fromString(guestDTO.eventID()), EventDAO.class)
         );
+    }
+
+    public Flux<EventDAO> findEventsBetweenDates(@NotNull OffsetDateTime from,
+                                                 @NotNull OffsetDateTime to) {
+        return reactiveMongoTemplate.find(Query.query(where(EventDAO.TIME_FIELD)
+                        .gte(from.toInstant().toEpochMilli())
+                        .lte(to.toInstant().toEpochMilli())),
+                EventDAO.class);
     }
 }
