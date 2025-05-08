@@ -1,15 +1,16 @@
-import { useMemo, useState } from "react";
 import {
-  Autocomplete,
-  Combobox,
+  Text,
   Flex,
   Input,
-  InputBase,
-  Loader,
   Stack,
-  Text,
+  Loader,
+  InputBase,
+  InputLabel,
+  Combobox,
   useCombobox,
+  Autocomplete,
 } from "@mantine/core";
+import { useMemo, useState } from "react";
 
 import { preferences } from "../../utils/consts";
 import { useFetchAllGuests } from "../../hooks/use-fetch-all-guests";
@@ -53,33 +54,36 @@ const Preferences: React.FC = () => {
           error={isError ? "Error fetching guests" : undefined}
           rightSection={isLoading ? <Loader size={"xs"} /> : null}
         />
-        <Combobox
-          store={combobox}
-          onOptionSubmit={(preference) => {
-            setSelectedPreference(preference);
-            combobox.closeDropdown();
-          }}
-        >
-          <Combobox.Target>
-            <InputBase
-              w={400}
-              component={"button"}
-              type={"button"}
-              pointer
-              rightSection={<Combobox.Chevron />}
-              rightSectionPointerEvents={"none"}
-              onClick={() => combobox.toggleDropdown()}
-            >
-              {selectedPreference || (
-                <Input.Placeholder>Select preference</Input.Placeholder>
-              )}
-            </InputBase>
-          </Combobox.Target>
+        <Stack align={"flex-start"} gap={2}>
+          <InputLabel>Preference</InputLabel>
+          <Combobox
+            store={combobox}
+            onOptionSubmit={(preference) => {
+              setSelectedPreference(preference);
+              combobox.closeDropdown();
+            }}
+          >
+            <Combobox.Target>
+              <InputBase
+                w={400}
+                component={"button"}
+                type={"button"}
+                pointer
+                rightSection={<Combobox.Chevron />}
+                rightSectionPointerEvents={"none"}
+                onClick={() => combobox.toggleDropdown()}
+              >
+                {selectedPreference || (
+                  <Input.Placeholder>Select preference</Input.Placeholder>
+                )}
+              </InputBase>
+            </Combobox.Target>
 
-          <Combobox.Dropdown w={400}>
-            <Combobox.Options>{preferenceOptionList}</Combobox.Options>
-          </Combobox.Dropdown>
-        </Combobox>
+            <Combobox.Dropdown w={400}>
+              <Combobox.Options>{preferenceOptionList}</Combobox.Options>
+            </Combobox.Dropdown>
+          </Combobox>
+        </Stack>
         <Autocomplete
           w={400}
           label={"Guest Name"}
