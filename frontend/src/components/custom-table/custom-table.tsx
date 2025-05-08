@@ -24,8 +24,7 @@ import { AddRowModal } from "./add-row-modal";
 interface CustomTableProps<T> {
   data: T[];
   columns: Column<T>[];
-  isAddable: boolean;
-  createRow: (row: T) => Promise<T>;
+  createRow?: (row: T) => Promise<T>;
   updateRow: (row: T) => Promise<T>;
   deleteRow: (id: string) => Promise<T>;
 }
@@ -33,7 +32,6 @@ interface CustomTableProps<T> {
 function CustomTable<T extends { id: string }>({
   data: initialData,
   columns,
-  isAddable,
   createRow,
   updateRow,
   deleteRow,
@@ -84,7 +82,7 @@ function CustomTable<T extends { id: string }>({
   return (
     <Container size={"md"} mt={"xl"}>
       <Paper shadow={"md"} radius={"md"} p={"md"} withBorder>
-        {isAddable && (
+        {createRow && (
           <>
             <Group justify={"flex-end"} mb={"md"}>
               <ActionIcon

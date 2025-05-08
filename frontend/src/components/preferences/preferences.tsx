@@ -63,16 +63,18 @@ const Preferences: React.FC = () => {
     onDropdownClose: () => combobox.resetSelectedOption(),
   });
 
-  const createSeatingPreference = async () => {
-    return {} as SeatingPreference;
-  };
-
   const updateSeatingPreference = async () => {
     return {} as SeatingPreference;
   };
 
   const deleteSeatingPreference = async () => {
     return {} as SeatingPreference;
+  };
+
+  const onCancel = () => {
+    setSelectedGuest(undefined);
+    setSecondSelectedGuest(undefined);
+    setSelectedPreference(null);
   };
 
   return (
@@ -131,7 +133,7 @@ const Preferences: React.FC = () => {
           />
         </Flex>
         <Group mt={"md"}>
-          <Button onClick={() => {}} variant={"outline"}>
+          <Button onClick={onCancel} variant={"outline"}>
             Cancel
           </Button>
           <Button onClick={() => {}}>Add</Button>
@@ -147,8 +149,6 @@ const Preferences: React.FC = () => {
             guestOptionList,
             secondGuestOptionList
           )}
-          isAddable={false}
-          createRow={createSeatingPreference}
           updateRow={updateSeatingPreference}
           deleteRow={deleteSeatingPreference}
         />

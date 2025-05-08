@@ -74,7 +74,6 @@ const GuestsView: React.FC = () => {
       <CustomTable<Guest>
         data={guests}
         columns={columns}
-        isAddable={true}
         createRow={mutateCreateGuest}
         updateRow={mutateUpdateGuest}
         deleteRow={mutateDeleteGuest}
