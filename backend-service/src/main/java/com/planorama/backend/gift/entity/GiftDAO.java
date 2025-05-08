@@ -1,14 +1,15 @@
 package com.planorama.backend.gift.entity;
 
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.UUID;
 
 @Document("gifts")
+@CompoundIndex(name = "unique_event_guest", def = "{'eventId': 1, 'guestId': 1}", unique = true)
 public record GiftDAO(@Id UUID id,
-                      @Indexed String eventId,
+                      String eventId,
                       String guestId,
                       Double amount,
                       String greeting

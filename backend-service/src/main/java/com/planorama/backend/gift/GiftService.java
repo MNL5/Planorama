@@ -1,7 +1,7 @@
 package com.planorama.backend.gift;
 
-import com.planorama.backend.gift.api.CreateGiftDTO;
 import com.planorama.backend.gift.api.UpdateGiftDTO;
+import com.planorama.backend.gift.api.UpsertGiftDTO;
 import com.planorama.backend.gift.entity.GiftDAO;
 import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
@@ -33,18 +33,19 @@ public class GiftService {
         return reactiveMongoTemplate.find(Query.query(Criteria.where(GiftDAO.EVENT_FIELD).is(eventID)), GiftDAO.class);
     }
 
-    public Mono<GiftDAO> createGift(CreateGiftDTO createGiftDTO) {
-        return reactiveMongoTemplate
-                .save(createGiftDAO(createGiftDTO))
-                .onErrorResume(e -> Mono.error(new RuntimeException("Failed to save Gift", e)));
+    public Mono<GiftDAO> upsertGift(UpsertGiftDTO upsertGiftDTO) {
+        return Mono.empty();
+//        return reactiveMongoTemplate
+//                .upsert(createGiftDAO(upsertGiftDTO))
+//                .onErrorResume(e -> Mono.error(new RuntimeException("Failed to save Gift", e)));
     }
 
-    private GiftDAO createGiftDAO(CreateGiftDTO createGiftDTO) {
+    private GiftDAO createGiftDAO(UpsertGiftDTO upsertGiftDTO) {
         return new GiftDAO(UUID.randomUUID(),
-                createGiftDTO.eventId(),
-                createGiftDTO.guestId(),
-                createGiftDTO.amount(),
-                createGiftDTO.greeting());
+                upsertGiftDTO.eventId(),
+                upsertGiftDTO.guestId(),
+                upsertGiftDTO.amount(),
+                upsertGiftDTO.greeting());
     }
 
     public Mono<GiftDAO> updateGift(String giftId, UpdateGiftDTO updateGiftDTO) {
