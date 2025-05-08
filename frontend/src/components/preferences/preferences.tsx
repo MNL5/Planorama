@@ -15,7 +15,7 @@ import {
 } from "@mantine/core";
 import { toast } from "react-toastify";
 import { useMemo, useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
 import { Relation } from "../../types/relation";
 import { CustomTable } from "../custom-table/custom-table";
@@ -23,12 +23,14 @@ import { GuestRelation } from "../../types/seating-preference";
 import { useEventContext } from "../../contexts/event-context";
 import { preferenceOptions } from "../../utils/preference-options";
 import { useFetchAllGuests } from "../../hooks/use-fetch-all-guests";
-import { seatingPreferenceColumns } from "../../utils/seating-preference-columns";
+import { relationColumns } from "../../utils/relation-columns";
 import {
   createRelation,
   deleteRelation,
+  getAllRelations,
   updateRelation,
 } from "../../services/relation-service/relation-service";
+import { isNil } from "lodash";
 
 const Preferences: React.FC = () => {
   const { currentEvent } = useEventContext();
@@ -58,7 +60,22 @@ const Preferences: React.FC = () => {
     [guestOptionList, selectedGuest]
   );
 
-  const seatingPreferenceData = useMemo(() => [], []);
+  const columns = useMemo(
+    () => relationColumns(guestOptionList, secondGuestOptionList),
+    [guestOptionList, secondGuestOptionList]
+  );
+
+  const {
+    data: relationsData,
+    isSuccess: isRelationsSuccess,
+    isLoading: isRelationsLoading,
+    isError: isRelationsError,
+    isFetching: isRelationsFetching,
+  } = useQuery<GuestRelation[], Error>({
+    queryKey: ["fetchRelations", currentEvent?.id],
+    queryFn: () => getAllRelations(currentEvent?.id as string),
+    enabled: !!currentEvent?.id,
+  });
 
   const preferenceOptionList = preferenceOptions.map((preference) => (
     <Combobox.Option value={preference.label} key={preference.value}>
@@ -118,11 +135,11 @@ const Preferences: React.FC = () => {
       toast.success("Preference added successfully");
     },
     onError: () => {
-      toast.error("Failed to add Preference");
+      toast.error("Failed to add preference");
     },
   });
 
-  const { mutateAsync: mutateUpdateGuest } = useMutation<
+  const { mutateAsync: mutateUpdateRelation } = useMutation<
     GuestRelation,
     Error,
     GuestRelation
@@ -134,24 +151,24 @@ const Preferences: React.FC = () => {
         updatedRelation.id
       ),
     onSuccess: () => {
-      toast.success("Guest updated successfully");
+      toast.success("Preference updated successfully");
     },
     onError: () => {
-      toast.error("Failed to update guest");
+      toast.error("Failed to update preference");
     },
   });
 
-  const { mutateAsync: mutateDeleteGuest } = useMutation<
+  const { mutateAsync: mutateDeleteRelation } = useMutation<
     GuestRelation,
     Error,
     string
   >({
     mutationFn: (guestId) => deleteRelation(guestId),
     onSuccess: () => {
-      toast.success("Guest deleted successfully");
+      toast.success("Preference deleted successfully");
     },
     onError: () => {
-      toast.error("Failed to delete guest");
+      toast.error("Failed to delete preference");
     },
   });
 
@@ -222,15 +239,23 @@ const Preferences: React.FC = () => {
         <Title order={1} c={"primary"}>
           Your Seating Preferences
         </Title>
-        <CustomTable<GuestRelation>
-          data={seatingPreferenceData}
-          columns={seatingPreferenceColumns(
-            guestOptionList,
-            secondGuestOptionList
-          )}
-          updateRow={mutateUpdateGuest}
-          deleteRow={mutateDeleteGuest}
-        />
+        {isRelationsSuccess &&
+        !isRelationsFetching &&
+        !isNil(guests) &&
+        columns ? (
+          <Flex style={{ flex: "1 1", overflowY: "scroll" }}>
+            <CustomTable<GuestRelation>
+              columns={columns}
+              data={relationsData}
+              updateRow={mutateUpdateRelation}
+              deleteRow={mutateDeleteRelation}
+            />
+          </Flex>
+        ) : isRelationsLoading ? (
+          <Loader size="lg" color="primary" />
+        ) : isRelationsError ? (
+          <Text>Oops! Something went wrong. Please try again later.</Text>
+        ) : null}
       </Stack>
     </Stack>
   );

@@ -4,7 +4,7 @@ import { preferenceOptions } from "./preference-options";
 import { GuestRelation } from "../types/seating-preference";
 import { OptionType } from "../types/option-type";
 
-const seatingPreferenceColumns = (
+const relationColumns = (
   firstGuestOptions: OptionType[],
   secondGuestOptions: OptionType[]
 ): Column<GuestRelation>[] => {
@@ -39,4 +39,4 @@ const seatingPreferenceColumns = (
   ];
 };
 
-export { seatingPreferenceColumns };
+export { relationColumns };
