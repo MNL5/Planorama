@@ -9,10 +9,13 @@ import {
   Combobox,
   useCombobox,
   Autocomplete,
+  Title,
 } from "@mantine/core";
 import { useMemo, useState } from "react";
 
-import { preferences } from "../../utils/consts";
+import { CustomTable } from "../custom-table/custom-table";
+import { SeatingPreference } from "../../types/seating-preference";
+import { preferenceOptions } from "../../utils/preference-options";
 import { useFetchAllGuests } from "../../hooks/use-fetch-all-guests";
 
 const Preferences: React.FC = () => {
@@ -42,8 +45,10 @@ const Preferences: React.FC = () => {
     [guestOptionList, selectedGuest]
   );
 
-  const preferenceOptionList = preferences.map((preference) => (
-    <Combobox.Option value={preference.label} key={preference.key}>
+  const seatingPreferenceData = useMemo(() => [], []);
+
+  const preferenceOptionList = preferenceOptions.map((preference) => (
+    <Combobox.Option value={preference.label} key={preference.value}>
       <Flex align={"center"} gap={10}>
         {preference.icon()}
         <Text>{preference.label}</Text>
@@ -54,6 +59,18 @@ const Preferences: React.FC = () => {
   const combobox = useCombobox({
     onDropdownClose: () => combobox.resetSelectedOption(),
   });
+
+  const createSeatingPreference = async () => {
+    return {} as SeatingPreference;
+  };
+
+  const updateSeatingPreference = async () => {
+    return {} as SeatingPreference;
+  };
+
+  const deleteSeatingPreference = async () => {
+    return {} as SeatingPreference;
+  };
 
   return (
     <Stack w={"100%"} h={"100vh"} p={100}>
@@ -109,7 +126,18 @@ const Preferences: React.FC = () => {
           rightSection={isLoading ? <Loader size={"xs"} /> : null}
         />
       </Flex>
-      <Stack></Stack>
+      <Stack>
+        <Title order={1} c={"primary"}>
+          Your Seating Preferences
+        </Title>
+        <CustomTable<SeatingPreference>
+          data={seatingPreferenceData}
+          columns={[]}
+          createRow={createSeatingPreference}
+          updateRow={updateSeatingPreference}
+          deleteRow={deleteSeatingPreference}
+        />
+      </Stack>
     </Stack>
   );
 };

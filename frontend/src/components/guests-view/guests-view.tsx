@@ -74,9 +74,9 @@ const GuestsView: React.FC = () => {
       <CustomTable<Guest>
         data={guests}
         columns={columns}
-        deleteRow={mutateDeleteGuest}
         createRow={mutateCreateGuest}
         updateRow={mutateUpdateGuest}
+        deleteRow={mutateDeleteGuest}
       />
     </Flex>
   ) : isLoading ? (
