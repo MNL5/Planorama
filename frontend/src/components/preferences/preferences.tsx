@@ -20,6 +20,10 @@ const Preferences: React.FC = () => {
   const [selectedPreference, setSelectedPreference] = useState<string | null>(
     null
   );
+  const [selectedGuest, setSelectedGuest] = useState<string | undefined>();
+  const [secondSelectedGuest, setSecondSelectedGuest] = useState<
+    string | undefined
+  >();
 
   const guestOptionList = useMemo(
     () =>
@@ -28,6 +32,12 @@ const Preferences: React.FC = () => {
         value: guest.id,
       })) || [],
     [guests]
+  );
+
+  const secondGuestOptionList = useMemo(
+    () =>
+      guestOptionList?.filter((option) => option.label !== selectedGuest) || [],
+    [guestOptionList, selectedGuest]
   );
 
   const preferenceOptionList = preferences.map((preference) => (
@@ -49,8 +59,10 @@ const Preferences: React.FC = () => {
         <Autocomplete
           w={400}
           label={"Guest Name"}
-          placeholder={"Select a guest"}
+          value={selectedGuest}
           data={guestOptionList}
+          onChange={setSelectedGuest}
+          placeholder={"Select a guest"}
           error={isError ? "Error fetching guests" : undefined}
           rightSection={isLoading ? <Loader size={"xs"} /> : null}
         />
@@ -87,8 +99,10 @@ const Preferences: React.FC = () => {
         <Autocomplete
           w={400}
           label={"Guest Name"}
+          value={secondSelectedGuest}
+          data={secondGuestOptionList}
           placeholder={"Select a guest"}
-          data={guestOptionList}
+          onChange={setSecondSelectedGuest}
           error={isError ? "Error fetching guests" : undefined}
           rightSection={isLoading ? <Loader size={"xs"} /> : null}
         />
