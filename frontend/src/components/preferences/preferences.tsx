@@ -38,9 +38,7 @@ import { OptionType } from "../../types/option-type";
 const Preferences: React.FC = () => {
   const { currentEvent } = useEventContext();
   const { guestsData: guests, isLoading, isError } = useFetchAllGuests(true);
-  const [selectedPreference, setSelectedPreference] = useState<Relation | null>(
-    null
-  );
+  const [selectedPreference, setSelectedPreference] = useState<Relation>();
   const [selectedGuest, setSelectedGuest] = useState<string | undefined>();
   const [secondSelectedGuest, setSecondSelectedGuest] = useState<
     string | undefined
@@ -119,7 +117,7 @@ const Preferences: React.FC = () => {
   const reset = () => {
     setSelectedGuest("");
     setSecondSelectedGuest("");
-    setSelectedPreference(null);
+    setSelectedPreference(undefined);
   };
 
   const isEmptyField = useMemo(() => {
@@ -204,7 +202,11 @@ const Preferences: React.FC = () => {
             <Combobox
               store={combobox}
               onOptionSubmit={(preference) => {
-                setSelectedPreference(preference as Relation);
+                const selectedOption = preferenceOptions.find(
+                  (option) => option.label === preference
+                );
+
+                setSelectedPreference(selectedOption?.value);
                 combobox.closeDropdown();
               }}
             >

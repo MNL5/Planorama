@@ -4,14 +4,27 @@ import {
   IconMoodAnnoyed,
   IconMoodHappy,
 } from "@tabler/icons-react";
+import { Relation } from "../types/relation";
 
-const preferenceOptions = [
-  { label: "Must sit with", value: "MUST", icon: () => <IconHeart /> },
-  { label: "Like to sit with", value: "LIKE", icon: () => <IconMoodHappy /> },
-  { label: "Hate to sit with", value: "HATE", icon: () => <IconMoodAnnoyed /> },
+const preferenceOptions: {
+  label: string;
+  value: Relation;
+  icon: () => React.ReactElement;
+}[] = [
+  { label: "Must sit with", value: Relation.MUST, icon: () => <IconHeart /> },
+  {
+    label: "Like to sit with",
+    value: Relation.LIKE,
+    icon: () => <IconMoodHappy />,
+  },
+  {
+    label: "Hate to sit with",
+    value: Relation.HATE,
+    icon: () => <IconMoodAnnoyed />,
+  },
   {
     label: "Must not sit with",
-    value: "MUST_NOT",
+    value: Relation.MUST_NOT,
     icon: () => <IconMoodAngry />,
   },
 ];
