@@ -6,7 +6,7 @@ import {
   abortablePostRequest,
   abortableDeleteRequest,
 } from "../abortable-request";
-import { GuestRelation } from "../../types/seating-preference";
+import { GuestRelation } from "../../types/guest-relation";
 
 const createRelation = async (
   eventId: string,

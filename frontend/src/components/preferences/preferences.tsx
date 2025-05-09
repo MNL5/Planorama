@@ -21,7 +21,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 
 import { Relation } from "../../types/relation";
 import { CustomTable } from "../custom-table/custom-table";
-import { GuestRelation } from "../../types/seating-preference";
+import { GuestRelation } from "../../types/guest-relation";
 import { useEventContext } from "../../contexts/event-context";
 import { preferenceOptions } from "../../utils/preference-options";
 import { useFetchAllGuests } from "../../hooks/use-fetch-all-guests";
@@ -83,15 +83,6 @@ const Preferences: React.FC = () => {
       guestOptionList?.filter((option) => option.value !== selectedGuestId) ||
       [],
     [guestOptionList, selectedGuestId]
-  );
-
-  const columns = useMemo(
-    () =>
-      relationColumns(
-        mapGuestsToOptionList(guests),
-        mapGuestsToOptionList(guests)
-      ),
-    [guests]
   );
 
   const {
@@ -272,10 +263,10 @@ const Preferences: React.FC = () => {
         {isRelationsSuccess &&
         !isRelationsFetching &&
         !isNil(guests) &&
-        columns ? (
+        relationColumns ? (
           <Flex style={{ flex: "1 1", overflowY: "scroll" }}>
             <CustomTable<GuestRelation>
-              columns={columns}
+              columns={relationColumns}
               data={relationsData}
               updateRow={mutateUpdateRelation}
               deleteRow={mutateDeleteRelation}
