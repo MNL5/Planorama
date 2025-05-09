@@ -14,7 +14,7 @@ import {
   Button,
   Tooltip,
 } from "@mantine/core";
-import { isNil } from "lodash";
+import { clone, isNil } from "lodash";
 import { toast } from "react-toastify";
 import { useMemo, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -38,7 +38,8 @@ import { OptionType } from "../../types/option-type";
 const Preferences: React.FC = () => {
   const { currentEvent } = useEventContext();
   const { guestsData: guests, isLoading, isError } = useFetchAllGuests(true);
-  const [selectedPreference, setSelectedPreference] = useState<Relation>();
+  const [selectedPreference, setSelectedPreference] = useState<string>();
+  const [selectedRelation, setSelectedRelation] = useState<Relation>();
   const [selectedGuest, setSelectedGuest] = useState<string | undefined>();
   const [secondSelectedGuest, setSecondSelectedGuest] = useState<
     string | undefined
@@ -85,7 +86,7 @@ const Preferences: React.FC = () => {
   );
 
   const columns = useMemo(
-    () => relationColumns(guestOptionList, secondGuestOptionList),
+    () => relationColumns(clone(guestOptionList), clone(secondGuestOptionList)),
     [guestOptionList, secondGuestOptionList]
   );
 
@@ -126,10 +127,10 @@ const Preferences: React.FC = () => {
   }, [secondSelectedGuestId, selectedGuestId, selectedPreference]);
 
   const onAdd = () => {
-    if (selectedGuestId && secondSelectedGuestId && selectedPreference) {
+    if (selectedGuestId && secondSelectedGuestId && selectedRelation) {
       mutateCreateRelation({
         firstGuestId: selectedGuestId,
-        relation: selectedPreference,
+        relation: selectedRelation,
         secondGuestId: secondSelectedGuestId,
       });
     }
@@ -206,11 +207,11 @@ const Preferences: React.FC = () => {
             <Combobox
               store={combobox}
               onOptionSubmit={(preference) => {
+                setSelectedPreference(preference);
                 const selectedOption = preferenceOptions.find(
                   (option) => option.label === preference
                 );
-
-                setSelectedPreference(selectedOption?.value);
+                setSelectedRelation(selectedOption?.value);
                 combobox.closeDropdown();
               }}
             >
