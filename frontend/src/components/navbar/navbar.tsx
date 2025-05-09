@@ -8,10 +8,12 @@ import { ENDPOINTS } from "../../utils/end-points";
 import { clearCache } from "../../utils/auth-utils";
 import AuthService from "../../services/auth-service/auth-service";
 import { useEventContext } from "../../contexts/event-context";
+import { useFetchEventsList } from "../../hooks/use-fetch-events-list";
 
 const Navbar = () => {
   const navigate = useNavigate();
   const { currentEvent, setCurrentEvent } = useEventContext();
+  const { doesUserHaveEvents } = useFetchEventsList(true);
 
   const handleLogout = async () => {
     const refreshToken = localStorage.getItem("refreshToken");
@@ -46,16 +48,20 @@ const Navbar = () => {
       )}
 
       <Group ml={"auto"} gap={"sm"} style={{ order: 2, alignSelf: "center" }}>
-        <Button
-          size={"s"}
-          radius={"md"}
-          variant={"light"}
-          className={"navbar-button"}
-          onClick={handleSwitchToEvent}
-        >
-          <Text size={"md"}>Switch Event</Text>
-        </Button>
-        <Divider orientation="vertical" />
+        {doesUserHaveEvents && (
+          <>
+            <Button
+              size={"s"}
+              radius={"md"}
+              variant={"light"}
+              className={"navbar-button"}
+              onClick={handleSwitchToEvent}
+            >
+              <Text size={"md"}>Switch Event</Text>
+            </Button>
+            <Divider orientation="vertical" />
+          </>
+        )}
         <Button
           size={"s"}
           radius={"md"}

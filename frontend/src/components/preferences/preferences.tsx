@@ -31,6 +31,8 @@ import {
   updateRelation,
 } from "../../services/relation-service/relation-service";
 import { isNil } from "lodash";
+import { Guest } from "../../types/guest";
+import { OptionType } from "../../types/option-type";
 
 const Preferences: React.FC = () => {
   const { currentEvent } = useEventContext();
@@ -43,21 +45,45 @@ const Preferences: React.FC = () => {
     string | undefined
   >();
 
-  const guestOptionList = useMemo(
-    () =>
-      guests
-        ?.map((guest) => ({
+  const mapGuestsToOptionList = (guests: Guest[] | undefined): OptionType[] => {
+    return guests
+      ? guests.map((guest) => ({
           label: guest.name,
           value: guest.id,
         }))
-        .filter((option) => option.value !== secondSelectedGuest) || [],
-    [guests, secondSelectedGuest]
+      : [];
+  };
+
+  const selectedGuestId = useMemo(() => {
+    const selectedOption = mapGuestsToOptionList(guests)?.find(
+      (guest) => guest.label === selectedGuest
+    );
+
+    return selectedOption?.value ?? "";
+  }, [guests, selectedGuest]);
+
+  const secondSelectedGuestId = useMemo(() => {
+    const selectedOption = mapGuestsToOptionList(guests)?.find(
+      (guest) => guest.label === secondSelectedGuest
+    );
+
+    return selectedOption?.value ?? "";
+  }, [guests, secondSelectedGuest]);
+
+  const guestOptionList: OptionType[] = useMemo(
+    () =>
+      mapGuestsToOptionList(guests)?.filter(
+        (option) => option.value !== selectedGuestId
+      ) || [],
+    [guests, selectedGuestId]
   );
 
   const secondGuestOptionList = useMemo(
     () =>
-      guestOptionList?.filter((option) => option.value !== selectedGuest) || [],
-    [guestOptionList, selectedGuest]
+      guestOptionList?.filter(
+        (option) => option.value !== secondSelectedGuest
+      ) || [],
+    [guestOptionList, secondSelectedGuest]
   );
 
   const columns = useMemo(
@@ -90,37 +116,21 @@ const Preferences: React.FC = () => {
     onDropdownClose: () => combobox.resetSelectedOption(),
   });
 
-  const onCancel = () => {
+  const reset = () => {
     setSelectedGuest(undefined);
     setSecondSelectedGuest(undefined);
     setSelectedPreference(null);
   };
 
   const onAdd = () => {
-    if (selectedGuest && secondSelectedGuest && selectedPreference) {
+    if (selectedGuestId && secondSelectedGuestId && selectedPreference) {
       mutateCreateRelation({
-        firstGuestId: selectedGuest,
+        firstGuestId: selectedGuestId,
         relation: selectedPreference,
-        secondGuestId: secondSelectedGuest,
+        secondGuestId: secondSelectedGuestId,
       });
-    }
-  };
 
-  const handleGuestChange = (guestName: string) => {
-    const selectedGuest = guestOptionList.find(
-      (guest) => guest.label === guestName
-    );
-    if (selectedGuest) {
-      setSelectedGuest(selectedGuest.value);
-    }
-  };
-
-  const handleSecondGuestChange = (guestName: string) => {
-    const selectedGuest = secondGuestOptionList.find(
-      (guest) => guest.label === guestName
-    );
-    if (selectedGuest) {
-      setSecondSelectedGuest(selectedGuest.value);
+      reset();
     }
   };
 
@@ -181,7 +191,7 @@ const Preferences: React.FC = () => {
             label={"Guest Name"}
             value={selectedGuest}
             data={guestOptionList}
-            onChange={handleGuestChange}
+            onChange={setSelectedGuest}
             placeholder={"Select a guest"}
             error={isError ? "Error fetching guests" : undefined}
             rightSection={isLoading ? <Loader size={"xs"} /> : null}
@@ -191,7 +201,6 @@ const Preferences: React.FC = () => {
             <Combobox
               store={combobox}
               onOptionSubmit={(preference) => {
-                console.log(preference);
                 setSelectedPreference(preference as Relation);
                 combobox.closeDropdown();
               }}
@@ -223,16 +232,23 @@ const Preferences: React.FC = () => {
             value={secondSelectedGuest}
             data={secondGuestOptionList}
             placeholder={"Select a guest"}
-            onChange={handleSecondGuestChange}
+            onChange={setSecondSelectedGuest}
             error={isError ? "Error fetching guests" : undefined}
             rightSection={isLoading ? <Loader size={"xs"} /> : null}
           />
         </Flex>
         <Group mt={"md"}>
-          <Button onClick={onCancel} variant={"outline"}>
-            Cancel
+          <Button onClick={reset} variant={"outline"}>
+            Clear
           </Button>
-          <Button onClick={onAdd}>Add</Button>
+          <Button
+            onClick={onAdd}
+            disabled={
+              !selectedGuestId || !secondSelectedGuestId || !selectedPreference
+            }
+          >
+            Add
+          </Button>
         </Group>
       </Stack>
       <Stack>
