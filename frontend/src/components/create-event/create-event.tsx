@@ -175,7 +175,6 @@ const CreateEvent: React.FC = () => {
                     />
                     <Flex justify={'flex-end'}>
                         <Button
-                            p={0}
                             size={'md'}
                             radius={'md'}
                             mr={'xl'}
@@ -193,16 +192,15 @@ const CreateEvent: React.FC = () => {
                                     );
                                 }
                             }}
-                            variant={'transparent'}
+                            variant={'light'}
                         >
                             <Text size={'md'}>Preview</Text>
                         </Button>
                         <Button
-                            p={0}
                             size={'md'}
                             radius={'md'}
                             type={'submit'}
-                            variant={'transparent'}
+                            variant={'light'}
                         >
                             <Text size={'md'}>Save</Text>
                         </Button>

@@ -104,31 +104,28 @@ const Invitation: React.FC<{ event: Event; guestId?: string }> = ({
                     </Stack>
                     <Flex gap={20} justify={'space-between'} mt={20}>
                         <Button
-                            p={0}
                             size={'md'}
                             radius={'md'}
                             w={'fit-content'}
-                            variant={'transparent'}
+                            variant={'light'}
                             onClick={handleSubmit.bind(null, 'ACCEPTED')}
                         >
                             <Text size={'md'}>Accept</Text>
                         </Button>
                         <Button
-                            p={0}
                             size={'md'}
                             radius={'md'}
                             w={'fit-content'}
-                            variant={'transparent'}
+                            variant={'light'}
                             onClick={handleSubmit.bind(null, 'TENTATIVE')}
                         >
                             <Text size={'md'}>Not Sure</Text>
                         </Button>
                         <Button
-                            p={0}
                             size={'md'}
                             radius={'md'}
                             w={'fit-content'}
-                            variant={'transparent'}
+                            variant={'light'}
                             onClick={handleSubmit.bind(null, 'DECLINE')}
                         >
                             <Text size={'md'}>Decline</Text>

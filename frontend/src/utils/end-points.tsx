@@ -3,6 +3,8 @@ import TableArrangement from '../components/table-arragment/table-arragement';
 import { GuestsView } from '../components/guests-view/guests-view';
 import { CreateEvent } from '../components/create-event/create-event';
 import { GiftsList } from '../components/gifts-list/gifts-list';
+import InvitationPage from '../components/invitationPage/invitationPage';
+import GiftPage from '../components/giftPage/gistPage';
 
 export const ENDPOINTS = [
     {
@@ -36,3 +38,14 @@ export const ENDPOINTS = [
         element: <GiftsList />,
     },
 ];
+
+export const GUEST_ENDPOINTS = [
+    {
+        path: "/rsvp",
+        element: <InvitationPage />,
+    },
+    {
+        path: "/gift",
+        element: <GiftPage />,
+    }
+]

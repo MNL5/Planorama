@@ -9,14 +9,13 @@ import "@mantine/dates/styles.css";
 import Home from "./components/home/home.tsx";
 import { mantheme } from "./types/mantheme.ts";
 import useRefresh from "./hooks/use-refresh.ts";
-import { ENDPOINTS } from "./utils/end-points.tsx";
+import { ENDPOINTS, GUEST_ENDPOINTS } from "./utils/end-points.tsx";
 import Navbar from "./components/navbar/navbar.tsx";
 import SignIn from "./components/sign-in/sign-in.tsx";
 import SignUp from "./components/sign-up/sign-up.tsx";
 import Overview from "./components/overview/overview.tsx";
 import { useEventListener } from "./hooks/use-event-listener.ts";
 import { useFetchEventsList } from "./hooks/use-fetch-events-list.ts";
-import InvitationPage from "./components/invitationPage/invitationPage.tsx";
 
 const theme = createTheme(mantheme);
 
@@ -24,7 +23,7 @@ const LOGIN_EVENT = "loginEvent";
 
 const App: React.FC = () => {
   const { pathname } = useLocation();
-  const isGuest = pathname.startsWith("/rsvp");
+  const isGuest = GUEST_ENDPOINTS.some(endpoint => pathname.startsWith(endpoint.path));
   const [isLogged, setLogged] = useState<boolean>(false);
   const { isLoading } = useRefresh(isGuest);
   const { doesUserHaveEvents, isLoadingEventsList } =
@@ -89,7 +88,13 @@ const App: React.FC = () => {
             <Route path="/signup" element={<SignUp />} />
           </>
         )}
-        <Route path="/rsvp/:id" element={<InvitationPage />} />
+        {GUEST_ENDPOINTS.map((endpoint) => (
+          <Route
+            key={endpoint.path}
+            path={`${endpoint.path}/:id`}
+            element={endpoint.element}
+          />
+        ))}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </MantineProvider>

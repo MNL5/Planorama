@@ -161,19 +161,19 @@ const TableArrangement = () => {
             <Drawer
                 opened={drawerOpened}
                 onClose={() => setDrawerOpened(false)}
-                title="הוספת שולחן"
+                title="Add Table"
                 position="left"
             >
                 {selectedType && (
                     <NumberInput
-                        label="מספר מקומות"
+                        label="No. of Seats"
                         value={seatCount}
                         onChange={setSeatCount}
                         min={1}
                     />
                 )}
                 <Button color="#6a0572" fullWidth mt="md" onClick={addElement}>
-                    הוסף
+                    Add
                 </Button>
             </Drawer>
         </Box>
