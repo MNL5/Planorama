@@ -256,9 +256,8 @@ const Preferences: React.FC = () => {
             Clear
           </Button>
           <Tooltip
-            label={
-              isEmptyField ? "Please select both guests and a preference" : null
-            }
+            label={"Please select both guests and a preference"}
+            disabled={!isEmptyField}
           >
             <Button onClick={onAdd} disabled={isEmptyField}>
               Add

@@ -12,11 +12,9 @@ const relationColumns = (
     {
       key: "firstGuestId",
       label: "Guest",
-      isEdit: true,
+      isEdit: false,
       isMulti: false,
       isNullable: false,
-      values: firstGuestOptions,
-      alt: listToMap(firstGuestOptions),
     },
     {
       key: "relation",
@@ -30,11 +28,9 @@ const relationColumns = (
     {
       key: "secondGuestId",
       label: "Guest",
-      isEdit: true,
+      isEdit: false,
       isMulti: false,
       isNullable: false,
-      values: secondGuestOptions,
-      alt: listToMap(secondGuestOptions),
     },
   ];
 };
