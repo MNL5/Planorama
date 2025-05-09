@@ -65,9 +65,12 @@ function CustomTable<T extends { id: string }>({
 
   const handleSaveClick = async () => {
     if (editRowId !== null) {
-      const guest = await updateRow({ ...editFormData, id: editRowId } as T);
+      const updatedRow = await updateRow({
+        ...editFormData,
+        id: editRowId,
+      } as T);
       setData((prev: T[]) =>
-        prev.map((row: T) => (row.id === guest.id ? guest : row))
+        prev.map((row: T) => (row.id === updatedRow.id ? updatedRow : row))
       );
       setEditRowId(null);
       setEditFormData({});

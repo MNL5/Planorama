@@ -14,7 +14,7 @@ import {
   Button,
   Tooltip,
 } from "@mantine/core";
-import { clone, isNil } from "lodash";
+import { isNil } from "lodash";
 import { toast } from "react-toastify";
 import { useMemo, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -86,8 +86,12 @@ const Preferences: React.FC = () => {
   );
 
   const columns = useMemo(
-    () => relationColumns(clone(guestOptionList), clone(secondGuestOptionList)),
-    [guestOptionList, secondGuestOptionList]
+    () =>
+      relationColumns(
+        mapGuestsToOptionList(guests),
+        mapGuestsToOptionList(guests)
+      ),
+    [guests]
   );
 
   const {
