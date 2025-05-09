@@ -14,6 +14,7 @@ import {
   Button,
   Tooltip,
 } from "@mantine/core";
+import { isNil } from "lodash";
 import { toast } from "react-toastify";
 import { useMemo, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -31,7 +32,6 @@ import {
   getAllRelations,
   updateRelation,
 } from "../../services/relation-service/relation-service";
-import { isNil } from "lodash";
 import { Guest } from "../../types/guest";
 import { OptionType } from "../../types/option-type";
 
@@ -95,6 +95,7 @@ const Preferences: React.FC = () => {
     isLoading: isRelationsLoading,
     isError: isRelationsError,
     isFetching: isRelationsFetching,
+    refetch: refetchRelations,
   } = useQuery<GuestRelation[], Error>({
     queryKey: ["fetchRelations", currentEvent?.id],
     queryFn: () => getAllRelations(currentEvent?.id as string),
@@ -144,6 +145,7 @@ const Preferences: React.FC = () => {
     onSuccess: () => {
       reset();
       toast.success("Preference added successfully");
+      refetchRelations();
     },
     onError: () => {
       toast.error("Failed to add preference");
@@ -163,6 +165,7 @@ const Preferences: React.FC = () => {
       ),
     onSuccess: () => {
       toast.success("Preference updated successfully");
+      refetchRelations();
     },
     onError: () => {
       toast.error("Failed to update preference");
@@ -177,6 +180,7 @@ const Preferences: React.FC = () => {
     mutationFn: (guestId) => deleteRelation(guestId),
     onSuccess: () => {
       toast.success("Preference deleted successfully");
+      refetchRelations();
     },
     onError: () => {
       toast.error("Failed to delete preference");
