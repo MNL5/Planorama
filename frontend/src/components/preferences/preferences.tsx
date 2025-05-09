@@ -133,8 +133,6 @@ const Preferences: React.FC = () => {
         relation: selectedPreference,
         secondGuestId: secondSelectedGuestId,
       });
-
-      reset();
     }
   };
 
@@ -146,6 +144,7 @@ const Preferences: React.FC = () => {
     mutationFn: (newRelation) =>
       createRelation(currentEvent?.id as string, newRelation),
     onSuccess: () => {
+      reset();
       toast.success("Preference added successfully");
     },
     onError: () => {
