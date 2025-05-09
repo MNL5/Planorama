@@ -98,6 +98,24 @@ const Preferences: React.FC = () => {
     enabled: !!currentEvent?.id,
   });
 
+  const mappedRelations = useMemo(() => {
+    return (
+      relationsData?.map((relation) => {
+        const firstGuest = guests?.find(
+          (guest) => guest.id === relation.firstGuestId
+        );
+        const secondGuest = guests?.find(
+          (guest) => guest.id === relation.secondGuestId
+        );
+        return {
+          ...relation,
+          firstGuestId: firstGuest?.name ?? "",
+          secondGuestId: secondGuest?.name ?? "",
+        };
+      }) ?? []
+    );
+  }, [guests, relationsData]);
+
   const preferenceOptionList = preferenceOptions.map((preference) => (
     <Combobox.Option value={preference.label} key={preference.value}>
       <Flex align={"center"} gap={10}>
@@ -267,7 +285,7 @@ const Preferences: React.FC = () => {
           <Flex style={{ flex: "1 1", overflowY: "scroll" }}>
             <CustomTable<GuestRelation>
               columns={relationColumns}
-              data={relationsData}
+              data={mappedRelations}
               updateRow={mutateUpdateRelation}
               deleteRow={mutateDeleteRelation}
             />

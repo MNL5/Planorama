@@ -70,7 +70,6 @@ function CustomTable<T extends { id: string }>({
         id: editRowId,
       } as T);
 
-      console.log(updatedRow);
       setData((prev: T[]) =>
         prev.map((row: T) => (row.id === updatedRow.id ? updatedRow : row))
       );
