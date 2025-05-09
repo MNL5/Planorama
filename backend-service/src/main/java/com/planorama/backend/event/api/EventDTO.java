@@ -7,9 +7,9 @@ import java.time.OffsetDateTime;
 import java.util.UUID;
 
 public record EventDTO(@NotNull UUID id,
-                       @Nullable String name,
-                       @Nullable String invitationText,
-                       @Nullable String invitationImg,
-                       @Nullable OffsetDateTime time,
+                       @NotNull String name,
+                       @NotNull String invitationText,
+                       @NotNull String invitationImg,
+                       @NotNull OffsetDateTime time,
                        @Nullable DiagramDTO diagram) {
 }

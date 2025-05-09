@@ -72,6 +72,12 @@ public class GuestService {
         return reactiveMongoTemplate.find(Query.query(Criteria.where(GuestDAO.EVENT_ID_FIELD).is(eventId)), GuestDAO.class);
     }
 
+    public Flux<GuestDAO> findAllByEventIdAndRsvpStatus(@NotNull String eventId, @NotNull Set<RSVPStatusDTO> rsvpStatus) {
+        Set<String> statuses = rsvpStatus.stream().map(Enum::name).collect(Collectors.toSet());
+        return reactiveMongoTemplate.find(Query.query(Criteria.where(GuestDAO.EVENT_ID_FIELD).is(eventId)
+                .and(GuestDAO.STATUS_FIELD).in(statuses)), GuestDAO.class);
+    }
+
     public Mono<GuestDAO> createGuest(@Valid @NotNull CreateGuestDTO createGuestDTO) {
         return reactiveMongoTemplate.save(createGuestDao(createGuestDTO))
                 .switchIfEmpty(Mono.error(new RuntimeException("Failed to create an guest")));
