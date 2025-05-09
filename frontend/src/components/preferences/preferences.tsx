@@ -98,6 +98,16 @@ const Preferences: React.FC = () => {
     enabled: !!currentEvent?.id,
   });
 
+  const isGuestRelationExist = useMemo(() => {
+    return relationsData?.some(
+      (relation) =>
+        (relation.firstGuestId === selectedGuestId &&
+          relation.secondGuestId === secondSelectedGuestId) ||
+        (relation.firstGuestId === secondSelectedGuestId &&
+          relation.secondGuestId === selectedGuestId)
+    );
+  }, [selectedGuestId, secondSelectedGuestId, relationsData]);
+
   const mappedRelations = useMemo(() => {
     return (
       relationsData?.map((relation) => {
@@ -265,10 +275,19 @@ const Preferences: React.FC = () => {
             Clear
           </Button>
           <Tooltip
-            label={"Please select both guests and a preference"}
-            disabled={!isEmptyField}
+            label={
+              isEmptyField
+                ? "Please select both guests and a preference"
+                : isGuestRelationExist
+                ? "Preference for these guests already exists"
+                : null
+            }
+            disabled={!isEmptyField && !isGuestRelationExist}
           >
-            <Button onClick={onAdd} disabled={isEmptyField}>
+            <Button
+              onClick={onAdd}
+              disabled={isEmptyField || isGuestRelationExist}
+            >
               Add
             </Button>
           </Tooltip>
