@@ -12,6 +12,7 @@ import {
   Title,
   Group,
   Button,
+  Tooltip,
 } from "@mantine/core";
 import { toast } from "react-toastify";
 import { useMemo, useState } from "react";
@@ -120,6 +121,10 @@ const Preferences: React.FC = () => {
     setSecondSelectedGuest("");
     setSelectedPreference(null);
   };
+
+  const isEmptyField = useMemo(() => {
+    return !selectedGuestId || !secondSelectedGuestId || !selectedPreference;
+  }, [secondSelectedGuestId, selectedGuestId, selectedPreference]);
 
   const onAdd = () => {
     if (selectedGuestId && secondSelectedGuestId && selectedPreference) {
@@ -240,14 +245,15 @@ const Preferences: React.FC = () => {
           <Button onClick={reset} variant={"outline"}>
             Clear
           </Button>
-          <Button
-            onClick={onAdd}
-            disabled={
-              !selectedGuestId || !secondSelectedGuestId || !selectedPreference
+          <Tooltip
+            label={
+              isEmptyField ? "Please select both guests and a preference" : ""
             }
           >
-            Add
-          </Button>
+            <Button onClick={onAdd} disabled={isEmptyField}>
+              Add
+            </Button>
+          </Tooltip>
         </Group>
       </Stack>
       <Stack>
