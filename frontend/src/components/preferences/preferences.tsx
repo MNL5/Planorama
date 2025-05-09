@@ -73,17 +73,16 @@ const Preferences: React.FC = () => {
   const guestOptionList: OptionType[] = useMemo(
     () =>
       mapGuestsToOptionList(guests)?.filter(
-        (option) => option.value !== selectedGuestId
+        (option) => option.value !== secondSelectedGuestId
       ) || [],
-    [guests, selectedGuestId]
+    [guests, secondSelectedGuestId]
   );
 
   const secondGuestOptionList = useMemo(
     () =>
-      guestOptionList?.filter(
-        (option) => option.value !== secondSelectedGuest
-      ) || [],
-    [guestOptionList, secondSelectedGuest]
+      guestOptionList?.filter((option) => option.value !== selectedGuestId) ||
+      [],
+    [guestOptionList, selectedGuestId]
   );
 
   const columns = useMemo(
@@ -117,8 +116,8 @@ const Preferences: React.FC = () => {
   });
 
   const reset = () => {
-    setSelectedGuest(undefined);
-    setSecondSelectedGuest(undefined);
+    setSelectedGuest("");
+    setSecondSelectedGuest("");
     setSelectedPreference(null);
   };
 
