@@ -16,6 +16,9 @@ const giftsColumns: (guests: Guest[]) => Column<Gift>[] = (guests: Guest[]) => {
       isMulti: false,
       isNullable: false,
       alt: guestsObject,
+      footer: (gift: Gift[]) => {
+        return "Total Gifts: " + gift.length;
+      }
     },
     {
       key: "greeting",
@@ -23,9 +26,6 @@ const giftsColumns: (guests: Guest[]) => Column<Gift>[] = (guests: Guest[]) => {
       isEdit: false,
       isMulti: false,
       isNullable: false,
-      footer: (gift: Gift[]) => {
-        return "Total Gifts: " + gift.length;
-      }
     },
     {
       key: "amount",

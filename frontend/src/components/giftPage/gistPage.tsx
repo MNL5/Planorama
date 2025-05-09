@@ -84,12 +84,12 @@ const GiftPage: React.FC = () => {
       }
 
       startTransition(async () => {
-        // await createGiftFunction({
-        //   guestId: id as string,
-        //   amount: Number(amount),
-        //   greeting: greeting,
-        //   eventId: event.id as string,
-        // } as CreateGift);
+        await createGiftFunction({
+          guestId: id as string,
+          amount: Number(amount),
+          greeting: greeting,
+          eventId: event.id as string,
+        } as CreateGift);
         await new Promise((resolve) => setTimeout(resolve, 3000));
         toast.success("Gift was received successfully!");
       })

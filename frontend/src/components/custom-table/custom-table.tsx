@@ -238,6 +238,16 @@ function CustomTable<T extends { id: string }>({
             ))}
           </Table.Tbody>
 
+          {
+            data.length === 0 && (
+              <Table.Tr>
+                <Table.Td colSpan={columns.length + 1} style={{ textAlign: "center" }}>
+                  There is no data to display
+                </Table.Td>
+              </Table.Tr>
+            )
+          }
+
           {columns.some((col) => col.footer) && (
             <Table.Tfoot pos={"sticky"} bottom={0} style={{backgroundColor: "white"}}>
               <Table.Tr>
