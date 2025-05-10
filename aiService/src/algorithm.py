@@ -8,8 +8,10 @@ class Algorithm:
         self.guests = guests
         self.tables = tables
         
+        self.tableToNumOfSeats = {}
         self.seatToTable = []
         for table in self.tables:
+            self.tableToNumOfSeats[table.id] = table.numOfSeats
             for _ in range(table.numOfSeats):
                 self.seatToTable.append(table.id)
         self.numOfTables = len(self.tables)
@@ -103,13 +105,71 @@ class Algorithm:
 
         return result
 
+    def createFirstArrangement(self, guests):
+        individual = [None] * len(guests)
+        shuffledGuests = guests.copy()
+        random.shuffle(shuffledGuests)
+        withoutTableGuests = []
+        for guest in shuffledGuests:
+            if guest.table is None:
+                withoutTableGuests.append(guest)
+                continue
+            for i in range(len(individual)):
+                if individual[i] is None and self.seatToTable[i] == guest.table:
+                    individual[i] = guest
+                    break
+
+        for guest in withoutTableGuests:
+            for i in range(len(individual)):
+                if individual[i] is None:
+                    individual[i] = guest
+                    break
+
+        return individual
+
     def create_population(self, guests, pop_size):
-        population = []
-        for i in range(pop_size):
+        population = [self.createFirstArrangement(guests)]
+        for i in range(pop_size - 1):
             individual = guests.copy()
             random.shuffle(individual)
             population.append(individual)
         return population
+    
+    def splitToTables(self, guests):
+        tables = {}
+        for guest in guests:
+            table = guest.table
+            if table is None:
+                continue
+            if table not in tables:
+                tables[table] = set()
+            tables[table].add(guest)
+        return tables
+    
+    def getTablesSwitch(self, oldGuestsPerTable, newGuestsPerTable):
+        tablesSwitch = {}
+        for table in oldGuestsPerTable:
+            for newTable in newGuestsPerTable:
+                if table != newTable and self.tableToNumOfSeats[table] == self.tableToNumOfSeats[newTable] and len(oldGuestsPerTable[table] & newGuestsPerTable[newTable]) >= self.tableToNumOfSeats[table] / 2:
+                    tablesSwitch[tablesSwitch[table] if table in tablesSwitch else table] = newTable
+                    tablesSwitch[newTable] = table
+                    break
+        return tablesSwitch
+    
+    def setTables(self, guests):
+        oldGuestsPerTable = self.splitToTables(guests)
+
+        for i, guest in enumerate(guests):
+            guest.table = self.seatToTable[i]
+
+        newGuestsPerTable = self.splitToTables(guests)
+
+        tablesSwitch = self.getTablesSwitch(oldGuestsPerTable, newGuestsPerTable)
+        for table in tablesSwitch:
+            for guest in newGuestsPerTable[table]:
+                guest.table = tablesSwitch[table]
+    
+        return guests
 
     def crossover(self, parent1, parent2):
         child1 = [None] * len(parent1)
@@ -193,7 +253,4 @@ class Algorithm:
 
             population = next_gen
 
-        for i, guest in enumerate(best_individual):
-            guest.table = self.seatToTable[i]
-
-        return best_individual
+        return self.setTables(best_individual)
