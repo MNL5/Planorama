@@ -63,8 +63,4 @@ public class GiftService {
         });
         return update;
     }
-
-    public Mono<GiftDAO> deleteGift(UUID giftID) {
-        return reactiveMongoTemplate.findAndRemove(Query.query(Criteria.where(GiftDAO.ID_FIELD).is(giftID)), GiftDAO.class);
-    }
 }

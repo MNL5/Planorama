@@ -7,8 +7,6 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.UUID;
-
 @RestController
 @RequestMapping("gifts")
 public class GiftController {
@@ -30,12 +28,6 @@ public class GiftController {
     @PostMapping
     public Mono<GiftDTO> upsertGift(@RequestBody UpsertGiftDTO upsertGiftDTO) {
         return giftService.upsertGift(upsertGiftDTO)
-                .map(giftMapper::daoToDTO);
-    }
-
-    @DeleteMapping("/{giftId}")
-    public Mono<GiftDTO> deleteGift(@PathVariable("giftId") UUID giftID) {
-        return giftService.deleteGift(giftID)
                 .map(giftMapper::daoToDTO);
     }
 }
