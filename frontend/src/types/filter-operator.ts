@@ -1,8 +1,8 @@
 enum FilterOperator {
-  EQUALS = "is",
-  NOT_EQUALS = "is not",
-  INCLUDES = "includes",
-  NOT_INCLUDES = "doesn't include",
+  EQUALS = "Is",
+  NOT_EQUALS = "Is not",
+  INCLUDES = "Includes",
+  NOT_INCLUDES = "Doesn't Include",
 }
 
 export { FilterOperator };

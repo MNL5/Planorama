@@ -102,11 +102,15 @@ function CustomTable<T extends { id: string }>({
   );
 
   const valuesOptions = useMemo(() => {
-    if (selectedField) {
+    const column = filterableColumns.find((col) => col.key === selectedField);
+
+    if (selectedField && column) {
       return uniq(searchedData.flatMap((row) => row[selectedField])).map(
         (value) => ({
           value: String(value),
-          label: String(value),
+          label: String(
+            value ? (column.alt ? column.alt[String(value)] : value) : ""
+          ),
         })
       );
     }
@@ -116,7 +120,7 @@ function CustomTable<T extends { id: string }>({
     if (selectedField && selectedOperator && selectedValue) {
       const filteredData = searchedData.filter((row) => {
         const cellValue = row[selectedField];
-        
+
         return FilterOperatorFunctions[selectedOperator](
           cellValue,
           selectedValue
