@@ -4,6 +4,7 @@ import { Column } from "../types/column";
 import mealOptions from "./meal-options";
 import rsvpOptions from "./rsvp-options";
 import { listToMap } from "./list-to-map";
+import { FilterOperator } from "../types/filter-operator";
 
 const guestColumns: (event: Event) => Column<Guest>[] = (event: Event) => {
   const tables =
@@ -27,6 +28,13 @@ const guestColumns: (event: Event) => Column<Guest>[] = (event: Event) => {
       isEdit: true,
       isMulti: false,
       isNullable: true,
+      isFilterable: true,
+      filterOperators: [
+        FilterOperator.EQUALS,
+        FilterOperator.NOT_EQUALS,
+        FilterOperator.CONTAINS,
+        FilterOperator.NOT_CONTAINS,
+      ],
     },
     {
       key: "phoneNumber",
@@ -45,6 +53,8 @@ const guestColumns: (event: Event) => Column<Guest>[] = (event: Event) => {
       isMulti: true,
       isNullable: true,
       alt: listToMap(mealOptions),
+      isFilterable: true,
+      filterOperators: [FilterOperator.INCLUDES, FilterOperator.NOT_INCLUDES],
     },
     {
       key: "tableId",
@@ -54,6 +64,8 @@ const guestColumns: (event: Event) => Column<Guest>[] = (event: Event) => {
       isNullable: true,
       values: tables,
       alt: listToMap(tables),
+      isFilterable: true,
+      filterOperators: [FilterOperator.EQUALS, FilterOperator.NOT_EQUALS],
     },
     {
       key: "status",
@@ -63,6 +75,8 @@ const guestColumns: (event: Event) => Column<Guest>[] = (event: Event) => {
       isMulti: false,
       isNullable: true,
       alt: listToMap(rsvpOptions),
+      isFilterable: true,
+      filterOperators: [FilterOperator.EQUALS, FilterOperator.NOT_EQUALS],
     },
   ];
 };

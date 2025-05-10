@@ -4,15 +4,16 @@ import {
   Input,
   Stack,
   Loader,
-  InputBase,
-  InputLabel,
-  Combobox,
-  useCombobox,
-  Autocomplete,
   Title,
   Group,
   Button,
   Tooltip,
+  Center,
+  Combobox,
+  InputBase,
+  InputLabel,
+  useCombobox,
+  Autocomplete,
 } from "@mantine/core";
 import { isNil } from "lodash";
 import { toast } from "react-toastify";
@@ -38,7 +39,13 @@ import { Column } from "../../types/column";
 const Preferences: React.FC = () => {
   const { currentEvent } = useEventContext();
   const [columns, setColumns] = useState<Column<GuestRelation>[] | null>(null);
-  const { guestsData: guests, isLoading, isFetching, isSuccess, isError } = useFetchAllGuests(true);
+  const {
+    guestsData: guests,
+    isLoading,
+    isFetching,
+    isSuccess,
+    isError,
+  } = useFetchAllGuests(true);
   const [selectedPreference, setSelectedPreference] = useState<string>();
   const [selectedRelation, setSelectedRelation] = useState<Relation>();
   const [selectedGuest, setSelectedGuest] = useState<string | undefined>();
@@ -52,13 +59,15 @@ const Preferences: React.FC = () => {
     }
   }, [isSuccess, isFetching, guests]);
 
-  const completeGuestOptionList = useMemo(() => 
-    guests ? 
-      guests.map((guest) => ({
-          label: guest.name,
-          value: guest.id,
-        })) : [],
-      [guests]
+  const completeGuestOptionList = useMemo(
+    () =>
+      guests
+        ? guests.map((guest) => ({
+            label: guest.name,
+            value: guest.id,
+          }))
+        : [],
+    [guests]
   );
 
   const selectedGuestId = useMemo(() => {
@@ -87,7 +96,9 @@ const Preferences: React.FC = () => {
 
   const secondGuestOptionList = useMemo(
     () =>
-      completeGuestOptionList.filter((option) => option.value !== selectedGuestId),
+      completeGuestOptionList.filter(
+        (option) => option.value !== selectedGuestId
+      ),
     [completeGuestOptionList, selectedGuestId]
   );
 
@@ -133,7 +144,8 @@ const Preferences: React.FC = () => {
     setSelectedPreference(undefined);
   };
 
-  const isEmptyField = !selectedGuestId || !secondSelectedGuestId || !selectedPreference;
+  const isEmptyField =
+    !selectedGuestId || !secondSelectedGuestId || !selectedPreference;
 
   const onAdd = () => {
     if (selectedGuestId && secondSelectedGuestId && selectedRelation) {
@@ -296,7 +308,9 @@ const Preferences: React.FC = () => {
             />
           </Flex>
         ) : isRelationsLoading ? (
-          <Loader size="lg" color="primary" />
+          <Center>
+            <Loader size="lg" color="primary" />
+          </Center>
         ) : isRelationsError ? (
           <Text>Oops! Something went wrong. Please try again later.</Text>
         ) : null}

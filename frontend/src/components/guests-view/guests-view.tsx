@@ -1,8 +1,8 @@
 import { isNil } from "lodash";
 import { toast } from "react-toastify";
 import { useEffect, useState } from "react";
-import { Flex, Loader, Text } from "@mantine/core";
 import { useMutation } from "@tanstack/react-query";
+import { Center, Flex, Loader, Text } from "@mantine/core";
 
 import { Guest } from "../../types/guest";
 import { Column } from "../../types/column";
@@ -80,7 +80,9 @@ const GuestsView: React.FC = () => {
       />
     </Flex>
   ) : isLoading ? (
-    <Loader size="lg" color="primary" />
+    <Center>
+      <Loader size="lg" color="primary" />
+    </Center>
   ) : isError ? (
     <Text>Oops! Something went wrong. Please try again later.</Text>
   ) : null;

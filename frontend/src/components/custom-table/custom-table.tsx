@@ -3,11 +3,14 @@ import {
   Table,
   Group,
   Paper,
+  Modal,
   Select,
+  Button,
   Container,
   TextInput,
   ActionIcon,
   MultiSelect,
+  Flex,
 } from "@mantine/core";
 import {
   IconX,
@@ -16,13 +19,16 @@ import {
   IconCheck,
   IconPencil,
   IconSearch,
+  IconFilter,
 } from "@tabler/icons-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { isEmpty } from "lodash";
 import { useDisclosure } from "@mantine/hooks";
 
 import { Column } from "../../types/column";
 import { AddRowModal } from "./add-row-modal";
+import { FilterOperator } from "../../types/filter-operator";
+import { FilterOperatorFunctions } from "../../utils/filter-operator-functions";
 
 interface CustomTableProps<T> {
   data: T[];
@@ -44,7 +50,39 @@ function CustomTable<T extends { id: string }>({
   const [editRowId, setEditRowId] = useState<string | null>(null);
   const [editFormData, setEditFormData] = useState<Partial<T>>({});
   const [searchQuery, setSearchQuery] = useState<string>("");
+
+  const [
+    filterModalOpened,
+    { open: openFilterModal, close: closeFilterModal },
+  ] = useDisclosure();
+  const [selectedField, setSelectedField] = useState<keyof T | null>(null);
+  const [selectedOperator, setSelectedOperator] =
+    useState<FilterOperator | null>(null);
+  const [selectedValue] = useState<string | null>(null);
+
   const searchableColumns = columns.filter((col) => col.isSearchable);
+  const filterableColumns = columns.filter((col) => col.isFilterable);
+
+  const fieldOptions = useMemo(
+    () =>
+      filterableColumns.map((col) => ({
+        value: col.key as string,
+        label: col.label,
+      })),
+    [filterableColumns]
+  );
+
+  const operatorOptions = useMemo(
+    () =>
+      filterableColumns.flatMap(
+        (col) =>
+          col.filterOperators?.map((operator) => ({
+            value: operator as string,
+            label: operator as string,
+          })) || []
+      ),
+    [filterableColumns]
+  );
 
   const searchedData = data.filter(
     (row) =>
@@ -57,6 +95,22 @@ function CustomTable<T extends { id: string }>({
         );
       })
   );
+
+  const handleApplyFilter = () => {
+    if (selectedField && selectedOperator && selectedValue) {
+      const filteredData = data.filter((row) => {
+        const cellValue = row[selectedField];
+        if (!cellValue) return false;
+
+        return FilterOperatorFunctions[selectedOperator](
+          cellValue,
+          selectedValue
+        );
+      });
+      setData(filteredData);
+    }
+    closeFilterModal();
+  };
 
   const handleAddRow = (newRow: T) => {
     setData((prev) => [...prev, newRow]);
@@ -124,14 +178,24 @@ function CustomTable<T extends { id: string }>({
                   onChange={handleSearchChange}
                 />
               )}
-              <ActionIcon
-                size={40}
-                onClick={open}
-                variant={"light"}
-                color={"primary"}
-              >
-                <IconPlus size={24} />
-              </ActionIcon>
+              <Group>
+                <ActionIcon
+                  size={40}
+                  onClick={openFilterModal}
+                  variant={"light"}
+                  color={"primary"}
+                >
+                  <IconFilter size={24} />
+                </ActionIcon>
+                <ActionIcon
+                  size={40}
+                  onClick={open}
+                  variant={"light"}
+                  color={"primary"}
+                >
+                  <IconPlus size={24} />
+                </ActionIcon>
+              </Group>
             </Group>
             <AddRowModal
               opened={opened}
@@ -140,6 +204,34 @@ function CustomTable<T extends { id: string }>({
               columns={columns}
               createRow={createRow}
             />
+            <Modal
+              opened={filterModalOpened}
+              onClose={closeFilterModal}
+              title={"Apply Filter"}
+            >
+              <Flex gap={"md"}>
+                <Select
+                  placeholder={"Filter by..."}
+                  data={fieldOptions}
+                  value={selectedField as string | null}
+                  onChange={(value) => {
+                    if (value) {
+                      setSelectedField(value as keyof T);
+                    }
+                  }}
+                />
+                <Select
+                  data={operatorOptions}
+                  value={selectedOperator}
+                  onChange={(value) =>
+                    setSelectedOperator(value as FilterOperator)
+                  }
+                />
+              </Flex>
+              <Button fullWidth mt="lg" onClick={handleApplyFilter}>
+                Apply Filter
+              </Button>
+            </Modal>
           </>
         )}
         <Table
