@@ -29,12 +29,7 @@ const guestColumns: (event: Event) => Column<Guest>[] = (event: Event) => {
       isMulti: false,
       isNullable: true,
       isFilterable: true,
-      filterOperators: [
-        FilterOperator.EQUALS,
-        FilterOperator.NOT_EQUALS,
-        FilterOperator.CONTAINS,
-        FilterOperator.NOT_CONTAINS,
-      ],
+      filterOperators: [FilterOperator.EQUALS, FilterOperator.NOT_EQUALS],
     },
     {
       key: "phoneNumber",

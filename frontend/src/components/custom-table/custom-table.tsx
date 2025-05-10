@@ -22,7 +22,7 @@ import {
   IconFilter,
 } from "@tabler/icons-react";
 import { useMemo, useState } from "react";
-import { isEmpty } from "lodash";
+import { isEmpty, uniq } from "lodash";
 import { useDisclosure } from "@mantine/hooks";
 
 import { Column } from "../../types/column";
@@ -58,7 +58,7 @@ function CustomTable<T extends { id: string }>({
   const [selectedField, setSelectedField] = useState<keyof T | null>(null);
   const [selectedOperator, setSelectedOperator] =
     useState<FilterOperator | null>(null);
-  const [selectedValue] = useState<string | null>(null);
+  const [selectedValue, setSelectedValue] = useState<string | null>(null);
 
   const searchableColumns = columns.filter((col) => col.isSearchable);
   const filterableColumns = columns.filter((col) => col.isFilterable);
@@ -83,24 +83,40 @@ function CustomTable<T extends { id: string }>({
     }
   }, [filterableColumns, selectedField]);
 
-  const searchedData = data.filter(
-    (row) =>
-      isEmpty(searchableColumns) ||
-      searchableColumns.some((col) => {
-        const cellValue = row[col.key];
-        return (
-          cellValue &&
-          String(cellValue).toLowerCase().includes(searchQuery.toLowerCase())
-        );
-      })
+  const searchedData = useMemo(
+    () =>
+      data.filter(
+        (row) =>
+          isEmpty(searchableColumns) ||
+          searchableColumns.some((col) => {
+            const cellValue = row[col.key];
+            return (
+              cellValue &&
+              String(cellValue)
+                .toLowerCase()
+                .includes(searchQuery.toLowerCase())
+            );
+          })
+      ),
+    [data, searchQuery, searchableColumns]
   );
+
+  const valuesOptions = useMemo(() => {
+    if (selectedField) {
+      return uniq(searchedData.flatMap((row) => row[selectedField])).map(
+        (value) => ({
+          value: String(value),
+          label: String(value),
+        })
+      );
+    }
+  }, [selectedField, searchedData]);
 
   const handleApplyFilter = () => {
     if (selectedField && selectedOperator && selectedValue) {
-      const filteredData = data.filter((row) => {
+      const filteredData = searchedData.filter((row) => {
         const cellValue = row[selectedField];
-        if (!cellValue) return false;
-
+        
         return FilterOperatorFunctions[selectedOperator](
           cellValue,
           selectedValue
@@ -226,6 +242,12 @@ function CustomTable<T extends { id: string }>({
                     setSelectedOperator(value as FilterOperator)
                   }
                   disabled={!selectedField}
+                />
+                <Select
+                  data={valuesOptions}
+                  value={selectedValue}
+                  onChange={(value) => setSelectedValue(value)}
+                  disabled={!selectedOperator}
                 />
               </Flex>
               <Button fullWidth mt="lg" onClick={handleApplyFilter}>
