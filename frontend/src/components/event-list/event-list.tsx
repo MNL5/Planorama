@@ -43,7 +43,7 @@ const EventList: React.FC = () => {
   );
 
   return (
-    <Stack w={"100%"} h={"100vh"}>
+    <Stack w={"100%"} h={"100vh"} align={"center"} gap={"xl"}>
       <Flex
         mt={20}
         w={"100%"}
@@ -64,9 +64,9 @@ const EventList: React.FC = () => {
           + Create New Event
         </Button>
       </Flex>
-      <Stack>
+      <Stack w={"auto"} align={'center'}>
         <TextInput
-          w={"50%"}
+          w={600}
           placeholder={"Search..."}
           rightSection={<IconSearch size={16} />}
           value={searchQuery}
