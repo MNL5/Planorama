@@ -1,12 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import { Box, Text, Stack, Button, Title, Popover, Group } from '@mantine/core';
+import { Box, Button, Stack, Text, Title } from '@mantine/core';
 import { useQuery } from '@tanstack/react-query';
+import React, { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
 import { useEventContext } from '../../contexts/event-context';
 import { updateEvent } from '../../services/event-service/event-service';
 import ElementType from '../../types/Element';
-import { toast } from 'react-toastify';
+import GuestTable from '../guest-table/guest-table';
 import { getAllGuests } from '../../Services/guest-service/guest-service';
 import { Guest } from '../../types/guest';
+import GuestSeatingList from '../guest-seating-list/guest-seating-list';
 
 const GuestSeating: React.FC = () => {
     const { currentEvent, setCurrentEvent } = useEventContext();
@@ -14,7 +16,6 @@ const GuestSeating: React.FC = () => {
     const [guests, setGuests] = useState<Guest[]>([]);
     const [openTableId, setOpenTableId] = useState<string | null>(null);
 
-    // Fetch guests
     const {
         data: guestsData = [],
         isLoading,
@@ -25,26 +26,22 @@ const GuestSeating: React.FC = () => {
         enabled: !!currentEvent?.id,
     });
 
-    // Initialize tables
     useEffect(() => {
         if (currentEvent) {
             setTables(currentEvent.diagram.elements || []);
         }
     }, [currentEvent]);
 
-    // Initialize guests state from fetched data
     useEffect(() => {
-        setGuests(guestsData.map((g) => ({ ...g })));
+        setGuests(guestsData);
     }, [guestsData]);
 
-    // Handle drop of guest onto table: update guest.assignedTableId
     const handleDrop = (tableId: string, guestId: string) => {
         setGuests((prev) =>
             prev.map((g) => (g.id === guestId ? { ...g, tableId } : g))
         );
     };
 
-    // Remove guest from table
     const handleRemove = (guestId: string) => {
         setGuests((prev) =>
             prev.map((g) =>
@@ -53,11 +50,9 @@ const GuestSeating: React.FC = () => {
         );
     };
 
-    // Save updated diagram: only needs tables layout since guest->table associations stored separately
     const handleSave = async () => {
         if (!currentEvent) return;
         try {
-            // include updated seating assignments in event if schema supports, else only save diagram
             const updatedEvent = {
                 ...currentEvent,
                 diagram: { elements: tables },
@@ -65,145 +60,58 @@ const GuestSeating: React.FC = () => {
             };
             const result = await updateEvent(updatedEvent, currentEvent.id);
             setCurrentEvent(result);
-            alert('Guest seating saved');
+            toast.success('Guest seating saved');
         } catch (err) {
             console.error(err);
+            toast.error('Failed to save guest seating');
         }
+    };
+
+    const handleGuestDragStart = (
+        e: React.DragEvent<HTMLDivElement>,
+        id: string
+    ) => {
+        e.dataTransfer.setData('guestId', id);
     };
 
     if (isLoading) return <Text>Loading guests...</Text>;
     if (isError) return <Text>Error loading guests</Text>;
 
     return (
-        <Box style={{ display: 'flex', height: '100vh' }}>
-            {/* Left: Guest List */}
-            <Box
+        <Box
+            style={{ display: 'flex', height: '100vh' }}
+            onClick={() => setOpenTableId(null)}
+        >
+            <div
                 style={{
-                    width: 240,
-                    padding: 16,
-                    borderRight: '1px solid #ddd',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
                 }}
             >
-                <Title order={4}>Guests</Title>
-                <Stack spacing="xs">
-                    {guests
-                        .filter((g) => !g.tableId)
-                        .map((guest) => (
-                            <Box
-                                key={guest.id}
-                                draggable
-                                onDragStart={(e) =>
-                                    e.dataTransfer.setData('guestId', guest.id)
-                                }
-                                style={{
-                                    padding: '8px',
-                                    border: '1px solid #ccc',
-                                    borderRadius: 4,
-                                    backgroundColor: '#f0f0f0',
-                                    cursor: 'grab',
-                                }}
-                            >
-                                {guest.name}
-                            </Box>
-                        ))}
-                </Stack>
+                <GuestSeatingList
+                    guests={guests.filter((g) => !g.tableId)}
+                    onDragStart={handleGuestDragStart}
+                />
                 <Button fullWidth mt="md" onClick={handleSave} color="green">
                     Save Seating
                 </Button>
-            </Box>
-
-            {/* Right: Tables Canvas */}
-            <Box
-                style={{ flex: 1, position: 'relative', background: '#fff' }}
-                onClick={() => setOpenTableId(null)}
-            >
-                {tables.map((table) => {
-                    const assignedGuests = guests.filter(
-                        (g) => g.tableId === table.id
-                    );
-                    // capacity check
-                    const isFull =
-                        assignedGuests.length >= (table.seatCount || Infinity);
-
-                    return (
-                        <Popover
-                            key={table.id}
-                            opened={openTableId === table.id}
-                            onClose={() => setOpenTableId(null)}
-                            position="right"
-                            withArrow
-                            trapFocus={false}
-                        >
-                            <Popover.Target>
-                                <Box
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        setOpenTableId(table.id);
-                                    }}
-                                    onDrop={(e) => {
-                                        e.preventDefault();
-                                        const guestId =
-                                            e.dataTransfer.getData('guestId');
-                                        if (isFull) {
-                                            toast.error('Table is full');
-                                        } else {
-                                            handleDrop(table.id, guestId);
-                                        }
-                                    }}
-                                    onDragOver={(e) => e.preventDefault()}
-                                    style={{
-                                        position: 'absolute',
-                                        top: table.y,
-                                        left: table.x,
-                                        width: table.width,
-                                        height: table.height,
-                                        backgroundColor: '#d0b9e0',
-                                        borderRadius:
-                                            table.type === 'circle' ? '50%' : 8,
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-                                        cursor: 'pointer',
-                                    }}
-                                >
-                                    <Text weight={700}>{table.label}</Text>
-                                </Box>
-                            </Popover.Target>
-
-                            <Popover.Dropdown>
-                                <Title order={5}>Table Guests</Title>
-                                <Stack spacing="xs">
-                                    {assignedGuests.map((g) => (
-                                        <Group key={g.id} position="apart">
-                                            <Box
-                                                draggable
-                                                onDragStart={(e) =>
-                                                    e.dataTransfer.setData(
-                                                        'guestId',
-                                                        g.id
-                                                    )
-                                                }
-                                                style={{ cursor: 'grab' }}
-                                            >
-                                                {g.name}
-                                            </Box>
-                                            <Button
-                                                size="xs"
-                                                color="red"
-                                                onClick={() =>
-                                                    handleRemove(g.id)
-                                                }
-                                            >
-                                                Remove
-                                            </Button>
-                                        </Group>
-                                    ))}
-                                </Stack>
-                            </Popover.Dropdown>
-                        </Popover>
-                    );
-                })}
+            </div>
+            <Box style={{ flex: 1, position: 'relative', background: '#fff' }}>
+                {tables.map((table) => (
+                    <GuestTable
+                        key={table.id}
+                        table={table}
+                        assignedGuests={guests.filter(
+                            (g) => g.tableId === table.id
+                        )}
+                        isOpen={openTableId === table.id}
+                        onOpen={(id) => setOpenTableId(id)}
+                        onClose={() => setOpenTableId(null)}
+                        onDrop={handleDrop}
+                        onRemove={handleRemove}
+                    />
+                ))}
             </Box>
         </Box>
     );
