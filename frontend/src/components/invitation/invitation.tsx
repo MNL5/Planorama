@@ -10,6 +10,7 @@ import { Guest } from "../../types/guest";
 import style from "./invitation.module.css";
 import mealOptions from "../../utils/meal-options";
 import { updateGuest } from "../../services/guest-service/guest-service";
+import Loader from "../loader/Loader";
 
 const Invitation: React.FC<{ event: Event; guestId?: string }> = ({
   event,
@@ -28,7 +29,7 @@ const Invitation: React.FC<{ event: Event; guestId?: string }> = ({
     });
   };
 
-  const { mutateAsync: mutateUpdateGuest } = useMutation<Guest, Error, Guest>({
+  const { mutateAsync: mutateUpdateGuest, isPending } = useMutation<Guest, Error, Guest>({
     mutationFn: (updatedGuest) =>
       updateGuest(event.id as string, updatedGuest, updatedGuest.id),
     onSuccess: () => {
@@ -58,6 +59,7 @@ const Invitation: React.FC<{ event: Event; guestId?: string }> = ({
       {isFormMode ? (
         <>
           <Stack>
+            <Loader isPending={isPending} />
             <Title size={"h2"} style={{ textDecoration: "underline" }}>
               RSVP
             </Title>

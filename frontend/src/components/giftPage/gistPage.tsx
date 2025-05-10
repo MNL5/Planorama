@@ -5,12 +5,12 @@ import { Title, Text, Stack, Container, TextInput, Flex, Button, Textarea, Numbe
 import { useMutation } from '@tanstack/react-query';
 import Cards, { Focused } from 'react-credit-cards-2';
 import 'react-credit-cards-2/dist/es/styles-compiled.css';
+import { toast } from 'react-toastify';
 
 import useEventByGuest from '../../hooks/use-event-by-guest';
 import { CreateGift, Gift } from '../../types/gift';
 import { createGift } from '../../Services/gift-service/gift-service';
-import { toast } from 'react-toastify';
-import { createPortal } from 'react-dom';
+import Loader from "../loader/Loader";
 
 type FormErrors = {
   number?: string;
@@ -135,14 +135,7 @@ const GiftPage: React.FC = () => {
 
     return <Container size={"xl"} mt={"xl"} mb={"xl"} style={{color: '#50147c', textAlign: 'center'}} opacity={isPending ? 0.4 : 1}>
         <Stack>
-          {
-            isPending && createPortal(
-              <Flex pos={"absolute"} top={0} left={0} right={0} bottom={0} justify={"center"} align={"center"} style={{zIndex: 100}}>
-                <CircularProgress color="secondary"/>
-              </Flex>,
-              document.getElementById("root")!
-            )
-          }
+          <Loader isPending={isPending} />
           <Title>Today It's Happening!</Title>
           <Title>{event.name}</Title>
           <Title>{timeString}</Title>
