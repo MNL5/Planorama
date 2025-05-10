@@ -91,6 +91,15 @@ const GiftPage: React.FC = () => {
           eventId: event.id as string,
         } as CreateGift);
         await new Promise((resolve) => setTimeout(resolve, 3000));
+        setAmount("")
+        setGreeting("")
+        setCard({
+          number: '',
+          expiry: '',
+          cvc: '',
+          name: '',
+          focus: '',
+        })
         toast.success("Gift was received successfully!");
       })
     };
@@ -124,7 +133,7 @@ const GiftPage: React.FC = () => {
     const time = new Date(event.time)
     const timeString = `${time.getHours()}:${time.getMinutes()}`
 
-    return <Container size={"xl"} mt={"xl"} mb={"xl"} style={{color: '#420F0F', textAlign: 'center'}} opacity={isPending ? 0.4 : 1}>
+    return <Container size={"xl"} mt={"xl"} mb={"xl"} style={{color: '#50147c', textAlign: 'center'}} opacity={isPending ? 0.4 : 1}>
         <Stack>
           {
             isPending && createPortal(
@@ -141,6 +150,7 @@ const GiftPage: React.FC = () => {
             <NumberInput
                 placeholder="Gift Amount"
                 onChange={setAmount}
+                value={amount}
                 min={1}
                 error={errors?.amount}
             />
@@ -152,6 +162,7 @@ const GiftPage: React.FC = () => {
               key={"greeting"}
               name='greeting'
               onChange={(e) => setGreeting(e.target.value)}
+              value={greeting}
               error={errors?.greeting}
           />
           <TextInput
