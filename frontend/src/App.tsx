@@ -13,9 +13,11 @@ import { ENDPOINTS, GUEST_ENDPOINTS } from "./utils/end-points.tsx";
 import Navbar from "./components/navbar/navbar.tsx";
 import SignIn from "./components/sign-in/sign-in.tsx";
 import SignUp from "./components/sign-up/sign-up.tsx";
-import Overview from "./components/overview/overview.tsx";
 import { useEventListener } from "./hooks/use-event-listener.ts";
+import { EventList } from "./components/event-list/event-list.tsx";
 import { useFetchEventsList } from "./hooks/use-fetch-events-list.ts";
+import { useEventContext } from "./contexts/event-context.tsx";
+import { CreateEvent } from "./components/create-event/create-event.tsx";
 
 const theme = createTheme(mantheme);
 
@@ -26,8 +28,8 @@ const App: React.FC = () => {
   const isGuest = GUEST_ENDPOINTS.some(endpoint => pathname.startsWith(endpoint.path));
   const [isLogged, setLogged] = useState<boolean>(false);
   const { isLoading } = useRefresh(isGuest);
-  const { doesUserHaveEvents, isLoadingEventsList } =
-    useFetchEventsList(isLogged);
+  const { doesUserHaveEvents, isLoadingEventsList } = useFetchEventsList(isLogged);
+  const { currentEvent } = useEventContext();
 
   useEventListener(LOGIN_EVENT, (event: CustomEvent) =>
     setLogged(event.detail)
@@ -62,7 +64,7 @@ const App: React.FC = () => {
           element={
             isLogged ? (
               doesUserHaveEvents ? (
-                <Navigate replace to="/overview" />
+                <Navigate replace to="/event-list" />
               ) : (
                 <Navigate replace to="/event-details" />
               )
@@ -73,8 +75,9 @@ const App: React.FC = () => {
         />
         {isLogged ? (
           <>
-            <Route path="/overview" element={<Overview />} />
-            {ENDPOINTS.map((endpoint) => (
+            <Route path="/event-list" element={<EventList />} />
+            <Route path="/event-details" element={<CreateEvent />} />
+            {currentEvent &&  ENDPOINTS.map((endpoint) => (
               <Route
                 key={endpoint.path}
                 path={endpoint.path}

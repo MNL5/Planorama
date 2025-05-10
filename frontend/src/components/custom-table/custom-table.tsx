@@ -65,9 +65,13 @@ function CustomTable<T extends { id: string }>({
 
   const handleSaveClick = async () => {
     if (editRowId !== null && updateRow) {
-      const guest = await updateRow({ ...editFormData, id: editRowId } as T);
+      const updatedRow = await updateRow({
+        ...editFormData,
+        id: editRowId,
+      } as T);
+
       setData((prev: T[]) =>
-        prev.map((row: T) => (row.id === guest.id ? guest : row))
+        prev.map((row: T) => (row.id === updatedRow.id ? updatedRow : row))
       );
       setEditRowId(null);
       setEditFormData({});
@@ -183,9 +187,17 @@ function CustomTable<T extends { id: string }>({
                         />
                       )
                     ) : col.isMulti ? (
-                      (row[col.key] as string[])?.map(val => col.alt ? col.alt[val] : val).join(", ") ?? ""
+                      (row[col.key] as string[])
+                        ?.map((val) => (col.alt ? col.alt[val] : val))
+                        .join(", ") ?? ""
                     ) : (
-                      String(row[col.key] ? (col.alt ? col.alt[row[col.key] as string] : row[col.key]) : "")
+                      String(
+                        row[col.key]
+                          ? col.alt
+                            ? col.alt[String(row[col.key] as string)]
+                            : row[col.key]
+                          : ""
+                      )
                     )}
                   </Table.Td>
                 ))}
