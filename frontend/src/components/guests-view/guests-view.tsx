@@ -1,20 +1,20 @@
 import { isNil } from "lodash";
-import { Flex, Loader, Text } from "@mantine/core";
 import { toast } from "react-toastify";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
+import { Flex, Loader, Text } from "@mantine/core";
+import { useMutation } from "@tanstack/react-query";
 
 import { Guest } from "../../types/guest";
+import { Column } from "../../types/column";
 import {
   createGuest,
   updateGuest,
-  getAllGuests,
   deleteGuest,
-} from "../../Services/guest-service/guest-service";
+} from "../../services/guest-service/guest-service";
 import { guestColumns } from "../../utils/guest-columns";
 import { CustomTable } from "../custom-table/custom-table";
 import { useEventContext } from "../../contexts/event-context";
-import { useEffect, useState } from "react";
-import { Column } from "../../types/column";
+import { useFetchAllGuests } from "../../hooks/use-fetch-all-guests";
 
 const GuestsView: React.FC = () => {
   const { currentEvent } = useEventContext();
@@ -27,15 +27,12 @@ const GuestsView: React.FC = () => {
   }, [currentEvent]);
 
   const {
-    data: guests,
+    guestsData: guests,
     isSuccess,
     isLoading,
     isError,
-    isFetching
-  } = useQuery<Guest[], Error>({
-    queryKey: ["fetchGuests", currentEvent?.id],
-    queryFn: () => getAllGuests(currentEvent?.id as string),
-  });
+    isFetching,
+  } = useFetchAllGuests(true);
 
   const { mutateAsync: mutateCreateGuest } = useMutation<
     Guest,
@@ -48,14 +45,10 @@ const GuestsView: React.FC = () => {
     },
     onError: () => {
       toast.error("Failed to create guest");
-    }
+    },
   });
 
-  const { mutateAsync: mutateUpdateGuest } = useMutation<
-    Guest,
-    Error,
-    Guest
-  >({
+  const { mutateAsync: mutateUpdateGuest } = useMutation<Guest, Error, Guest>({
     mutationFn: (updatedGuest) =>
       updateGuest(currentEvent?.id as string, updatedGuest, updatedGuest.id),
     onSuccess: () => {
@@ -63,22 +56,17 @@ const GuestsView: React.FC = () => {
     },
     onError: () => {
       toast.error("Failed to update guest");
-    }
+    },
   });
 
-  const { mutateAsync: mutateDeleteGuest } = useMutation<
-    Guest,
-    Error,
-    string
-  >({
-    mutationFn: (guestId) =>
-      deleteGuest(guestId),
+  const { mutateAsync: mutateDeleteGuest } = useMutation<Guest, Error, string>({
+    mutationFn: (guestId) => deleteGuest(guestId),
     onSuccess: () => {
       toast.success("Guest deleted successfully");
     },
     onError: () => {
       toast.error("Failed to delete guest");
-    }
+    },
   });
 
   return isSuccess && !isFetching && !isNil(guests) && columns ? (
@@ -86,9 +74,9 @@ const GuestsView: React.FC = () => {
       <CustomTable<Guest>
         data={guests}
         columns={columns}
-        deleteRow={mutateDeleteGuest}
         createRow={mutateCreateGuest}
         updateRow={mutateUpdateGuest}
+        deleteRow={mutateDeleteGuest}
       />
     </Flex>
   ) : isLoading ? (

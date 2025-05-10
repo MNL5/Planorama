@@ -24,7 +24,7 @@ import { AddRowModal } from "./add-row-modal";
 interface CustomTableProps<T> {
   data: T[];
   columns: Column<T>[];
-  createRow: (row: T) => Promise<T>;
+  createRow?: (row: T) => Promise<T>;
   updateRow: (row: T) => Promise<T>;
   deleteRow: (id: string) => Promise<T>;
 }
@@ -65,9 +65,13 @@ function CustomTable<T extends { id: string }>({
 
   const handleSaveClick = async () => {
     if (editRowId !== null) {
-      const guest = await updateRow({ ...editFormData, id: editRowId } as T);
+      const updatedRow = await updateRow({
+        ...editFormData,
+        id: editRowId,
+      } as T);
+
       setData((prev: T[]) =>
-        prev.map((row: T) => (row.id === guest.id ? guest : row))
+        prev.map((row: T) => (row.id === updatedRow.id ? updatedRow : row))
       );
       setEditRowId(null);
       setEditFormData({});
@@ -82,23 +86,27 @@ function CustomTable<T extends { id: string }>({
   return (
     <Container size={"md"} mt={"xl"}>
       <Paper shadow={"md"} radius={"md"} p={"md"} withBorder>
-        <Group justify={"flex-end"} mb={"md"}>
-          <ActionIcon
-            size={40}
-            onClick={open}
-            variant={"light"}
-            color={"primary"}
-          >
-            <IconPlus size={24} />
-          </ActionIcon>
-        </Group>
-        <AddRowModal
-          opened={opened}
-          onClose={close}
-          onAddRow={handleAddRow}
-          columns={columns}
-          createRow={createRow}
-        />
+        {createRow && (
+          <>
+            <Group justify={"flex-end"} mb={"md"}>
+              <ActionIcon
+                size={40}
+                onClick={open}
+                variant={"light"}
+                color={"primary"}
+              >
+                <IconPlus size={24} />
+              </ActionIcon>
+            </Group>
+            <AddRowModal
+              opened={opened}
+              onClose={close}
+              onAddRow={handleAddRow}
+              columns={columns}
+              createRow={createRow}
+            />
+          </>
+        )}
         <Table
           withTableBorder
           highlightOnHover
@@ -177,9 +185,17 @@ function CustomTable<T extends { id: string }>({
                         />
                       )
                     ) : col.isMulti ? (
-                      (row[col.key] as string[])?.map(val => col.alt ? col.alt[val] : val).join(", ") ?? ""
+                      (row[col.key] as string[])
+                        ?.map((val) => (col.alt ? col.alt[val] : val))
+                        .join(", ") ?? ""
                     ) : (
-                      String(row[col.key] ? (col.alt ? col.alt[row[col.key]] : row[col.key]) : "")
+                      String(
+                        row[col.key]
+                          ? col.alt
+                            ? col.alt[String(row[col.key])]
+                            : row[col.key]
+                          : ""
+                      )
                     )}
                   </Table.Td>
                 ))}

@@ -27,9 +27,9 @@
 
 .x {
     position: absolute;
-    font-size: 1.5rem !important;
+    font-size: 1.6rem !important;
     top: 0;
-    left: .3em;
+    right: .2em;
     cursor: pointer;
     font-weight: bold;    
     font-size: 1em;

@@ -28,7 +28,7 @@
     color: #50147c;
 }
 
-.logout-btn {
+.navbar-btn {
     background: #f4e7f9e6;
     color: #b280d6;
     font-weight: 400;
@@ -39,6 +39,6 @@
     transition: background 0.3s ease-in-out;
 }
 
-.logout-btn:hover {
+.navbar-btn:hover {
     background: #f4e7f9e6;
 }
