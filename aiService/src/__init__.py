@@ -55,7 +55,8 @@ def create_app(test_config=None):
         result = algorithm.solve(guests, generations=500, pop_size=200, elite_size=20)
 
         response = {
-            "guests": [guest.to_dict() for guest in result if guest.group != "_"]
+            "guests": [guest.to_dict() for guest in result if guest.group != "_"],
+            "totalFitness": algorithm.fitness(result),
         }
 
         return jsonify(response), 200
