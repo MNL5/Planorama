@@ -8,8 +8,6 @@ import {
   ActionIcon,
   MultiSelect,
 } from "@mantine/core";
-import { useState } from "react";
-import { useDisclosure } from "@mantine/hooks";
 import {
   IconX,
   IconPlus,
@@ -18,10 +16,12 @@ import {
   IconPencil,
   IconSearch,
 } from "@tabler/icons-react";
+import { useState } from "react";
+import { isEmpty } from "lodash";
+import { useDisclosure } from "@mantine/hooks";
 
 import { Column } from "../../types/column";
 import { AddRowModal } from "./add-row-modal";
-import { isEmpty } from "lodash";
 
 interface CustomTableProps<T> {
   data: T[];
