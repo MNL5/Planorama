@@ -16,6 +16,7 @@ public record GiftDAO(@Id UUID id,
 ) {
     public static final String ID_FIELD = "id";
     public static final String EVENT_FIELD = "eventId";
+    public static final String GUEST_FIELD = "guestId";
     public static final String GREETING_FIELD = "greeting";
     public static final String AMOUNT_FIELD = "amount";
 }

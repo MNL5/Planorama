@@ -1,6 +1,5 @@
 package com.planorama.backend.gift;
 
-import com.planorama.backend.gift.api.UpdateGiftDTO;
 import com.planorama.backend.gift.api.UpsertGiftDTO;
 import com.planorama.backend.gift.entity.GiftDAO;
 import org.springframework.data.mongodb.core.FindAndModifyOptions;
@@ -13,19 +12,21 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 
 @Service
 public class GiftService {
+    private static final String EMPTY_GREETING = "*No greeting was added*";
     private final ReactiveMongoTemplate reactiveMongoTemplate;
-    private final Map<String, Function<UpdateGiftDTO, Object>> updateFields;
+    private final Map<String, BiFunction<GiftDAO, UpsertGiftDTO, Object>> updateFields;
 
     public GiftService(ReactiveMongoTemplate reactiveMongoTemplate) {
         this.reactiveMongoTemplate = reactiveMongoTemplate;
         this.updateFields = Map.of(
-                GiftDAO.GREETING_FIELD, UpdateGiftDTO::greeting,
-                GiftDAO.AMOUNT_FIELD, UpdateGiftDTO::amount
+                GiftDAO.AMOUNT_FIELD, (dao, gift) -> dao.amount() + gift.amount(),
+                GiftDAO.GREETING_FIELD, (dao, gift) -> dao.greeting().concat("\n----------\n").concat(Optional.ofNullable(gift.greeting()).orElse(EMPTY_GREETING))
         );
     }
 
@@ -34,10 +35,15 @@ public class GiftService {
     }
 
     public Mono<GiftDAO> upsertGift(UpsertGiftDTO upsertGiftDTO) {
-        return Mono.empty();
-//        return reactiveMongoTemplate
-//                .upsert(createGiftDAO(upsertGiftDTO))
-//                .onErrorResume(e -> Mono.error(new RuntimeException("Failed to save Gift", e)));
+        return reactiveMongoTemplate.findOne(Query.query(Criteria.where(GiftDAO.EVENT_FIELD).is(upsertGiftDTO.eventId())
+                        .and(GiftDAO.GUEST_FIELD).is(upsertGiftDTO.guestId())), GiftDAO.class)
+                .flatMap(currentGift -> reactiveMongoTemplate.findAndModify(Query.query(Criteria.where(GiftDAO.ID_FIELD).is(currentGift.id())),
+                        createUpdateCommand(currentGift, upsertGiftDTO),
+                        FindAndModifyOptions.options().returnNew(true),
+                        GiftDAO.class))
+                .switchIfEmpty(reactiveMongoTemplate.save(createGiftDAO(upsertGiftDTO)))
+                .flatMap(reactiveMongoTemplate::save)
+                .onErrorResume(e -> Mono.error(new RuntimeException("Failed to save Gift", e)));
     }
 
     private GiftDAO createGiftDAO(UpsertGiftDTO upsertGiftDTO) {
@@ -45,21 +51,14 @@ public class GiftService {
                 upsertGiftDTO.eventId(),
                 upsertGiftDTO.guestId(),
                 upsertGiftDTO.amount(),
-                upsertGiftDTO.greeting());
+                Optional.ofNullable(upsertGiftDTO.greeting()).orElse(EMPTY_GREETING));
     }
 
-    public Mono<GiftDAO> updateGift(String giftId, UpdateGiftDTO updateGiftDTO) {
-        return reactiveMongoTemplate.findAndModify(Query.query(Criteria.where(GiftDAO.ID_FIELD).is(giftId)),
-                createUpdateCommand(updateGiftDTO),
-                FindAndModifyOptions.options().returnNew(true),
-                GiftDAO.class);
-    }
-
-    private Update createUpdateCommand(UpdateGiftDTO updateGiftDTO) {
+    private Update createUpdateCommand(GiftDAO giftDAO, UpsertGiftDTO upsertGiftDTO) {
         final Update update = new Update();
 
         updateFields.forEach((key, extractor) -> {
-            Object value = extractor.apply(updateGiftDTO);
+            Object value = extractor.apply(giftDAO, upsertGiftDTO);
             if (value != null) update.set(key, value);
         });
         return update;
