@@ -72,17 +72,16 @@ function CustomTable<T extends { id: string }>({
     [filterableColumns]
   );
 
-  const operatorOptions = useMemo(
-    () =>
-      filterableColumns.flatMap(
-        (col) =>
-          col.filterOperators?.map((operator) => ({
-            value: operator as string,
-            label: operator as string,
-          })) || []
-      ),
-    [filterableColumns]
-  );
+  const operatorOptions = useMemo(() => {
+    if (selectedField) {
+      return filterableColumns
+        .find((col) => col.key === selectedField)
+        ?.filterOperators?.map((operator) => ({
+          value: operator,
+          label: operator,
+        }));
+    }
+  }, [filterableColumns, selectedField]);
 
   const searchedData = data.filter(
     (row) =>
@@ -226,6 +225,7 @@ function CustomTable<T extends { id: string }>({
                   onChange={(value) =>
                     setSelectedOperator(value as FilterOperator)
                   }
+                  disabled={!selectedField}
                 />
               </Flex>
               <Button fullWidth mt="lg" onClick={handleApplyFilter}>
