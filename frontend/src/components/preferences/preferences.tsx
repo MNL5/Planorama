@@ -16,7 +16,7 @@ import {
 } from "@mantine/core";
 import { isNil } from "lodash";
 import { toast } from "react-toastify";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
 import { Relation } from "../../types/relation";
@@ -32,12 +32,13 @@ import {
   getAllRelations,
   updateRelation,
 } from "../../services/relation-service/relation-service";
-import { Guest } from "../../types/guest";
 import { OptionType } from "../../types/option-type";
+import { Column } from "../../types/column";
 
 const Preferences: React.FC = () => {
   const { currentEvent } = useEventContext();
-  const { guestsData: guests, isLoading, isError } = useFetchAllGuests(true);
+  const [columns, setColumns] = useState<Column<GuestRelation>[] | null>(null);
+  const { guestsData: guests, isLoading, isFetching, isSuccess, isError } = useFetchAllGuests(true);
   const [selectedPreference, setSelectedPreference] = useState<string>();
   const [selectedRelation, setSelectedRelation] = useState<Relation>();
   const [selectedGuest, setSelectedGuest] = useState<string | undefined>();
@@ -45,44 +46,49 @@ const Preferences: React.FC = () => {
     string | undefined
   >();
 
-  const mapGuestsToOptionList = (guests: Guest[] | undefined): OptionType[] => {
-    return guests
-      ? guests.map((guest) => ({
+  useEffect(() => {
+    if (isSuccess && !isFetching && !isNil(guests)) {
+      setColumns(relationColumns(guests));
+    }
+  }, [isSuccess, isFetching, guests]);
+
+  const completeGuestOptionList = useMemo(() => 
+    guests ? 
+      guests.map((guest) => ({
           label: guest.name,
           value: guest.id,
-        }))
-      : [];
-  };
+        })) : [],
+      [guests]
+  );
 
   const selectedGuestId = useMemo(() => {
-    const selectedOption = mapGuestsToOptionList(guests)?.find(
+    const selectedOption = completeGuestOptionList.find(
       (guest) => guest.label === selectedGuest
     );
 
     return selectedOption?.value ?? "";
-  }, [guests, selectedGuest]);
+  }, [completeGuestOptionList, selectedGuest]);
 
   const secondSelectedGuestId = useMemo(() => {
-    const selectedOption = mapGuestsToOptionList(guests)?.find(
+    const selectedOption = completeGuestOptionList.find(
       (guest) => guest.label === secondSelectedGuest
     );
 
     return selectedOption?.value ?? "";
-  }, [guests, secondSelectedGuest]);
+  }, [completeGuestOptionList, secondSelectedGuest]);
 
   const guestOptionList: OptionType[] = useMemo(
     () =>
-      mapGuestsToOptionList(guests)?.filter(
+      completeGuestOptionList.filter(
         (option) => option.value !== secondSelectedGuestId
-      ) || [],
-    [guests, secondSelectedGuestId]
+      ),
+    [completeGuestOptionList, secondSelectedGuestId]
   );
 
   const secondGuestOptionList = useMemo(
     () =>
-      guestOptionList?.filter((option) => option.value !== selectedGuestId) ||
-      [],
-    [guestOptionList, selectedGuestId]
+      completeGuestOptionList.filter((option) => option.value !== selectedGuestId),
+    [completeGuestOptionList, selectedGuestId]
   );
 
   const {
@@ -108,24 +114,6 @@ const Preferences: React.FC = () => {
     );
   }, [selectedGuestId, secondSelectedGuestId, relationsData]);
 
-  const mappedRelations = useMemo(() => {
-    return (
-      relationsData?.map((relation) => {
-        const firstGuest = guests?.find(
-          (guest) => guest.id === relation.firstGuestId
-        );
-        const secondGuest = guests?.find(
-          (guest) => guest.id === relation.secondGuestId
-        );
-        return {
-          ...relation,
-          firstGuestId: firstGuest?.name ?? "",
-          secondGuestId: secondGuest?.name ?? "",
-        };
-      }) ?? []
-    );
-  }, [guests, relationsData]);
-
   const preferenceOptionList = preferenceOptions.map((preference) => (
     <Combobox.Option value={preference.label} key={preference.value}>
       <Flex align={"center"} gap={10}>
@@ -145,9 +133,7 @@ const Preferences: React.FC = () => {
     setSelectedPreference(undefined);
   };
 
-  const isEmptyField = useMemo(() => {
-    return !selectedGuestId || !secondSelectedGuestId || !selectedPreference;
-  }, [secondSelectedGuestId, selectedGuestId, selectedPreference]);
+  const isEmptyField = !selectedGuestId || !secondSelectedGuestId || !selectedPreference;
 
   const onAdd = () => {
     if (selectedGuestId && secondSelectedGuestId && selectedRelation) {
@@ -293,18 +279,18 @@ const Preferences: React.FC = () => {
           </Tooltip>
         </Group>
       </Stack>
-      <Stack>
+      <Stack align="center">
         <Title order={1} c={"primary"}>
           Your Seating Preferences
         </Title>
         {isRelationsSuccess &&
         !isRelationsFetching &&
         !isNil(guests) &&
-        relationColumns ? (
+        columns ? (
           <Flex style={{ flex: "1 1", overflowY: "scroll" }}>
             <CustomTable<GuestRelation>
-              columns={relationColumns}
-              data={mappedRelations}
+              columns={columns}
+              data={relationsData}
               updateRow={mutateUpdateRelation}
               deleteRow={mutateDeleteRelation}
             />

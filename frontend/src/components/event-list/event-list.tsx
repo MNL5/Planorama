@@ -27,7 +27,7 @@ const EventList: React.FC = () => {
 
   const handleCreateNewEvent = () => {
     setCurrentEvent(null);
-    navigate("/create-event");
+    navigate("/event-details");
   };
 
   return (
