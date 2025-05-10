@@ -16,10 +16,12 @@ import {
   IconTrash,
   IconCheck,
   IconPencil,
+  IconSearch,
 } from "@tabler/icons-react";
 
 import { Column } from "../../types/column";
 import { AddRowModal } from "./add-row-modal";
+import { isEmpty } from "lodash";
 
 interface CustomTableProps<T> {
   data: T[];
@@ -40,6 +42,20 @@ function CustomTable<T extends { id: string }>({
   const [data, setData] = useState<T[]>(initialData);
   const [editRowId, setEditRowId] = useState<string | null>(null);
   const [editFormData, setEditFormData] = useState<Partial<T>>({});
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const searchableColumns = columns.filter((col) => col.isSearchable);
+
+  const searchedData = data.filter(
+    (row) =>
+      isEmpty(searchableColumns) ||
+      searchableColumns.some((col) => {
+        const cellValue = row[col.key];
+        return (
+          cellValue &&
+          String(cellValue).toLowerCase().includes(searchQuery.toLowerCase())
+        );
+      })
+  );
 
   const handleAddRow = (newRow: T) => {
     setData((prev) => [...prev, newRow]);
@@ -83,12 +99,30 @@ function CustomTable<T extends { id: string }>({
     setData((prev: T[]) => prev.filter((row: T) => row.id !== id));
   };
 
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(event.target.value);
+  };
+
   return (
     <Container size={"md"} mt={"xl"}>
       <Paper shadow={"md"} radius={"md"} p={"md"} withBorder>
         {createRow && (
           <>
-            <Group justify={"flex-end"} mb={"md"}>
+            <Group
+              justify={
+                !isEmpty(searchableColumns) ? "space-between" : "flex-end"
+              }
+              mb={"md"}
+            >
+              {!isEmpty(searchableColumns) && (
+                <TextInput
+                  w={"50%"}
+                  placeholder={"Search..."}
+                  rightSection={<IconSearch size={16} />}
+                  value={searchQuery}
+                  onChange={handleSearchChange}
+                />
+              )}
               <ActionIcon
                 size={40}
                 onClick={open}
@@ -123,7 +157,7 @@ function CustomTable<T extends { id: string }>({
           </Table.Thead>
 
           <Table.Tbody>
-            {data.map((row) => (
+            {searchedData.map((row) => (
               <Table.Tr key={row.id} bg={"gray.0"}>
                 {columns.map((col) => (
                   <Table.Td key={String(col.key)}>

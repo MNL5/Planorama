@@ -9,6 +9,7 @@ interface Column<T> {
   values?: OptionType[];
   validationFunction?: (value: unknown) => boolean;
   alt?: { [key: string]: string };
+  isSearchable?: boolean;
 }
 
 export type { Column };

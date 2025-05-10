@@ -19,6 +19,7 @@ const guestColumns: (event: Event) => Column<Guest>[] = (event: Event) => {
       isEdit: true,
       isMulti: false,
       isNullable: false,
+      isSearchable: true,
     },
     {
       key: "group",
