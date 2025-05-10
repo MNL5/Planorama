@@ -28,8 +28,6 @@ const Navbar = () => {
     navigate("/event-list");
   };
 
-  console.log(currentEvent)
-
   return (
     <nav className="navbar">
       <div className="navbar-logo">
