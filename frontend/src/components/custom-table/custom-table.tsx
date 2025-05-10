@@ -114,7 +114,7 @@ function CustomTable<T extends { id: string }>({
         })
       );
     }
-  }, [selectedField, searchedData]);
+  }, [selectedField, searchedData, filterableColumns]);
 
   const handleApplyFilter = () => {
     if (selectedField && selectedOperator && selectedValue) {
@@ -130,6 +130,14 @@ function CustomTable<T extends { id: string }>({
     }
     closeFilterModal();
   };
+
+  const handleClearFilter = () => {
+    setData(initialData);
+    setSelectedField(null);
+    setSelectedOperator(null);
+    setSelectedValue(null);
+    closeFilterModal(); 
+  }
 
   const handleAddRow = (newRow: T) => {
     setData((prev) => [...prev, newRow]);
@@ -236,6 +244,8 @@ function CustomTable<T extends { id: string }>({
                   onChange={(value) => {
                     if (value) {
                       setSelectedField(value as keyof T);
+                      setSelectedOperator(null);
+                      setSelectedValue(null);
                     }
                   }}
                 />
@@ -254,9 +264,12 @@ function CustomTable<T extends { id: string }>({
                   disabled={!selectedOperator}
                 />
               </Flex>
-              <Button fullWidth mt="lg" onClick={handleApplyFilter}>
-                Apply Filter
-              </Button>
+              <Group align={"center"} justify={"flex-end"} mt={"lg"}>
+                <Button variant={"outline"} onClick={handleClearFilter}>
+                  Clear Filter
+                </Button>
+                <Button onClick={handleApplyFilter}>Apply Filter</Button>
+              </Group>
             </Modal>
           </>
         )}
