@@ -33,6 +33,13 @@ public class GuestController implements GuestAPI {
                 .map(guestMapper::daoToDTO);
     }
 
+    @GetMapping("/byTable")
+    public Flux<GuestDTO> getAllGuestByEventIdAndTableId(@RequestParam("event") String eventId,
+                                                         @RequestParam("table") String tableId) {
+        return guestService.findAllByEventIdAndTableId(eventId, tableId)
+                .map(guestMapper::daoToDTO);
+    }
+
     @Override
     public Flux<GuestDTO> getAllGuestsByEventIDAndRsvpStatus(String eventId, Set<RSVPStatusDTO> rsvpStatus) {
         return guestService.findAllByEventIdAndRsvpStatus(eventId, rsvpStatus)
@@ -43,6 +50,14 @@ public class GuestController implements GuestAPI {
     public Mono<GuestDTO> createGuest(@RequestBody CreateGuestDTO createGuestDTO) {
         return guestService.createGuest(createGuestDTO)
                 .map(guestMapper::daoToDTO);
+    }
+
+    @PutMapping
+    public Mono<String> updateGuests(@RequestBody GuestsUpdateDTO guestsUpdateDTO) {
+        return guestService.updateGuests(guestsUpdateDTO)
+                .filter(result -> result.getModifiedCount() != guestsUpdateDTO.guests().size())
+                .map(result -> String.format("Updated %d guests", result.getModifiedCount()))
+                .switchIfEmpty(Mono.error(new RuntimeException(String.format("Failed to update %d guests", guestsUpdateDTO.guests().size()))));
     }
 
     @PutMapping("/{guestId}")
