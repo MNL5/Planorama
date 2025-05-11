@@ -40,17 +40,17 @@ const updateGuests = async (
 };
 
 const getAllGuests = async (eventId: string) => {
-    const response: AxiosResponse<Guest[]> = await abortableGetRequest<Guest[]>(
-        `guests?event=${eventId}  `
-    ).request;
-    return response.data;
+  const response: AxiosResponse<Guest[]> = await abortableGetRequest<Guest[]>(
+    `guests?event=${eventId}`
+  ).request;
+  return response.data;
 };
 
 const deleteGuest = async (id: string) => {
-    const response: AxiosResponse<Guest> = await abortableDeleteRequest<Guest>(
-        `guests/${id}`
-    ).request;
-    return response.data;
+  const response: AxiosResponse<Guest> = await abortableDeleteRequest<Guest>(
+    `guests/${id}`
+  ).request;
+  return response.data;
 };
 
 export { createGuest, updateGuest, updateGuests, getAllGuests, deleteGuest };
