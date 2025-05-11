@@ -57,10 +57,12 @@ const GuestSeating: React.FC = () => {
     const handleSave = async () => {
         if (!currentEvent) return;
         try {
-            const updatedGuestsTables = guests.map((g) => ({
-                id: g.id,
-                tableId: g.tableId,
-            }));
+            const updatedGuestsTables: Record<string, { tableId?: string }> =
+                {};
+
+            guests.forEach((guest) => {
+                updatedGuestsTables[guest.id] = { tableId: guest?.tableId };
+            });
 
             await updateGuests(currentEvent.id, updatedGuestsTables);
             toast.success('Guest seating saved');

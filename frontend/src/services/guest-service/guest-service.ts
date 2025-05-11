@@ -30,7 +30,7 @@ const updateGuest = async (
 
 const updateGuests = async (
     eventId: string,
-    guestsToUpdate: Partial<Guest>[]
+    guestsToUpdate: Record<string, Partial<Guest>>
 ) => {
     const response = await abortablePutRequest<Guest>(`guests`, {
         eventId,
