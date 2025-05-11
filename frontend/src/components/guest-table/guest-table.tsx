@@ -1,5 +1,16 @@
-import { Box, Button, Group, Popover, Stack, Text, Title } from '@mantine/core';
 import React from 'react';
+import {
+    Box,
+    Button,
+    Popover,
+    Card,
+    ScrollArea,
+    Text,
+    Title,
+    Group,
+    Divider,
+    Badge,
+} from '@mantine/core';
 import { toast } from 'react-toastify';
 import Element from '../../types/Element';
 import { Guest } from '../../types/guest';
@@ -23,8 +34,7 @@ const GuestTable: React.FC<GuestTableProps> = ({
     onDrop,
     onRemove,
 }) => {
-    const capacity = table.seatCount;
-    const isFull = assignedGuests.length >= capacity;
+    const isFull = assignedGuests.length >= table.seatCount;
 
     return (
         <Popover
@@ -33,6 +43,14 @@ const GuestTable: React.FC<GuestTableProps> = ({
             position="right"
             withArrow
             trapFocus={false}
+            styles={{
+                dropdown: {
+                    padding: 0,
+                    background: 'transparent',
+                    boxShadow: 'none',
+                },
+                arrow: { color: 'transparent' },
+            }}
         >
             <Popover.Target>
                 <Box
@@ -43,11 +61,8 @@ const GuestTable: React.FC<GuestTableProps> = ({
                     onDrop={(e) => {
                         e.preventDefault();
                         const guestId = e.dataTransfer.getData('guestId');
-                        if (isFull) {
-                            toast.error('Table is full');
-                        } else {
-                            onDrop(table.id, guestId);
-                        }
+                        if (isFull) toast.error('Table is full');
+                        else onDrop(table.id, guestId);
                     }}
                     onDragOver={(e) => e.preventDefault()}
                     style={{
@@ -61,39 +76,58 @@ const GuestTable: React.FC<GuestTableProps> = ({
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
                         cursor: 'pointer',
                     }}
                 >
-                    <Text weight={700}>{table.label}</Text>
+                    <Text size="md" color="#3c096c">
+                        ({assignedGuests.length}/{table.seatCount})
+                    </Text>
                 </Box>
             </Popover.Target>
 
             <Popover.Dropdown>
-                <Title order={5}>Table Guests</Title>
-                <Stack spacing="xs" mt="md">
-                    {assignedGuests.map((g) => (
-                        <Group key={g.id} position="apart">
-                            <Box
-                                draggable
-                                onDragStart={(e) =>
-                                    e.dataTransfer.setData('guestId', g.id)
-                                }
-                                style={{ cursor: 'grab' }}
-                            >
-                                {g.name}
-                            </Box>
-                            <Button
-                                size="xs"
-                                color="red"
-                                variant="subtle"
-                                onClick={() => onRemove(g.id)}
-                            >
-                                Remove
-                            </Button>
-                        </Group>
-                    ))}
-                </Stack>
+                <Card shadow="sm" radius="md" withBorder style={{ width: 260 }}>
+                    <Group align="center" style={{ padding: '8px 16px' }}>
+                        <Title order={5}>Table Guests</Title>
+                        <Badge color={isFull ? 'red' : 'teal'} variant="light">
+                            {assignedGuests.length}/{table.seatCount}
+                        </Badge>
+                    </Group>
+                    <Divider />
+                    <ScrollArea style={{ height: 200, padding: '8px 16px' }}>
+                        {assignedGuests.length === 0 ? (
+                            <Text color="dimmed" mt="md">
+                                No guests assigned
+                            </Text>
+                        ) : (
+                            assignedGuests.map((g) => (
+                                <Group key={g.id} style={{ padding: '4px 0' }}>
+                                    <Box
+                                        draggable
+                                        onDragStart={(e) =>
+                                            e.dataTransfer.setData(
+                                                'guestId',
+                                                g.id
+                                            )
+                                        }
+                                        style={{ flex: 1, cursor: 'grab' }}
+                                    >
+                                        {g.name}
+                                    </Box>
+                                    <Button
+                                        size="xs"
+                                        variant="outline"
+                                        color="red"
+                                        onClick={() => onRemove(g.id)}
+                                    >
+                                        Remove
+                                    </Button>
+                                </Group>
+                            ))
+                        )}
+                    </ScrollArea>
+                </Card>
             </Popover.Dropdown>
         </Popover>
     );

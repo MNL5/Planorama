@@ -1,14 +1,18 @@
-import { Box, Button, Stack, Text, Title } from '@mantine/core';
+import { Box, Button, Text } from '@mantine/core';
 import { useQuery } from '@tanstack/react-query';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { useEventContext } from '../../contexts/event-context';
 import { updateEvent } from '../../services/event-service/event-service';
+import {
+    getAllGuests,
+    updateGuest,
+    updateGuests,
+} from '../../Services/guest-service/guest-service';
 import ElementType from '../../types/Element';
-import GuestTable from '../guest-table/guest-table';
-import { getAllGuests } from '../../Services/guest-service/guest-service';
 import { Guest } from '../../types/guest';
 import GuestSeatingList from '../guest-seating-list/guest-seating-list';
+import GuestTable from '../guest-table/guest-table';
 
 const GuestSeating: React.FC = () => {
     const { currentEvent, setCurrentEvent } = useEventContext();
@@ -53,13 +57,12 @@ const GuestSeating: React.FC = () => {
     const handleSave = async () => {
         if (!currentEvent) return;
         try {
-            const updatedEvent = {
-                ...currentEvent,
-                diagram: { elements: tables },
-                guests,
-            };
-            const result = await updateEvent(updatedEvent, currentEvent.id);
-            setCurrentEvent(result);
+            const updatedGuestsTables = guests.map((g) => ({
+                id: g.id,
+                tableId: g.tableId,
+            }));
+
+            await updateGuests(currentEvent.id, updatedGuestsTables);
             toast.success('Guest seating saved');
         } catch (err) {
             console.error(err);
