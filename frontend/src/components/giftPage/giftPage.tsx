@@ -1,5 +1,4 @@
 import React, { useState, useTransition } from 'react';
-import { CircularProgress } from '@mui/material';
 import { useParams } from 'react-router-dom';
 import { Title, Text, Stack, Container, TextInput, Flex, Button, Textarea, NumberInput } from '@mantine/core';
 import { useMutation } from '@tanstack/react-query';
@@ -10,19 +9,8 @@ import { toast } from 'react-toastify';
 import useEventByGuest from '../../hooks/use-event-by-guest';
 import { CreateGift, Gift } from '../../types/gift';
 import { createGift } from '../../Services/gift-service/gift-service';
-import Loader from "../loader/Loader";
-
-type FormErrors = {
-  number?: string;
-  expiry?: string;
-  cvc?: string;
-  name?: string;
-  amount?: string;
-  greeting?: string;
-}
-
-const creditCardRegex = /^(?:4[0-9]{12}(?:[0-9]{3})?|5[1-5][0-9]{14}|3[47][0-9]{13}|3(?:0[0-5]|[68][0-9])[0-9]{11}|6(?:011|5[0-9]{2})[0-9]{12}|(?:2131|1800|35\d{3})\d{11})$/
-const numberRegex = /^\d+$/;
+import MainLoader from "../mainLoader/MainLoader";
+import { FormErrors, numberRegex, validateGift } from '../../utils/gift-utils';
 
 const GiftPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -52,34 +40,10 @@ const GiftPage: React.FC = () => {
         }
     });
 
-    if (!event) {
-        if (isLoading) {
-            return (
-                  <CircularProgress
-                    color="secondary"
-                    style={{ position: "absolute", top: "40%", left: "50%" }}
-                  />
-                );
-        }
-        return <Stack align='center' justify='center' style={{color: '#420F0F', padding: '20px'}}>
-                <Title>Event not found</Title>
-                <Text>Please check the link or contact the event organizer.</Text>
-            </Stack> 
-    }
-
     const handleSubmit = async () => {
-      const errors = {} as FormErrors;
-      if (!amount) errors.amount = "Please enter a gift amount";
-      if (!greeting) errors.greeting = "Please enter a greeting message";
-      if (!card.number) errors.number = "Please enter a card number";
-      if (!card.name) errors.name = "Please enter a name on the card";
-      if (!card.expiry) errors.expiry = "Please enter a valid expiry date";
-      if (!card.cvc) errors.cvc = "Please enter a valid CVC code";
-      if (!creditCardRegex.test(card.number)) errors.number = "Please enter a valid card number";
-      if (card.expiry.length !== 5 || card.expiry[2] !== '/') errors.expiry = "Please enter a valid expiry date in MM/YY format";
-      if (card.cvc.length !== 3 && card.cvc.length !== 4) errors.cvc = "Please enter a valid CVC code";
+      const errors = validateGift(amount, greeting, card);
       setErrors(errors);
-      if (errors.number || errors.expiry || errors.cvc || errors.name || errors.amount || errors.greeting) {
+      if (Object.keys(errors).length > 0) {
         return;
       }
 
@@ -130,12 +94,24 @@ const GiftPage: React.FC = () => {
       setCard((prev) => ({ ...prev, focus: evt.target.name }));
     }
 
+    if (!event) {
+        if (isLoading) {
+            return (
+                  <MainLoader isPending />
+                );
+        }
+        return <Stack align='center' justify='center' style={{color: '#420F0F', padding: '20px'}}>
+                <Title>Event not found</Title>
+                <Text>Please check the link or contact the event organizer.</Text>
+            </Stack> 
+    }
+
     const time = new Date(event.time)
     const timeString = `${time.getHours()}:${time.getMinutes()}`
 
     return <Container size={"xl"} mt={"xl"} mb={"xl"} style={{color: '#50147c', textAlign: 'center'}} opacity={isPending ? 0.4 : 1}>
         <Stack>
-          <Loader isPending={isPending} />
+          <MainLoader isPending={isPending} />
           <Title>Today It's Happening!</Title>
           <Title>{event.name}</Title>
           <Title>{timeString}</Title>

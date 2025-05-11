@@ -1,11 +1,7 @@
 import { isNil } from "lodash";
-import { Container, Loader, Text } from "@mantine/core";
+import { Container, Text } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
 
-import { Guest } from "../../types/guest";
-import {
-  getAllGuests,
-} from "../../Services/guest-service/guest-service";
 import { CustomTable } from "../custom-table/custom-table";
 import { useEventContext } from "../../contexts/event-context";
 import { useEffect, useState } from "react";
@@ -13,21 +9,19 @@ import { Column } from "../../types/column";
 import { Gift } from "../../types/gift";
 import { getAllGifts } from "../../Services/gift-service/gift-service";
 import { giftsColumns } from "../../utils/gift-columns";
+import MainLoader from "../mainLoader/MainLoader";
+import { useFetchAllGuests } from "../../hooks/use-fetch-all-guests";
 
 const GiftsList: React.FC = () => {
   const { currentEvent } = useEventContext();
   const [columns, setColumns] = useState<Column<Gift>[] | null>(null);
-
   const {
-    data: guests,
+    guestsData: guests,
     isSuccess: isSuccessGuest,
     isLoading: isLoadingGuest,
     isError: isErrorGuest,
     isFetching: isFetchingGuest
-  } = useQuery<Guest[], Error>({
-    queryKey: ["fetchGuests", currentEvent?.id],
-    queryFn: () => getAllGuests(currentEvent?.id as string),
-  });
+  } = useFetchAllGuests(true);
 
   useEffect(() => {
     if (isSuccessGuest && !isFetchingGuest && !isNil(guests)) {
@@ -59,7 +53,7 @@ const GiftsList: React.FC = () => {
       />
     </Container>
   ) : isLoading ? (
-    <Loader size="lg" color="primary" />
+    <MainLoader isPending />
   ) : isError ? (
     <Text>Oops! Something went wrong. Please try again later.</Text>
   ) : null;

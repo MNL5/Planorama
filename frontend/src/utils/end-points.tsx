@@ -3,7 +3,7 @@ import { Preferences } from "../components/preferences/preferences";
 import { CreateEvent } from "../components/create-event/create-event";
 import TableArrangement from "../components/table-arragment/table-arragement";
 import InvitationPage from "../components/invitationPage/invitationPage";
-import GiftPage from "../components/giftPage/gistPage";
+import GiftPage from "../components/giftPage/giftPage";
 import { GiftsList } from "../components/gifts-list/gifts-list";
 
 export const ENDPOINTS = [

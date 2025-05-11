@@ -24,7 +24,7 @@ import { fileToBase64 } from "../../utils/image-utils";
 import { useEventContext } from "../../contexts/event-context";
 import InvitationModal from "../invitationModal/invitationModal";
 import { Event, CreateEvent as EventToCreate } from "../../types/event";
-import Loader from "../loader/Loader";
+import MainLoader from "../mainLoader/MainLoader";
 
 const CreateEvent: React.FC = () => {
   const navigate = useNavigate();
@@ -108,7 +108,7 @@ const CreateEvent: React.FC = () => {
       justify={"space-evenly"}
       style={{ marginTop: "16vh" }}
     >
-      <Loader isPending={isPending} />
+      <MainLoader isPending={isPending} />
       <form
         onSubmit={form.onSubmit(async (values) => {
           const preview = await getEventPreview(values);

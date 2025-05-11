@@ -7,7 +7,7 @@ import Element from '../../types/Element';
 import RndElement from '../RndElement/RndElement';
 import { useEventContext } from '../../contexts/event-context';
 import { updateEvent } from '../../Services/event-service/event-service';
-import Loader from '../loader/Loader';
+import MainLoader from '../mainLoader/MainLoader';
 
 const elementTypes = [
     { type: 'square', label: 'Square Table' },
@@ -103,7 +103,7 @@ const TableArrangement = () => {
 
     return (
         <Box style={{ display: 'flex', direction: 'rtl', flex: '1 1' }}>
-            <Loader isPending={isPending} />
+            <MainLoader isPending={isPending} />
             <Box
                 ref={canvasRef}
                 style={{

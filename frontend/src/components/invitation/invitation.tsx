@@ -10,7 +10,7 @@ import { Guest } from "../../types/guest";
 import style from "./invitation.module.css";
 import mealOptions from "../../utils/meal-options";
 import { updateGuest } from "../../services/guest-service/guest-service";
-import Loader from "../loader/Loader";
+import MainLoader from "../mainLoader/MainLoader";
 
 const Invitation: React.FC<{ event: Event; guestId?: string }> = ({
   event,
@@ -59,7 +59,7 @@ const Invitation: React.FC<{ event: Event; guestId?: string }> = ({
       {isFormMode ? (
         <>
           <Stack>
-            <Loader isPending={isPending} />
+            <MainLoader isPending={isPending} />
             <Title size={"h2"} style={{ textDecoration: "underline" }}>
               RSVP
             </Title>

@@ -34,7 +34,7 @@ import {
 } from "../../services/relation-service/relation-service";
 import { OptionType } from "../../types/option-type";
 import { Column } from "../../types/column";
-import Loader from "../loader/Loader";
+import MainLoader from "../mainLoader/MainLoader";
 
 const Preferences: React.FC = () => {
   const { currentEvent } = useEventContext();
@@ -200,7 +200,7 @@ const Preferences: React.FC = () => {
 
   return (
     <Stack w={"100%"} h={"100vh"} p={100} align={"center"} gap={40} style={{ flex: "1 1", overflow: "hidden" }}>
-      <Loader isPending={isRelationsLoading || isLoading || isCreatePeding || isUpdatePending || isDeletePending} />
+      <MainLoader isPending={isRelationsLoading || isLoading || isCreatePeding || isUpdatePending || isDeletePending} />
       <Stack align={"flex-end"} gap={20}>
         <Flex align={"center"} gap={100} justify={"center"}>
           <Autocomplete

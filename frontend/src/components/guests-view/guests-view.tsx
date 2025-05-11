@@ -15,7 +15,7 @@ import { guestColumns } from "../../utils/guest-columns";
 import { CustomTable } from "../custom-table/custom-table";
 import { useEventContext } from "../../contexts/event-context";
 import { useFetchAllGuests } from "../../hooks/use-fetch-all-guests";
-import Loader from "../loader/Loader";
+import MainLoader from "../mainLoader/MainLoader";
 
 const GuestsView: React.FC = () => {
   const { currentEvent } = useEventContext();
@@ -72,7 +72,7 @@ const GuestsView: React.FC = () => {
 
   return isSuccess && !isFetching && !isNil(guests) && columns ? (
     <Container size={"xl"} mt={"xl"} mb={"xl"} style={{ flex: "1 1", overflow: "hidden" }}>
-      <Loader isPending={isCreatePending || isUpdatePending || isDeletePeding} />
+      <MainLoader isPending={isCreatePending || isUpdatePending || isDeletePeding} />
       <CustomTable<Guest>
         data={guests}
         columns={columns}
@@ -82,7 +82,7 @@ const GuestsView: React.FC = () => {
       />
     </Container>
   ) : isLoading ? (
-    <Loader isPending />
+    <MainLoader isPending />
   ) : isError ? (
     <Text>Oops! Something went wrong. Please try again later.</Text>
   ) : null;
