@@ -3,7 +3,6 @@ import {
   Flex,
   Input,
   Stack,
-  Loader,
   InputBase,
   InputLabel,
   Combobox,
@@ -13,6 +12,7 @@ import {
   Group,
   Button,
   Tooltip,
+  Container,
 } from "@mantine/core";
 import { isNil } from "lodash";
 import { toast } from "react-toastify";
@@ -34,6 +34,7 @@ import {
 } from "../../services/relation-service/relation-service";
 import { OptionType } from "../../types/option-type";
 import { Column } from "../../types/column";
+import MainLoader from "../mainLoader/MainLoader";
 
 const Preferences: React.FC = () => {
   const { currentEvent } = useEventContext();
@@ -145,7 +146,7 @@ const Preferences: React.FC = () => {
     }
   };
 
-  const { mutateAsync: mutateCreateRelation } = useMutation<
+  const { mutateAsync: mutateCreateRelation, isPending: isCreatePeding } = useMutation<
     GuestRelation,
     Error,
     Omit<GuestRelation, "id">
@@ -162,7 +163,7 @@ const Preferences: React.FC = () => {
     },
   });
 
-  const { mutateAsync: mutateUpdateRelation } = useMutation<
+  const { mutateAsync: mutateUpdateRelation, isPending: isUpdatePending } = useMutation<
     GuestRelation,
     Error,
     GuestRelation
@@ -182,7 +183,7 @@ const Preferences: React.FC = () => {
     },
   });
 
-  const { mutateAsync: mutateDeleteRelation } = useMutation<
+  const { mutateAsync: mutateDeleteRelation, isPending: isDeletePending } = useMutation<
     GuestRelation,
     Error,
     string
@@ -198,7 +199,8 @@ const Preferences: React.FC = () => {
   });
 
   return (
-    <Stack w={"100%"} h={"100vh"} p={100} align={"center"} gap={40}>
+    <Stack w={"100%"} h={"100vh"} p={100} align={"center"} gap={40} style={{ flex: "1 1", overflow: "hidden" }}>
+      <MainLoader isPending={isRelationsLoading || isLoading || isCreatePeding || isUpdatePending || isDeletePending} />
       <Stack align={"flex-end"} gap={20}>
         <Flex align={"center"} gap={100} justify={"center"}>
           <Autocomplete
@@ -209,7 +211,6 @@ const Preferences: React.FC = () => {
             onChange={setSelectedGuest}
             placeholder={"Select a guest"}
             error={isError ? "Error fetching guests" : undefined}
-            rightSection={isLoading ? <Loader size={"xs"} /> : null}
           />
           <Stack align={"flex-start"} gap={2}>
             <InputLabel>Preference</InputLabel>
@@ -253,7 +254,6 @@ const Preferences: React.FC = () => {
             placeholder={"Select a guest"}
             onChange={setSecondSelectedGuest}
             error={isError ? "Error fetching guests" : undefined}
-            rightSection={isLoading ? <Loader size={"xs"} /> : null}
           />
         </Flex>
         <Group mt={"md"}>
@@ -279,7 +279,7 @@ const Preferences: React.FC = () => {
           </Tooltip>
         </Group>
       </Stack>
-      <Stack align="center">
+      <Stack align="center" style={{ flex: "1 1", overflow: "hidden" }}>
         <Title order={1} c={"primary"}>
           Your Seating Preferences
         </Title>
@@ -287,16 +287,14 @@ const Preferences: React.FC = () => {
         !isRelationsFetching &&
         !isNil(guests) &&
         columns ? (
-          <Flex style={{ flex: "1 1", overflowY: "scroll" }}>
+          <Container size={"xl"} style={{ flex: "1 1", overflow: "hidden" }}>
             <CustomTable<GuestRelation>
               columns={columns}
               data={relationsData}
               updateRow={mutateUpdateRelation}
               deleteRow={mutateDeleteRelation}
             />
-          </Flex>
-        ) : isRelationsLoading ? (
-          <Loader size="lg" color="primary" />
+          </Container>
         ) : isRelationsError ? (
           <Text>Oops! Something went wrong. Please try again later.</Text>
         ) : null}

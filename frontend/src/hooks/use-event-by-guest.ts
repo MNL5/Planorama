@@ -6,7 +6,7 @@ import { Event } from '../types/event';
 
 const useEventByGuest = (guestId?: string) => {
     const [event, setEvent] = useState<Event | null>(null);
-    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
 
     useEffect(() => {
         if (!guestId) return;
