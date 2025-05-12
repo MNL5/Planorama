@@ -2,6 +2,7 @@ import { GuestsView } from "../components/guests-view/guests-view";
 import { Preferences } from "../components/preferences/preferences";
 import { CreateEvent } from "../components/create-event/create-event";
 import TableArrangement from "../components/table-arragment/table-arragement";
+import GuestSeating from "../components/guest-seating/guest-seating";
 import InvitationPage from "../components/invitationPage/invitationPage";
 import GiftPage from "../components/giftPage/giftPage";
 import { GiftsList } from "../components/gifts-list/gifts-list";
@@ -28,10 +29,15 @@ export const ENDPOINTS = [
     element: <TableArrangement />,
   },
   {
-        name: 'Gifts',
-        path: '/gifts',
-        element: <GiftsList />,
-    },
+    name: 'Guest Seating',
+    path: '/guest-seating',
+    element: <GuestSeating />,
+  },
+  {
+      name: 'Gifts',
+      path: '/gifts',
+      element: <GiftsList />,
+  },
 ];
 
 export const GUEST_ENDPOINTS = [

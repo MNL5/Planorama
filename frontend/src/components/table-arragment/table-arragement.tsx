@@ -6,7 +6,7 @@ import { Box, Button, Drawer, NumberInput, Text } from '@mantine/core';
 import Element from '../../types/Element';
 import RndElement from '../RndElement/RndElement';
 import { useEventContext } from '../../contexts/event-context';
-import { updateEvent } from '../../Services/event-service/event-service';
+import { updateEvent } from '../../services/event-service/event-service';
 import MainLoader from '../mainLoader/MainLoader';
 
 const elementTypes = [
