@@ -29,24 +29,24 @@ export const ENDPOINTS = [
     element: <TableArrangement />,
   },
   {
-    name: 'Guest Seating',
-    path: '/guest-seating',
+    name: "Guest Seating",
+    path: "/guest-seating",
     element: <GuestSeating />,
   },
   {
-      name: 'Gifts',
-      path: '/gifts',
-      element: <GiftsList />,
+    name: "Gifts",
+    path: "/gifts",
+    element: <GiftsList />,
   },
 ];
 
 export const GUEST_ENDPOINTS = [
-    {
-        path: "/rsvp",
-        element: <InvitationPage />,
-    },
-    {
-        path: "/gift",
-        element: <GiftPage />,
-    }
-]
+  {
+    path: "/rsvp",
+    element: <InvitationPage />,
+  },
+  {
+    path: "/gift",
+    element: <GiftPage />,
+  },
+];

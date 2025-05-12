@@ -66,7 +66,7 @@ const CreateEvent: React.FC = () => {
 
   const getEventPreview = async (
     values: { eventName: string; invitationText: string; eventDate: Date },
-    checkFields = false
+    checkFields = false,
   ) => {
     const image = (await getBase64Image()) ?? currentEvent?.invitationImg;
     if (
@@ -83,7 +83,11 @@ const CreateEvent: React.FC = () => {
     }
   };
 
-  const { mutate: mutateEvent, isPending } = useMutation<Event, Error, EventToCreate>({
+  const { mutate: mutateEvent, isPending } = useMutation<
+    Event,
+    Error,
+    EventToCreate
+  >({
     mutationFn: async (newEvent) => {
       if (!isEmpty(currentEvent)) {
         return updateEvent(newEvent, currentEvent.id);
@@ -156,7 +160,7 @@ const CreateEvent: React.FC = () => {
                   setPreview(preview as Event);
                 } else {
                   toast.error(
-                    "Please fill all the fields to preview the invitation"
+                    "Please fill all the fields to preview the invitation",
                   );
                 }
               }}
@@ -164,12 +168,7 @@ const CreateEvent: React.FC = () => {
             >
               <Text size={"md"}>Preview</Text>
             </Button>
-            <Button
-              size={"md"}
-              radius={"md"}
-              type={"submit"}
-              variant={"light"}
-            >
+            <Button size={"md"} radius={"md"} type={"submit"} variant={"light"}>
               <Text size={"md"}>Save</Text>
             </Button>
           </Flex>

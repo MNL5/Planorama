@@ -10,7 +10,7 @@ import { GuestRelation } from "../../types/guest-relation";
 
 const createRelation = async (
   eventId: string,
-  guestRelation: Omit<GuestRelation, "id">
+  guestRelation: Omit<GuestRelation, "id">,
 ) => {
   const response = await abortablePostRequest<GuestRelation>("relations", {
     eventId,
@@ -22,7 +22,7 @@ const createRelation = async (
 const updateRelation = async (
   eventId: string,
   relationToEdit: Omit<GuestRelation, "id">,
-  id: string
+  id: string,
 ) => {
   const response = await abortablePutRequest<GuestRelation>(`relations/${id}`, {
     eventId,

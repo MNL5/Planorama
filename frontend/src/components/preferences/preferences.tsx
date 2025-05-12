@@ -67,12 +67,12 @@ const Preferences: React.FC = () => {
             value: guest.id,
           }))
         : [],
-    [guests]
+    [guests],
   );
 
   const selectedGuestId = useMemo(() => {
     const selectedOption = completeGuestOptionList.find(
-      (guest) => guest.label === selectedGuest
+      (guest) => guest.label === selectedGuest,
     );
 
     return selectedOption?.value ?? "";
@@ -80,7 +80,7 @@ const Preferences: React.FC = () => {
 
   const secondSelectedGuestId = useMemo(() => {
     const selectedOption = completeGuestOptionList.find(
-      (guest) => guest.label === secondSelectedGuest
+      (guest) => guest.label === secondSelectedGuest,
     );
 
     return selectedOption?.value ?? "";
@@ -89,17 +89,17 @@ const Preferences: React.FC = () => {
   const guestOptionList: OptionType[] = useMemo(
     () =>
       completeGuestOptionList.filter(
-        (option) => option.value !== secondSelectedGuestId
+        (option) => option.value !== secondSelectedGuestId,
       ),
-    [completeGuestOptionList, secondSelectedGuestId]
+    [completeGuestOptionList, secondSelectedGuestId],
   );
 
   const secondGuestOptionList = useMemo(
     () =>
       completeGuestOptionList.filter(
-        (option) => option.value !== selectedGuestId
+        (option) => option.value !== selectedGuestId,
       ),
-    [completeGuestOptionList, selectedGuestId]
+    [completeGuestOptionList, selectedGuestId],
   );
 
   const {
@@ -121,7 +121,7 @@ const Preferences: React.FC = () => {
         (relation.firstGuestId === selectedGuestId &&
           relation.secondGuestId === secondSelectedGuestId) ||
         (relation.firstGuestId === secondSelectedGuestId &&
-          relation.secondGuestId === selectedGuestId)
+          relation.secondGuestId === selectedGuestId),
     );
   }, [selectedGuestId, secondSelectedGuestId, relationsData]);
 
@@ -157,61 +157,67 @@ const Preferences: React.FC = () => {
     }
   };
 
-  const { mutateAsync: mutateCreateRelation, isPending: isCreatePeding } = useMutation<
-    GuestRelation,
-    Error,
-    Omit<GuestRelation, "id">
-  >({
-    mutationFn: (newRelation) =>
-      createRelation(currentEvent?.id as string, newRelation),
-    onSuccess: () => {
-      reset();
-      toast.success("Preference added successfully");
-      refetchRelations();
-    },
-    onError: () => {
-      toast.error("Failed to add preference");
-    },
-  });
+  const { mutateAsync: mutateCreateRelation, isPending: isCreatePeding } =
+    useMutation<GuestRelation, Error, Omit<GuestRelation, "id">>({
+      mutationFn: (newRelation) =>
+        createRelation(currentEvent?.id as string, newRelation),
+      onSuccess: () => {
+        reset();
+        toast.success("Preference added successfully");
+        refetchRelations();
+      },
+      onError: () => {
+        toast.error("Failed to add preference");
+      },
+    });
 
-  const { mutateAsync: mutateUpdateRelation, isPending: isUpdatePending } = useMutation<
-    GuestRelation,
-    Error,
-    GuestRelation
-  >({
-    mutationFn: (updatedRelation) =>
-      updateRelation(
-        currentEvent?.id as string,
-        updatedRelation,
-        updatedRelation.id
-      ),
-    onSuccess: () => {
-      toast.success("Preference updated successfully");
-      refetchRelations();
-    },
-    onError: () => {
-      toast.error("Failed to update preference");
-    },
-  });
+  const { mutateAsync: mutateUpdateRelation, isPending: isUpdatePending } =
+    useMutation<GuestRelation, Error, GuestRelation>({
+      mutationFn: (updatedRelation) =>
+        updateRelation(
+          currentEvent?.id as string,
+          updatedRelation,
+          updatedRelation.id,
+        ),
+      onSuccess: () => {
+        toast.success("Preference updated successfully");
+        refetchRelations();
+      },
+      onError: () => {
+        toast.error("Failed to update preference");
+      },
+    });
 
-  const { mutateAsync: mutateDeleteRelation, isPending: isDeletePending } = useMutation<
-    GuestRelation,
-    Error,
-    string
-  >({
-    mutationFn: (guestId) => deleteRelation(guestId),
-    onSuccess: () => {
-      toast.success("Preference deleted successfully");
-      refetchRelations();
-    },
-    onError: () => {
-      toast.error("Failed to delete preference");
-    },
-  });
+  const { mutateAsync: mutateDeleteRelation, isPending: isDeletePending } =
+    useMutation<GuestRelation, Error, string>({
+      mutationFn: (guestId) => deleteRelation(guestId),
+      onSuccess: () => {
+        toast.success("Preference deleted successfully");
+        refetchRelations();
+      },
+      onError: () => {
+        toast.error("Failed to delete preference");
+      },
+    });
 
   return (
-    <Stack w={"100%"} h={"100vh"} p={100} align={"center"} gap={40} style={{ flex: "1 1", overflow: "hidden" }}>
-      <MainLoader isPending={isRelationsLoading || isLoading || isCreatePeding || isUpdatePending || isDeletePending} />
+    <Stack
+      w={"100%"}
+      h={"100vh"}
+      p={100}
+      align={"center"}
+      gap={40}
+      style={{ flex: "1 1", overflow: "hidden" }}
+    >
+      <MainLoader
+        isPending={
+          isRelationsLoading ||
+          isLoading ||
+          isCreatePeding ||
+          isUpdatePending ||
+          isDeletePending
+        }
+      />
       <Stack align={"flex-end"} gap={20}>
         <Flex align={"center"} gap={100} justify={"center"}>
           <Autocomplete
@@ -230,7 +236,7 @@ const Preferences: React.FC = () => {
               onOptionSubmit={(preference) => {
                 setSelectedPreference(preference);
                 const selectedOption = preferenceOptions.find(
-                  (option) => option.label === preference
+                  (option) => option.label === preference,
                 );
                 setSelectedRelation(selectedOption?.value);
                 combobox.closeDropdown();
@@ -276,8 +282,8 @@ const Preferences: React.FC = () => {
               isEmptyField
                 ? "Please select both guests and a preference"
                 : isGuestRelationExist
-                ? "Preference for these guests already exists"
-                : null
+                  ? "Preference for these guests already exists"
+                  : null
             }
             disabled={!isEmptyField && !isGuestRelationExist}
           >

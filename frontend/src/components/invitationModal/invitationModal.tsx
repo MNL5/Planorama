@@ -22,7 +22,7 @@ const InvitationModal: React.FC<{ event: Event; onClose: () => void }> = ({
         <Invitation event={event} />
       </div>
     </div>,
-    document.getElementById("root")!
+    document.getElementById("root")!,
   );
 };
 

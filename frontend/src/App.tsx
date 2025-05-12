@@ -25,14 +25,17 @@ const LOGIN_EVENT = "loginEvent";
 
 const App: React.FC = () => {
   const { pathname } = useLocation();
-  const isGuest = GUEST_ENDPOINTS.some(endpoint => pathname.startsWith(endpoint.path));
+  const isGuest = GUEST_ENDPOINTS.some((endpoint) =>
+    pathname.startsWith(endpoint.path),
+  );
   const [isLogged, setLogged] = useState<boolean>(false);
   const { isLoading } = useRefresh(isGuest);
-  const { doesUserHaveEvents, isLoadingEventsList } = useFetchEventsList(isLogged);
+  const { doesUserHaveEvents, isLoadingEventsList } =
+    useFetchEventsList(isLogged);
   const { currentEvent } = useEventContext();
 
   useEventListener(LOGIN_EVENT, (event: CustomEvent) =>
-    setLogged(event.detail)
+    setLogged(event.detail),
   );
 
   if (isLoading || (isLogged && isLoadingEventsList))
@@ -77,13 +80,14 @@ const App: React.FC = () => {
           <>
             <Route path="/event-list" element={<EventList />} />
             <Route path="/event-details" element={<CreateEvent />} />
-            {currentEvent &&  ENDPOINTS.map((endpoint) => (
-              <Route
-                key={endpoint.path}
-                path={endpoint.path}
-                element={endpoint.element}
-              />
-            ))}
+            {currentEvent &&
+              ENDPOINTS.map((endpoint) => (
+                <Route
+                  key={endpoint.path}
+                  path={endpoint.path}
+                  element={endpoint.element}
+                />
+              ))}
           </>
         ) : (
           <>

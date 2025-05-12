@@ -1,36 +1,36 @@
 .backdrop {
-    position: absolute;
-    width: 100vw;
-    height: 100vh;
-    background-color: rgba(0, 0, 0, 0.5);
-    top: 0;
-    left: 0;
+  position: absolute;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  top: 0;
+  left: 0;
 }
 
 .modal {
-    position: absolute;
-    width: fit-content;
-    height: 95%;
-    overflow-y: scroll;
-    background-color: #F0EBD8;
-    top: 50%;
-    left: 50%;
-    background: linear-gradient(to right, #e9dbf1, #e6c8fa);
-    transform: translate(-50%, -50%);
-    border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.26);
+  position: absolute;
+  width: fit-content;
+  height: 95%;
+  overflow-y: scroll;
+  background-color: #f0ebd8;
+  top: 50%;
+  left: 50%;
+  background: linear-gradient(to right, #e9dbf1, #e6c8fa);
+  transform: translate(-50%, -50%);
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.26);
 }
 
 .modal > div {
-    width: 100%;
+  width: 100%;
 }
 
 .x {
-    position: absolute;
-    font-size: 1.6rem !important;
-    top: 0;
-    right: .2em;
-    cursor: pointer;
-    font-weight: bold;    
-    font-size: 1em;
+  position: absolute;
+  font-size: 1.6rem !important;
+  top: 0;
+  right: 0.2em;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 1em;
 }

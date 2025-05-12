@@ -12,7 +12,7 @@ const useEventContext = () => {
   const context = useContext(EventContext);
   if (!context) {
     throw new Error(
-      "useEventContext must be used within a EventContextProvider"
+      "useEventContext must be used within a EventContextProvider",
     );
   }
   return context;

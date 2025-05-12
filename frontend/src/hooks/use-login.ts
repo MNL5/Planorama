@@ -7,7 +7,7 @@ import Credentials from "../services/auth-service/types/credentials";
 import { AbortableRequestReturnType } from "../services/abortable-request";
 
 const useLogin = (
-  callback: (Credentials: Credentials) => AbortableRequestReturnType<Auth>
+  callback: (Credentials: Credentials) => AbortableRequestReturnType<Auth>,
 ) => {
   const [isPending, startTransition] = useTransition();
 
