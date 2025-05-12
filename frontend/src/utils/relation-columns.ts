@@ -4,8 +4,10 @@ import { preferenceOptions } from "./preference-options";
 import { GuestRelation } from "../types/guest-relation";
 import { Guest } from "../types/guest";
 
-const relationColumns: (guests: Guest[]) => Column<GuestRelation>[] = (guests: Guest[]) => {
-  const guestsObject: {[key: string]: string} = {}
+const relationColumns: (guests: Guest[]) => Column<GuestRelation>[] = (
+  guests: Guest[],
+) => {
+  const guestsObject: { [key: string]: string } = {};
   guests?.forEach((guest) => {
     guestsObject[guest.id] = guest.name;
   });
@@ -37,6 +39,6 @@ const relationColumns: (guests: Guest[]) => Column<GuestRelation>[] = (guests: G
       alt: guestsObject,
     },
   ];
-}
+};
 
 export { relationColumns };

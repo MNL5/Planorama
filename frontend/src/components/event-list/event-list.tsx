@@ -40,7 +40,7 @@ const EventList: React.FC = () => {
   };
 
   const searchedEvents = eventsList?.filter((eventItem) =>
-    eventItem.name.toLowerCase().includes(searchQuery.toLowerCase())
+    eventItem.name.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   return (

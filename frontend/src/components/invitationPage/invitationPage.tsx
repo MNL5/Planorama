@@ -12,9 +12,7 @@ const InvitationPage: React.FC = () => {
 
   if (!event) {
     if (isLoading) {
-      return (
-        <MainLoader isPending />
-      );
+      return <MainLoader isPending />;
     }
     return (
       <Stack

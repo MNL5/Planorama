@@ -68,7 +68,7 @@ function CustomTable<T extends { id: string }>({
         value: col.key as string,
         label: col.label,
       })),
-    [filterableColumns]
+    [filterableColumns],
   );
 
   const operatorOptions = useMemo(() => {
@@ -95,9 +95,9 @@ function CustomTable<T extends { id: string }>({
                 .toLowerCase()
                 .includes(searchQuery.toLowerCase())
             );
-          })
+          }),
       ),
-    [data, searchQuery, searchableColumns]
+    [data, searchQuery, searchableColumns],
   );
 
   const valuesOptions = useMemo(() => {
@@ -108,9 +108,9 @@ function CustomTable<T extends { id: string }>({
         (value) => ({
           value: String(value),
           label: String(
-            value ? (column.alt ? column.alt[String(value)] : value) : ""
+            value ? (column.alt ? column.alt[String(value)] : value) : "",
           ),
-        })
+        }),
       );
     }
   }, [selectedField, searchedData, filterableColumns]);
@@ -122,7 +122,7 @@ function CustomTable<T extends { id: string }>({
 
         return FilterOperatorFunctions[selectedOperator](
           cellValue,
-          selectedValue
+          selectedValue,
         );
       });
       setData(filteredData);
@@ -135,8 +135,8 @@ function CustomTable<T extends { id: string }>({
     setSelectedField(null);
     setSelectedOperator(null);
     setSelectedValue(null);
-    closeFilterModal(); 
-  }
+    closeFilterModal();
+  };
 
   const handleAddRow = (newRow: T) => {
     setData((prev) => [...prev, newRow]);
@@ -168,7 +168,7 @@ function CustomTable<T extends { id: string }>({
       } as T);
 
       setData((prev: T[]) =>
-        prev.map((row: T) => (row.id === updatedRow.id ? updatedRow : row))
+        prev.map((row: T) => (row.id === updatedRow.id ? updatedRow : row)),
       );
       setEditRowId(null);
       setEditFormData({});
@@ -186,100 +186,110 @@ function CustomTable<T extends { id: string }>({
   };
 
   return (
-    <Paper mah={"100%"} display={"flex"} shadow={"md"} radius={"md"} p={"md"} withBorder style={{ overflowY: "hidden", flexDirection: "column" }}>
-        {createRow && (
-          <>
-            <Group
-              justify={
-                !isEmpty(searchableColumns) ? "space-between" : "flex-end"
-              }
-              mb={"md"}
-            >
-              {!isEmpty(searchableColumns) && (
-                <TextInput
-                  w={"50%"}
-                  placeholder={"Search..."}
-                  rightSection={<IconSearch size={16} />}
-                  value={searchQuery}
-                  onChange={handleSearchChange}
-                />
-              )}
-              <Group>
-                <ActionIcon
-                  size={40}
-                  onClick={openFilterModal}
-                  variant={"light"}
-                  color={"primary"}
-                >
-                  <IconFilter size={24} />
-                </ActionIcon>
-                <ActionIcon
-                  size={40}
-                  onClick={open}
-                  variant={"light"}
-                  color={"primary"}
-                >
-                  <IconPlus size={24} />
-                </ActionIcon>
-              </Group>
+    <Paper
+      mah={"100%"}
+      display={"flex"}
+      shadow={"md"}
+      radius={"md"}
+      p={"md"}
+      withBorder
+      style={{ overflowY: "hidden", flexDirection: "column" }}
+    >
+      {createRow && (
+        <>
+          <Group
+            justify={!isEmpty(searchableColumns) ? "space-between" : "flex-end"}
+            mb={"md"}
+          >
+            {!isEmpty(searchableColumns) && (
+              <TextInput
+                w={"50%"}
+                placeholder={"Search..."}
+                rightSection={<IconSearch size={16} />}
+                value={searchQuery}
+                onChange={handleSearchChange}
+              />
+            )}
+            <Group>
+              <ActionIcon
+                size={40}
+                onClick={openFilterModal}
+                variant={"light"}
+                color={"primary"}
+              >
+                <IconFilter size={24} />
+              </ActionIcon>
+              <ActionIcon
+                size={40}
+                onClick={open}
+                variant={"light"}
+                color={"primary"}
+              >
+                <IconPlus size={24} />
+              </ActionIcon>
             </Group>
-            <AddRowModal
-              opened={opened}
-              onClose={close}
-              onAddRow={handleAddRow}
-              columns={columns}
-              createRow={createRow}
-            />
-            <Modal
-              opened={filterModalOpened}
-              onClose={closeFilterModal}
-              title={"Apply Filter"}
-            >
-              <Flex gap={"md"}>
-                <Select
-                  placeholder={"Filter by..."}
-                  data={fieldOptions}
-                  value={selectedField as string | null}
-                  onChange={(value) => {
-                    if (value) {
-                      setSelectedField(value as keyof T);
-                      setSelectedOperator(null);
-                      setSelectedValue(null);
-                    }
-                  }}
-                />
-                <Select
-                  data={operatorOptions}
-                  value={selectedOperator}
-                  onChange={(value) =>
-                    setSelectedOperator(value as FilterOperator)
+          </Group>
+          <AddRowModal
+            opened={opened}
+            onClose={close}
+            onAddRow={handleAddRow}
+            columns={columns}
+            createRow={createRow}
+          />
+          <Modal
+            opened={filterModalOpened}
+            onClose={closeFilterModal}
+            title={"Apply Filter"}
+          >
+            <Flex gap={"md"}>
+              <Select
+                placeholder={"Filter by..."}
+                data={fieldOptions}
+                value={selectedField as string | null}
+                onChange={(value) => {
+                  if (value) {
+                    setSelectedField(value as keyof T);
+                    setSelectedOperator(null);
+                    setSelectedValue(null);
                   }
-                  disabled={!selectedField}
-                />
-                <Select
-                  data={valuesOptions}
-                  value={selectedValue}
-                  onChange={(value) => setSelectedValue(value)}
-                  disabled={!selectedOperator}
-                />
-              </Flex>
-              <Group align={"center"} justify={"flex-end"} mt={"lg"}>
-                <Button variant={"outline"} onClick={handleClearFilter}>
-                  Clear Filter
-                </Button>
-                <Button onClick={handleApplyFilter}>Apply Filter</Button>
-              </Group>
-            </Modal>
-          </>
-        )}
-        <Flex style={{ flex: "1 1 auto", overflowY: "auto" }}>
+                }}
+              />
+              <Select
+                data={operatorOptions}
+                value={selectedOperator}
+                onChange={(value) =>
+                  setSelectedOperator(value as FilterOperator)
+                }
+                disabled={!selectedField}
+              />
+              <Select
+                data={valuesOptions}
+                value={selectedValue}
+                onChange={(value) => setSelectedValue(value)}
+                disabled={!selectedOperator}
+              />
+            </Flex>
+            <Group align={"center"} justify={"flex-end"} mt={"lg"}>
+              <Button variant={"outline"} onClick={handleClearFilter}>
+                Clear Filter
+              </Button>
+              <Button onClick={handleApplyFilter}>Apply Filter</Button>
+            </Group>
+          </Modal>
+        </>
+      )}
+      <Flex style={{ flex: "1 1 auto", overflowY: "auto" }}>
         <Table
           withTableBorder
           highlightOnHover
           striped={false}
           withColumnBorders
         >
-          <Table.Thead pos={"sticky"} top={0} style={{backgroundColor: "white"}}>
+          <Table.Thead
+            pos={"sticky"}
+            top={0}
+            style={{ backgroundColor: "white" }}
+          >
             <Table.Tr>
               {columns.map((col) => (
                 <Table.Th key={String(col.key)}>{col.label}</Table.Th>
@@ -293,7 +303,10 @@ function CustomTable<T extends { id: string }>({
               searchedData.map((row) => (
                 <Table.Tr key={row.id} bg={"gray.0"}>
                   {columns.map((col) => (
-                    <Table.Td key={String(col.key)} style={{whiteSpace: "pre-wrap"}}>
+                    <Table.Td
+                      key={String(col.key)}
+                      style={{ whiteSpace: "pre-wrap" }}
+                    >
                       {editRowId === row.id && col.isEdit ? (
                         !col.values ? (
                           <TextInput
@@ -352,16 +365,16 @@ function CustomTable<T extends { id: string }>({
                           />
                         )
                       ) : col.isMulti ? (
-                        (row[col.key] as string[])
+                        ((row[col.key] as string[])
                           ?.map((val) => (col.alt ? col.alt[val] : val))
-                          .join(", ") ?? ""
+                          .join(", ") ?? "")
                       ) : (
                         String(
                           row[col.key]
                             ? col.alt
                               ? col.alt[String(row[col.key] as string)]
                               : row[col.key]
-                            : ""
+                            : "",
                         )
                       )}
                     </Table.Td>
@@ -388,23 +401,24 @@ function CustomTable<T extends { id: string }>({
                         </>
                       ) : (
                         <>
-                        { updateRow &&
-                          <ActionIcon
-                            color={"blue"}
-                            variant={"transparent"}
-                            onClick={() => handleEditClick(row)}
-                          >
-                            <IconPencil size={18} />
-                          </ActionIcon>}
-                          {
-                          deleteRow &&
-                          <ActionIcon
-                            color={"red"}
-                            variant={"transparent"}
-                            onClick={() => handleDeleteClick(row.id)}
-                          >
-                            <IconTrash size={18} />
-                          </ActionIcon>}
+                          {updateRow && (
+                            <ActionIcon
+                              color={"blue"}
+                              variant={"transparent"}
+                              onClick={() => handleEditClick(row)}
+                            >
+                              <IconPencil size={18} />
+                            </ActionIcon>
+                          )}
+                          {deleteRow && (
+                            <ActionIcon
+                              color={"red"}
+                              variant={"transparent"}
+                              onClick={() => handleDeleteClick(row.id)}
+                            >
+                              <IconTrash size={18} />
+                            </ActionIcon>
+                          )}
                         </>
                       )}
                     </Group>
@@ -422,21 +436,28 @@ function CustomTable<T extends { id: string }>({
             )}
           </Table.Tbody>
 
-          {
-            data.length === 0 && (
-              <Table.Tr>
-                <Table.Td colSpan={columns.length + 1} style={{ textAlign: "center" }}>
-                  There is no data to display
-                </Table.Td>
-              </Table.Tr>
-            )
-          }
+          {data.length === 0 && (
+            <Table.Tr>
+              <Table.Td
+                colSpan={columns.length + 1}
+                style={{ textAlign: "center" }}
+              >
+                There is no data to display
+              </Table.Td>
+            </Table.Tr>
+          )}
 
           {columns.some((col) => col.footer) && (
-            <Table.Tfoot pos={"sticky"} bottom={0} style={{backgroundColor: "white"}}>
+            <Table.Tfoot
+              pos={"sticky"}
+              bottom={0}
+              style={{ backgroundColor: "white" }}
+            >
               <Table.Tr>
                 {columns.map((col) => (
-                  <Table.Td key={String(col.key)} fw={"bold"}>{col.footer ? col.footer(data) : ""}</Table.Td>
+                  <Table.Td key={String(col.key)} fw={"bold"}>
+                    {col.footer ? col.footer(data) : ""}
+                  </Table.Td>
                 ))}
                 <Table.Td />
               </Table.Tr>

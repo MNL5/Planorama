@@ -35,44 +35,51 @@ const GuestsView: React.FC = () => {
     isFetching,
   } = useFetchAllGuests(true);
 
-  const { mutateAsync: mutateCreateGuest, isPending: isCreatePending } = useMutation<
-    Guest,
-    Error,
-    Omit<Guest, "id">
-  >({
-    mutationFn: (newGuest) => createGuest(currentEvent?.id as string, newGuest),
-    onSuccess: () => {
-      toast.success("Guest created successfully");
-    },
-    onError: () => {
-      toast.error("Failed to create guest");
-    },
-  });
+  const { mutateAsync: mutateCreateGuest, isPending: isCreatePending } =
+    useMutation<Guest, Error, Omit<Guest, "id">>({
+      mutationFn: (newGuest) =>
+        createGuest(currentEvent?.id as string, newGuest),
+      onSuccess: () => {
+        toast.success("Guest created successfully");
+      },
+      onError: () => {
+        toast.error("Failed to create guest");
+      },
+    });
 
-  const { mutateAsync: mutateUpdateGuest, isPending: isUpdatePending } = useMutation<Guest, Error, Guest>({
-    mutationFn: (updatedGuest) =>
-      updateGuest(currentEvent?.id as string, updatedGuest, updatedGuest.id),
-    onSuccess: () => {
-      toast.success("Guest updated successfully");
-    },
-    onError: () => {
-      toast.error("Failed to update guest");
-    },
-  });
+  const { mutateAsync: mutateUpdateGuest, isPending: isUpdatePending } =
+    useMutation<Guest, Error, Guest>({
+      mutationFn: (updatedGuest) =>
+        updateGuest(currentEvent?.id as string, updatedGuest, updatedGuest.id),
+      onSuccess: () => {
+        toast.success("Guest updated successfully");
+      },
+      onError: () => {
+        toast.error("Failed to update guest");
+      },
+    });
 
-  const { mutateAsync: mutateDeleteGuest, isPending: isDeletePeding } = useMutation<Guest, Error, string>({
-    mutationFn: (guestId) => deleteGuest(guestId),
-    onSuccess: () => {
-      toast.success("Guest deleted successfully");
-    },
-    onError: () => {
-      toast.error("Failed to delete guest");
-    },
-  });
+  const { mutateAsync: mutateDeleteGuest, isPending: isDeletePeding } =
+    useMutation<Guest, Error, string>({
+      mutationFn: (guestId) => deleteGuest(guestId),
+      onSuccess: () => {
+        toast.success("Guest deleted successfully");
+      },
+      onError: () => {
+        toast.error("Failed to delete guest");
+      },
+    });
 
   return isSuccess && !isFetching && !isNil(guests) && columns ? (
-    <Container size={"xl"} mt={"xl"} mb={"xl"} style={{ flex: "1 1", overflow: "hidden" }}>
-      <MainLoader isPending={isCreatePending || isUpdatePending || isDeletePeding} />
+    <Container
+      size={"xl"}
+      mt={"xl"}
+      mb={"xl"}
+      style={{ flex: "1 1", overflow: "hidden" }}
+    >
+      <MainLoader
+        isPending={isCreatePending || isUpdatePending || isDeletePeding}
+      />
       <CustomTable<Guest>
         data={guests}
         columns={columns}

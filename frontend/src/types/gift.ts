@@ -3,7 +3,7 @@ type CreateGift = {
   amount: number;
   greeting: string;
   eventId: string;
-}
+};
 
 type Gift = Omit<CreateGift, "eventId"> & {
   id: string;

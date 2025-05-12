@@ -3,7 +3,7 @@ import { Column } from "../types/column";
 import { Gift } from "../types/gift";
 
 const giftsColumns: (guests: Guest[]) => Column<Gift>[] = (guests: Guest[]) => {
-  const guestsObject: {[key: string]: string} = {}
+  const guestsObject: { [key: string]: string } = {};
   guests?.forEach((guest) => {
     guestsObject[guest.id] = guest.name;
   });
@@ -18,7 +18,7 @@ const giftsColumns: (guests: Guest[]) => Column<Gift>[] = (guests: Guest[]) => {
       alt: guestsObject,
       footer: (gift: Gift[]) => {
         return "Total Gifts: " + gift.length;
-      }
+      },
     },
     {
       key: "greeting",
@@ -37,7 +37,7 @@ const giftsColumns: (guests: Guest[]) => Column<Gift>[] = (guests: Guest[]) => {
         return `${gifts?.reduce((acc, gift) => acc + gift.amount, 0) || 0}`;
       },
     },
-  ]
+  ];
 };
 
 export { giftsColumns };

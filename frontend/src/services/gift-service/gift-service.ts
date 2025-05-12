@@ -16,7 +16,7 @@ const createGift = async (eventId: string, gift: Omit<Gift, "id">) => {
 
 const getAllGifts = async (eventId: string) => {
   const response: AxiosResponse<Gift[]> = await abortableGetRequest<Gift[]>(
-    `gifts?event=${eventId}  `
+    `gifts?event=${eventId}  `,
   ).request;
   return response.data;
 };

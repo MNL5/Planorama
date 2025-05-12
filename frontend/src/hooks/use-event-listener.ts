@@ -2,7 +2,7 @@ import { useEffect } from "react";
 
 export const useEventListener = (
   event: string,
-  callback: (event: CustomEvent) => void
+  callback: (event: CustomEvent) => void,
 ) => {
   useEffect(() => {
     const listener = (event: Event) => {

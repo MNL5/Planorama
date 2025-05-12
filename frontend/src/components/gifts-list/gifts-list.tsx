@@ -20,7 +20,7 @@ const GiftsList: React.FC = () => {
     isSuccess: isSuccessGuest,
     isLoading: isLoadingGuest,
     isError: isErrorGuest,
-    isFetching: isFetchingGuest
+    isFetching: isFetchingGuest,
   } = useFetchAllGuests(true);
 
   useEffect(() => {
@@ -34,7 +34,7 @@ const GiftsList: React.FC = () => {
     isSuccess: isSuccessGift,
     isLoading: isLoadingGift,
     isError: isErrorGift,
-    isFetching: isFetchingGift
+    isFetching: isFetchingGift,
   } = useQuery<Gift[], Error>({
     queryKey: ["fetchGifts", currentEvent?.id],
     queryFn: () => getAllGifts(currentEvent?.id as string),
@@ -46,11 +46,13 @@ const GiftsList: React.FC = () => {
   const isFetching = isFetchingGuest || isFetchingGift;
 
   return isSuccess && !isFetching && !isNil(gifts) && columns ? (
-    <Container size={"xl"} mt={"xl"} mb={"xl"} style={{ flex: "1 1", overflow: "hidden" }}>
-      <CustomTable<Gift>
-        data={gifts}
-        columns={columns}
-      />
+    <Container
+      size={"xl"}
+      mt={"xl"}
+      mb={"xl"}
+      style={{ flex: "1 1", overflow: "hidden" }}
+    >
+      <CustomTable<Gift> data={gifts} columns={columns} />
     </Container>
   ) : isLoading ? (
     <MainLoader isPending />
