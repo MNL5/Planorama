@@ -86,6 +86,6 @@ const GuestsView: React.FC = () => {
   ) : isError ? (
     <Text>Oops! Something went wrong. Please try again later.</Text>
   ) : null;
-};
+}; 
 
 export { GuestsView };
