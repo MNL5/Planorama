@@ -21,13 +21,13 @@ export const ENDPOINTS = [
     element: <Preferences />,
   },
   {
-    name: 'Guest Seating',
-    path: '/guest-seating',
-    element: <GuestSeating />,
-},
-  {
     name: "Venue Seats",
     path: "/venue-seats",
     element: <TableArrangement />,
+  },
+  {
+    name: 'Guest Seating',
+    path: '/guest-seating',
+    element: <GuestSeating />,
   },
 ];

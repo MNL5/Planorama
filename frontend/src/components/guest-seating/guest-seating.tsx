@@ -3,19 +3,17 @@ import { useQuery } from '@tanstack/react-query';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { useEventContext } from '../../contexts/event-context';
-import { updateEvent } from '../../services/event-service/event-service';
 import {
     getAllGuests,
-    updateGuest,
     updateGuests,
-} from '../../Services/guest-service/guest-service';
+} from '../../services/guest-service/guest-service';
 import ElementType from '../../types/Element';
 import { Guest } from '../../types/guest';
 import GuestSeatingList from '../guest-seating-list/guest-seating-list';
 import GuestTable from '../guest-table/guest-table';
 
 const GuestSeating: React.FC = () => {
-    const { currentEvent, setCurrentEvent } = useEventContext();
+    const { currentEvent } = useEventContext();
     const [tables, setTables] = useState<ElementType[]>([]);
     const [guests, setGuests] = useState<Guest[]>([]);
     const [openTableId, setOpenTableId] = useState<string | null>(null);
@@ -84,7 +82,7 @@ const GuestSeating: React.FC = () => {
 
     return (
         <Box
-            style={{ display: 'flex', height: '100vh' }}
+            style={{ display: 'flex', flex: '1 1' }}
             onClick={() => setOpenTableId(null)}
         >
             <div
