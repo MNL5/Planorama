@@ -1,6 +1,6 @@
 import { Box, Button, Text } from '@mantine/core';
 import { useQuery } from '@tanstack/react-query';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useTransition } from 'react';
 import { toast } from 'react-toastify';
 import { useEventContext } from '../../contexts/event-context';
 import {
@@ -11,12 +11,14 @@ import ElementType from '../../types/Element';
 import { Guest } from '../../types/guest';
 import GuestSeatingList from '../guest-seating-list/guest-seating-list';
 import GuestTable from '../guest-table/guest-table';
+import MainLoader from '../mainLoader/MainLoader';
 
 const GuestSeating: React.FC = () => {
     const { currentEvent } = useEventContext();
     const [tables, setTables] = useState<ElementType[]>([]);
     const [guests, setGuests] = useState<Guest[]>([]);
     const [openTableId, setOpenTableId] = useState<string | null>(null);
+    const [isPending, startTransition] = useTransition();
 
     const {
         data: guestsData = [],
@@ -54,12 +56,13 @@ const GuestSeating: React.FC = () => {
 
     const handleSave = async () => {
         if (!currentEvent) return;
-        try {
+        startTransition(async () => {
+            try {
             const updatedGuestsTables: Record<string, { tableId?: string }> =
                 {};
 
             guests.forEach((guest) => {
-                updatedGuestsTables[guest.id] = { tableId: guest?.tableId };
+                updatedGuestsTables[guest.id] = { tableId: guest?.tableId || "" };
             });
 
             await updateGuests(currentEvent.id, updatedGuestsTables);
@@ -68,6 +71,7 @@ const GuestSeating: React.FC = () => {
             console.error(err);
             toast.error('Failed to save guest seating');
         }
+        })
     };
 
     const handleGuestDragStart = (
@@ -77,7 +81,7 @@ const GuestSeating: React.FC = () => {
         e.dataTransfer.setData('guestId', id);
     };
 
-    if (isLoading) return <Text>Loading guests...</Text>;
+    if (isLoading) return <MainLoader isPending />;
     if (isError) return <Text>Error loading guests</Text>;
 
     return (
@@ -85,6 +89,7 @@ const GuestSeating: React.FC = () => {
             style={{ display: 'flex', flex: '1 1' }}
             onClick={() => setOpenTableId(null)}
         >
+            <MainLoader isPending={isPending} />
             <div
                 style={{
                     display: 'flex',
