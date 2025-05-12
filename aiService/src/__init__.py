@@ -52,11 +52,11 @@ def create_app(test_config=None):
             guests.append(Guest(i, "_"))
 
         algorithm = Algorithm(guests, tables, relations)
-        result = algorithm.solve(guests, generations=500, pop_size=200, elite_size=20)
+        result, best_fitness = algorithm.solve(generations=500, pop_size=200, elite_size=20, mutation_rate=0.01)
 
         response = {
             "guests": [guest.to_dict() for guest in result if guest.group != "_"],
-            "totalFitness": algorithm.fitness(result),
+            "totalFitness": best_fitness,
         }
 
         return jsonify(response), 200

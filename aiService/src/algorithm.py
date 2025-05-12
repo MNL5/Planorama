@@ -38,7 +38,11 @@ class Algorithm:
             self.groupToAmount[guest.group] += 1
         self.maxGroupSize = max(self.groupToAmount.values())
 
-    def happinesFunc(self, guest, i, groupToAmountPerTable, guestToTable):
+        self.isGroupMustSplit = {}
+        for group, amount in self.groupToAmount.items():
+            self.isGroupMustSplit[group] = all(amount > table.numOfSeats for table in self.tables)
+
+    def happinesFunc(self, guest, i, groupToAmountPerTable, guestToTable, groupTables, amountPerTable):
         table = self.seatToTable[i]
         seatWithMe = groupToAmountPerTable[table][guest.group] - 1
         score = seatWithMe
@@ -60,23 +64,35 @@ class Algorithm:
                 withMustNot = getNumOf(RelationType.MUST_NOT)
                 score -= withMustNot * 5
 
-        notSeatingWithPrecent = ((self.groupToAmount[guest.group] - 1) - seatWithMe) / (self.groupToAmount[guest.group] - 1)
-        groupSizeFactor = self.maxGroupSize / self.groupToAmount[guest.group]
-        score -= notSeatingWithPrecent * groupSizeFactor * 5
+        # notSeatingWithPrecent = ((self.groupToAmount[guest.group] - 1) - seatWithMe) / (self.groupToAmount[guest.group] - 1)
+        # groupSizeFactor = self.maxGroupSize / self.groupToAmount[guest.group]
+        # score -= notSeatingWithPrecent * groupSizeFactor * 5
 
-        if '_' in groupToAmountPerTable[table] and groupToAmountPerTable[table]['_'] > groupToAmountPerTable[table][guest.group]:
-            score -= groupToAmountPerTable[table]['_'] * 0.3
+        # if '_' in groupToAmountPerTable[table] and groupToAmountPerTable[table]['_'] >= amountPerTable[table]:
+        #     score -= groupToAmountPerTable[table]['_'] * 0.3 / amountPerTable[table]
 
-        if groupToAmountPerTable[table][guest.group] == 1:
-            score -= 5
+        # if groupToAmountPerTable[table][guest.group] == 1:
+        #     score -= 15
+
+        # if groupToAmountPerTable[table][guest.group] == self.tableToNumOfSeats[table] or groupTables[guest.group] == 1:
+        #     score += 10 / self.groupToAmount[guest.group]
+
+        # if groupTables[guest.group] > 1 and not self.isGroupMustSplit[guest.group]:
+        #     score -= groupTables[guest.group] * 2 / self.groupToAmount[guest.group]
 
         return score
     
     def calcHelpers(self, guests):
         groupToAmountPerTable = {}
         guestToTable = {}
+        groupTables = {}
+        isGroupSplitHelper = {}
+        amountPerTable = {}
 
         for i, guest in enumerate(guests):
+            if guest.group == "_":
+                continue
+
             table = self.seatToTable[i]
             guestToTable[guest.id] = table
 
@@ -87,11 +103,22 @@ class Algorithm:
                 groupToAmountPerTable[table][guest.group] = 0
             groupToAmountPerTable[table][guest.group] += 1
 
-        return groupToAmountPerTable, guestToTable
+            if table not in amountPerTable:
+                amountPerTable[table] = 0
+            amountPerTable[table] += 1
+
+            if guest.group not in isGroupSplitHelper:
+                isGroupSplitHelper[guest.group] = set()
+            isGroupSplitHelper[guest.group].add(table)
+
+        for group, tables in isGroupSplitHelper.items():
+            groupTables[group] = len(tables)
+
+        return groupToAmountPerTable, guestToTable, groupTables, amountPerTable
 
     def fitness(self, guests):
-        groupToAmountPerTable, guestToTable = self.calcHelpers(guests)
-        return sum([self.happinesFunc(guest, i, groupToAmountPerTable, guestToTable) for i, guest in enumerate(guests) if guests[i].group != "_"])
+        groupToAmountPerTable, guestToTable, groupTables, amountPerTable = self.calcHelpers(guests)
+        return sum([self.happinesFunc(guest, i, groupToAmountPerTable, guestToTable, groupTables, amountPerTable) for i, guest in enumerate(guests) if guest.group != "_"])
 
     def sortGuests(self, guests, isReverse = False):
         numOfPrevSeats = 0
@@ -127,10 +154,10 @@ class Algorithm:
 
         return individual
 
-    def create_population(self, guests, pop_size):
-        population = [self.createFirstArrangement(guests)]
-        for i in range(pop_size - 1):
-            individual = guests.copy()
+    def create_population(self, pop_size):
+        population = []
+        for i in range(pop_size):
+            individual = self.guests.copy()
             random.shuffle(individual)
             population.append(individual)
         return population
@@ -215,17 +242,13 @@ class Algorithm:
             selected.append(winner)
         return selected
     
-    def solve(self, guests, pop_size=100, elite_size=10, mutation_rate=0.01, generations=100):
-        population = self.create_population(guests, pop_size)
+    def solve(self, pop_size=100, elite_size=10, mutation_rate=0.01, generations=100):
+        population = self.create_population(pop_size)
         best_fitness = 0
         best_individual = None
 
         for generation in range(generations):
             fitnesses = [self.fitness(individual) for individual in population]
-            minFitness = min(fitnesses)
-            if minFitness < 0:
-                fitnesses = [f - minFitness for f in fitnesses]
-
             fitnessSortedIndexes = np.argsort(fitnesses)
             elites = [population[idx] for idx in fitnessSortedIndexes[-elite_size:]]
 
@@ -235,11 +258,15 @@ class Algorithm:
             if currBest > best_fitness:
                 best_fitness = currBest
                 best_individual = currBestIndividual
+                
+                groupToAmountPerTable, guestToTable, groupTables, amountPerTable = self.calcHelpers(best_individual)
+                if all(tables == 1 or self.isGroupMustSplit[group] for group, tables in groupTables.items()):
+                    break
 
             if generations - 1 == generation:
                 break
 
-            population = self.selection(population, fitnesses, elite_size, tournament_size=10)
+            population = self.selection(population, fitnesses, elite_size, tournament_size=3)
 
             next_gen = elites.copy()
             for i in range(0, len(population), 2):
@@ -253,4 +280,4 @@ class Algorithm:
 
             population = next_gen
 
-        return self.setTables(best_individual)
+        return self.setTables(best_individual), best_fitness
