@@ -1,12 +1,13 @@
 import { v4 as uuidv4 } from 'uuid';
 import { toast } from 'react-toastify';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useTransition } from 'react';
 import { Box, Button, Drawer, NumberInput, Text } from '@mantine/core';
 
 import Element from '../../types/Element';
 import RndElement from '../RndElement/RndElement';
 import { useEventContext } from '../../contexts/event-context';
 import { updateEvent } from '../../Services/event-service/event-service';
+import MainLoader from '../mainLoader/MainLoader';
 
 const elementTypes = [
     { type: 'square', label: 'Square Table' },
@@ -23,6 +24,7 @@ const TableArrangement = () => {
         null
     );
     const { currentEvent, setCurrentEvent } = useEventContext();
+    const [isPending, startTransition] = useTransition();
 
     const addElement = () => {
         if (!canvasRef.current || !selectedType) return;
@@ -58,29 +60,31 @@ const TableArrangement = () => {
         setElements((prev) => prev.filter((el) => el.id !== id));
     };
 
-    const handleSave = async () => {
-        try {
-            if (currentEvent?.id) {
-                setCurrentEvent(
-                    await updateEvent(
-                        { ...currentEvent, diagram: { elements } },
-                        currentEvent.id
-                    )
+    const handleSave = () => {
+        startTransition(async () => {
+            try {
+                if (currentEvent?.id) {
+                    setCurrentEvent(
+                        await updateEvent(
+                            { ...currentEvent, diagram: { elements } },
+                            currentEvent.id
+                        )
+                    );
+                    toast.success('Seating arrangement saved');
+                } else {
+                    console.error('no current event id');
+                }
+            } catch (error) {
+                console.error(error);
+                const innerError = error as {
+                    response: { data: { error: string } };
+                    message: string;
+                };
+                toast.error(
+                    innerError.response?.data?.error || 'Problem has occured'
                 );
-                toast.success('Seating arrangement saved');
-            } else {
-                console.error('no current event id');
             }
-        } catch (error) {
-            console.error(error);
-            const innerError = error as {
-                response: { data: { error: string } };
-                message: string;
-            };
-            toast.error(
-                innerError.response?.data?.error || 'Problem has occured'
-            );
-        }
+        })
     };
 
     const loadLayout = async () => {
@@ -99,6 +103,7 @@ const TableArrangement = () => {
 
     return (
         <Box style={{ display: 'flex', direction: 'rtl', flex: '1 1' }}>
+            <MainLoader isPending={isPending} />
             <Box
                 ref={canvasRef}
                 style={{
@@ -161,19 +166,19 @@ const TableArrangement = () => {
             <Drawer
                 opened={drawerOpened}
                 onClose={() => setDrawerOpened(false)}
-                title="הוספת שולחן"
+                title="Add Table"
                 position="left"
             >
                 {selectedType && (
                     <NumberInput
-                        label="מספר מקומות"
+                        label="No. of Seats"
                         value={seatCount}
                         onChange={setSeatCount}
                         min={1}
                     />
                 )}
                 <Button color="#6a0572" fullWidth mt="md" onClick={addElement}>
-                    הוסף
+                    Add
                 </Button>
             </Drawer>
         </Box>

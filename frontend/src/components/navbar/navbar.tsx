@@ -31,7 +31,7 @@ const Navbar = () => {
   return (
     <nav className="navbar">
       <div className="navbar-logo">
-        <Link to="/">
+        <Link to="/" onClick={() => setCurrentEvent(null)}>
           <img src={logo} alt="logo" className="logo" />
         </Link>
       </div>

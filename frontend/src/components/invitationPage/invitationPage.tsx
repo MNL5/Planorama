@@ -1,10 +1,10 @@
 import React from "react";
-import { CircularProgress } from "@mui/material";
 import { useParams } from "react-router-dom";
 import { Title, Text, Stack } from "@mantine/core";
 
 import useEventByGuest from "../../hooks/use-event-by-guest";
 import Invitation from "../invitation/invitation";
+import MainLoader from "../mainLoader/MainLoader";
 
 const InvitationPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -13,10 +13,7 @@ const InvitationPage: React.FC = () => {
   if (!event) {
     if (isLoading) {
       return (
-        <CircularProgress
-          color="secondary"
-          style={{ position: "absolute", top: "40%", left: "50%" }}
-        />
+        <MainLoader isPending />
       );
     }
     return (
