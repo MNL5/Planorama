@@ -10,6 +10,7 @@ import { Guest } from "../../types/guest";
 import style from "./invitation.module.css";
 import mealOptions from "../../utils/meal-options";
 import { updateGuest } from "../../services/guest-service/guest-service";
+import MainLoader from "../mainLoader/MainLoader";
 
 const Invitation: React.FC<{ event: Event; guestId?: string }> = ({
   event,
@@ -28,7 +29,7 @@ const Invitation: React.FC<{ event: Event; guestId?: string }> = ({
     });
   };
 
-  const { mutateAsync: mutateUpdateGuest } = useMutation<Guest, Error, Guest>({
+  const { mutateAsync: mutateUpdateGuest, isPending } = useMutation<Guest, Error, Guest>({
     mutationFn: (updatedGuest) =>
       updateGuest(event.id as string, updatedGuest, updatedGuest.id),
     onSuccess: () => {
@@ -58,6 +59,7 @@ const Invitation: React.FC<{ event: Event; guestId?: string }> = ({
       {isFormMode ? (
         <>
           <Stack>
+            <MainLoader isPending={isPending} />
             <Title size={"h2"} style={{ textDecoration: "underline" }}>
               RSVP
             </Title>
@@ -91,7 +93,7 @@ const Invitation: React.FC<{ event: Event; guestId?: string }> = ({
               size={"md"}
               radius={"md"}
               w={"fit-content"}
-              variant={"transparent"}
+              variant={"light"}
               onClick={handleSubmit.bind(null, "ACCEPTED")}
             >
               <Text size={"md"}>Accept</Text>
@@ -101,7 +103,7 @@ const Invitation: React.FC<{ event: Event; guestId?: string }> = ({
               size={"md"}
               radius={"md"}
               w={"fit-content"}
-              variant={"transparent"}
+              variant={"light"}
               onClick={handleSubmit.bind(null, "TENTATIVE")}
             >
               <Text size={"md"}>Not Sure</Text>
@@ -111,7 +113,7 @@ const Invitation: React.FC<{ event: Event; guestId?: string }> = ({
               size={"md"}
               radius={"md"}
               w={"fit-content"}
-              variant={"transparent"}
+              variant={"light"}
               onClick={handleSubmit.bind(null, "DECLINE")}
             >
               <Text size={"md"}>Decline</Text>

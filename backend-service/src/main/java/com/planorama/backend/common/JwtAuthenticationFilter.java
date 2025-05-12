@@ -1,5 +1,7 @@
 package com.planorama.backend.common;
 
+import com.planorama.backend.event.api.EventAPI;
+import com.planorama.backend.event.api.EventDTO;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -16,10 +18,14 @@ import java.util.Set;
 @Order(1)
 public class JwtAuthenticationFilter implements Filter {
     private final JWTUtil jwtUtil;
+    private final EventAPI eventAPI;
     private final Set<String> permitRoutes;
 
-    public JwtAuthenticationFilter(JWTUtil jwtUtil, @Qualifier("permitRoutes") Set<String> permitRoutes) {
+    public JwtAuthenticationFilter(JWTUtil jwtUtil,
+                                   EventAPI eventAPI,
+                                   @Qualifier("permitRoutes") Set<String> permitRoutes) {
         this.jwtUtil = jwtUtil;
+        this.eventAPI = eventAPI;
         this.permitRoutes = permitRoutes;
     }
 
@@ -45,7 +51,9 @@ public class JwtAuthenticationFilter implements Filter {
         }
 
         try {
-            httpRequest.setAttribute("userID", jwtUtil.verifyToken(Arrays.stream(token.split(" ")).toList().getLast()));
+            String userId = jwtUtil.verifyToken(Arrays.stream(token.split(" ")).toList().getLast());
+            httpRequest.setAttribute("userID", userId);
+            httpRequest.setAttribute("eventIDs", eventAPI.getAllEvents(userId).map(EventDTO::id).collectList().block());
             filterChain.doFilter(request, response);
         } catch (Exception e) {
             ((HttpServletResponse) response).sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid or expired token");

@@ -1,20 +1,21 @@
 package com.planorama.backend.guest;
 
+import com.mongodb.bulk.BulkWriteResult;
 import com.planorama.backend.event.api.DeleteEvent;
-import com.planorama.backend.guest.api.CreateGuestDTO;
-import com.planorama.backend.guest.api.RSVPStatusDTO;
-import com.planorama.backend.guest.api.SeatGuests;
-import com.planorama.backend.guest.api.UpdateGuestDTO;
+import com.planorama.backend.guest.api.*;
 import com.planorama.backend.guest.entity.GuestDAO;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
+import org.springframework.data.mongodb.core.BulkOperations;
 import org.springframework.data.mongodb.core.FindAndModifyOptions;
+import org.springframework.data.mongodb.core.ReactiveBulkOperations;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.data.mongodb.core.query.UpdateDefinition;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -72,6 +73,10 @@ public class GuestService {
         return reactiveMongoTemplate.find(Query.query(Criteria.where(GuestDAO.EVENT_ID_FIELD).is(eventId)), GuestDAO.class);
     }
 
+    public Flux<GuestDAO> findAllByEventIdAndTableId(@NotNull String eventId, @NotNull String tableId) {
+        return reactiveMongoTemplate.find(Query.query(Criteria.where(GuestDAO.EVENT_ID_FIELD).is(eventId).and(GuestDAO.TABLE_FIELD).is(tableId)), GuestDAO.class);
+    }
+
     public Flux<GuestDAO> findAllByEventIdAndRsvpStatus(@NotNull String eventId, @NotNull Set<RSVPStatusDTO> rsvpStatus) {
         Set<String> statuses = rsvpStatus.stream().map(Enum::name).collect(Collectors.toSet());
         return reactiveMongoTemplate.find(Query.query(Criteria.where(GuestDAO.EVENT_ID_FIELD).is(eventId)
@@ -102,7 +107,15 @@ public class GuestService {
                 GuestDAO.class);
     }
 
-    private Update createUpdateCommand(UpdateGuestDTO updateGuestDTO) {
+    public Mono<BulkWriteResult> updateGuests(GuestsUpdateDTO guestsUpdateDTO) {
+        ReactiveBulkOperations bulkOps = reactiveMongoTemplate.bulkOps(BulkOperations.BulkMode.UNORDERED, GuestDAO.class);
+        guestsUpdateDTO.guests().forEach((guestId, updateDto) -> bulkOps.updateOne(
+                Query.query(Criteria.where(GuestDAO.ID_FIELD).is(guestId)),
+                createUpdateCommand(updateDto)));
+        return bulkOps.execute();
+    }
+
+    private UpdateDefinition createUpdateCommand(UpdateGuestDTO updateGuestDTO) {
         final Update update = new Update();
 
         updateFields.forEach((key, extractor) -> {

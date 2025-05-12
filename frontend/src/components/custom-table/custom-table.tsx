@@ -6,7 +6,6 @@ import {
   Modal,
   Select,
   Button,
-  Container,
   TextInput,
   ActionIcon,
   MultiSelect,
@@ -34,8 +33,8 @@ interface CustomTableProps<T> {
   data: T[];
   columns: Column<T>[];
   createRow?: (row: T) => Promise<T>;
-  updateRow: (row: T) => Promise<T>;
-  deleteRow: (id: string) => Promise<T>;
+  updateRow?: (row: T) => Promise<T>;
+  deleteRow?: (id: string) => Promise<T>;
 }
 
 function CustomTable<T extends { id: string }>({
@@ -162,7 +161,7 @@ function CustomTable<T extends { id: string }>({
   };
 
   const handleSaveClick = async () => {
-    if (editRowId !== null) {
+    if (editRowId !== null && updateRow) {
       const updatedRow = await updateRow({
         ...editFormData,
         id: editRowId,
@@ -177,6 +176,7 @@ function CustomTable<T extends { id: string }>({
   };
 
   const handleDeleteClick = async (id: string) => {
+    if (!deleteRow) return;
     await deleteRow(id);
     setData((prev: T[]) => prev.filter((row: T) => row.id !== id));
   };
@@ -186,8 +186,7 @@ function CustomTable<T extends { id: string }>({
   };
 
   return (
-    <Container size={"md"} mt={"xl"}>
-      <Paper shadow={"md"} radius={"md"} p={"md"} withBorder>
+    <Paper mah={"100%"} display={"flex"} shadow={"md"} radius={"md"} p={"md"} withBorder style={{ overflowY: "hidden", flexDirection: "column" }}>
         {createRow && (
           <>
             <Group
@@ -273,13 +272,14 @@ function CustomTable<T extends { id: string }>({
             </Modal>
           </>
         )}
+        <Flex style={{ flex: "1 1 auto", overflowY: "auto" }}>
         <Table
           withTableBorder
           highlightOnHover
           striped={false}
           withColumnBorders
         >
-          <Table.Thead>
+          <Table.Thead pos={"sticky"} top={0} style={{backgroundColor: "white"}}>
             <Table.Tr>
               {columns.map((col) => (
                 <Table.Th key={String(col.key)}>{col.label}</Table.Th>
@@ -293,7 +293,7 @@ function CustomTable<T extends { id: string }>({
               searchedData.map((row) => (
                 <Table.Tr key={row.id} bg={"gray.0"}>
                   {columns.map((col) => (
-                    <Table.Td key={String(col.key)}>
+                    <Table.Td key={String(col.key)} style={{whiteSpace: "pre-wrap"}}>
                       {editRowId === row.id && col.isEdit ? (
                         !col.values ? (
                           <TextInput
@@ -359,7 +359,7 @@ function CustomTable<T extends { id: string }>({
                         String(
                           row[col.key]
                             ? col.alt
-                              ? col.alt[String(row[col.key])]
+                              ? col.alt[String(row[col.key] as string)]
                               : row[col.key]
                             : ""
                         )
@@ -388,20 +388,23 @@ function CustomTable<T extends { id: string }>({
                         </>
                       ) : (
                         <>
+                        { updateRow &&
                           <ActionIcon
                             color={"blue"}
                             variant={"transparent"}
                             onClick={() => handleEditClick(row)}
                           >
                             <IconPencil size={18} />
-                          </ActionIcon>
+                          </ActionIcon>}
+                          {
+                          deleteRow &&
                           <ActionIcon
                             color={"red"}
                             variant={"transparent"}
                             onClick={() => handleDeleteClick(row.id)}
                           >
                             <IconTrash size={18} />
-                          </ActionIcon>
+                          </ActionIcon>}
                         </>
                       )}
                     </Group>
@@ -418,9 +421,30 @@ function CustomTable<T extends { id: string }>({
               </Table.Tr>
             )}
           </Table.Tbody>
+
+          {
+            data.length === 0 && (
+              <Table.Tr>
+                <Table.Td colSpan={columns.length + 1} style={{ textAlign: "center" }}>
+                  There is no data to display
+                </Table.Td>
+              </Table.Tr>
+            )
+          }
+
+          {columns.some((col) => col.footer) && (
+            <Table.Tfoot pos={"sticky"} bottom={0} style={{backgroundColor: "white"}}>
+              <Table.Tr>
+                {columns.map((col) => (
+                  <Table.Td key={String(col.key)} fw={"bold"}>{col.footer ? col.footer(data) : ""}</Table.Td>
+                ))}
+                <Table.Td />
+              </Table.Tr>
+            </Table.Tfoot>
+          )}
         </Table>
-      </Paper>
-    </Container>
+      </Flex>
+    </Paper>
   );
 }
 

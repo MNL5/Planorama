@@ -10,12 +10,12 @@ import {
 } from "@mantine/core";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { CircularProgress } from "@mui/material";
 
 import "./sign-up.css";
 import useLogin from "../../hooks/use-login";
 import useAuthForm from "../../hooks/use-form-auth";
 import authService from "../../services/auth-service/auth-service";
+import MainLoader from "../mainLoader/MainLoader";
 
 const SignUp = () => {
   const form = useAuthForm(true); // Enable confirm password validation
@@ -37,18 +37,7 @@ const SignUp = () => {
           className="auth-card"
           style={isPending ? { pointerEvents: "none", opacity: 0.4 } : {}}
         >
-          {isPending && (
-            <CircularProgress
-              color="secondary"
-              style={{
-                position: "absolute",
-                top: "40%",
-                left: "45%",
-                zIndex: 10,
-                opacity: 1,
-              }}
-            />
-          )}
+          <MainLoader isPending={isPending} />
           <Title order={2} className="auth-title">
             Sign Up
           </Title>

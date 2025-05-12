@@ -24,6 +24,7 @@ import { fileToBase64 } from "../../utils/image-utils";
 import { useEventContext } from "../../contexts/event-context";
 import InvitationModal from "../invitationModal/invitationModal";
 import { Event, CreateEvent as EventToCreate } from "../../types/event";
+import MainLoader from "../mainLoader/MainLoader";
 
 const CreateEvent: React.FC = () => {
   const navigate = useNavigate();
@@ -82,7 +83,7 @@ const CreateEvent: React.FC = () => {
     }
   };
 
-  const { mutate: mutateEvent } = useMutation<Event, Error, EventToCreate>({
+  const { mutate: mutateEvent, isPending } = useMutation<Event, Error, EventToCreate>({
     mutationFn: async (newEvent) => {
       if (!isEmpty(currentEvent)) {
         return updateEvent(newEvent, currentEvent.id);
@@ -107,6 +108,7 @@ const CreateEvent: React.FC = () => {
       justify={"space-evenly"}
       style={{ marginTop: "16vh" }}
     >
+      <MainLoader isPending={isPending} />
       <form
         onSubmit={form.onSubmit(async (values) => {
           const preview = await getEventPreview(values);
@@ -144,7 +146,6 @@ const CreateEvent: React.FC = () => {
           />
           <Flex justify={"flex-end"}>
             <Button
-              p={0}
               size={"md"}
               radius={"md"}
               mr={"xl"}
@@ -159,16 +160,15 @@ const CreateEvent: React.FC = () => {
                   );
                 }
               }}
-              variant={"transparent"}
+              variant={"light"}
             >
               <Text size={"md"}>Preview</Text>
             </Button>
             <Button
-              p={0}
               size={"md"}
               radius={"md"}
               type={"submit"}
-              variant={"transparent"}
+              variant={"light"}
             >
               <Text size={"md"}>Save</Text>
             </Button>
