@@ -93,7 +93,6 @@ const Invitation: React.FC<{ event: Event; guestId?: string }> = ({
           </Stack>
           <Flex gap={20} justify={"space-between"} mt={20}>
             <Button
-              p={0}
               size={"md"}
               radius={"md"}
               w={"fit-content"}
@@ -103,7 +102,6 @@ const Invitation: React.FC<{ event: Event; guestId?: string }> = ({
               <Text size={"md"}>Accept</Text>
             </Button>
             <Button
-              p={0}
               size={"md"}
               radius={"md"}
               w={"fit-content"}
@@ -113,7 +111,6 @@ const Invitation: React.FC<{ event: Event; guestId?: string }> = ({
               <Text size={"md"}>Not Sure</Text>
             </Button>
             <Button
-              p={0}
               size={"md"}
               radius={"md"}
               w={"fit-content"}
