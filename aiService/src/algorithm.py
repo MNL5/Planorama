@@ -218,7 +218,7 @@ class Algorithm:
     def setSatisfactory(self, guests):
         groupToAmountPerTable, guestToTable, amountPerTable = self.calcHelpers(guests, lambda i, guest: guest.table)
         for guest in guests:
-            if guest.group == "_": continue
+            if guest.group == "_" or guest.table == None: continue
             guest.satisfaction = self.happinesFunc(guest, guest.table, groupToAmountPerTable, guestToTable) / self.maxHappinesFunc(guest)
         return guests
     
