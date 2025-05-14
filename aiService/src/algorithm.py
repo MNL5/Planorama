@@ -42,10 +42,19 @@ class Algorithm:
         for group, amount in self.groupToAmount.items():
             self.isGroupMustSplit[group] = all(amount > table.numOfSeats for table in self.tables)
 
-    def happinesFunc(self, guest, i, groupToAmountPerTable, guestToTable, groupTables, amountPerTable):
-        table = self.seatToTable[i]
-        seatWithMe = groupToAmountPerTable[table][guest.group] - 1
-        score = seatWithMe
+    def maxHappinesFunc(self, guest):
+        score = self.groupToAmount[guest.group] - 1
+
+        if guest.id in self.relations:
+            if RelationType.MUST in self.relations[guest.id]:
+                score += len(self.relations[guest.id][RelationType.MUST]) * 1.5
+            if RelationType.LIKE in self.relations[guest.id]:
+                score += len(self.relations[guest.id][RelationType.LIKE])
+
+        return score
+
+    def happinesFunc(self, guest, table, groupToAmountPerTable, guestToTable):
+        score = groupToAmountPerTable[table][guest.group] - 1
 
         def getNumOf(type):
             return reduce(lambda acc, guestId: acc + (1 if guestToTable[guestId] == table else 0), self.relations[guest.id][type], 0)
@@ -66,18 +75,16 @@ class Algorithm:
 
         return score
     
-    def calcHelpers(self, guests):
+    def calcHelpers(self, guests, seatToTable):
         groupToAmountPerTable = {}
         guestToTable = {}
-        groupTables = {}
-        isGroupSplitHelper = {}
         amountPerTable = {}
 
         for i, guest in enumerate(guests):
             if guest.group == "_":
                 continue
 
-            table = self.seatToTable[i]
+            table = seatToTable(i, guest)
             guestToTable[guest.id] = table
 
             if table not in groupToAmountPerTable:
@@ -90,19 +97,12 @@ class Algorithm:
             if table not in amountPerTable:
                 amountPerTable[table] = 0
             amountPerTable[table] += 1
-
-            if guest.group not in isGroupSplitHelper:
-                isGroupSplitHelper[guest.group] = set()
-            isGroupSplitHelper[guest.group].add(table)
-
-        for group, tables in isGroupSplitHelper.items():
-            groupTables[group] = len(tables)
-
-        return groupToAmountPerTable, guestToTable, groupTables, amountPerTable
+        
+        return groupToAmountPerTable, guestToTable, amountPerTable
 
     def fitness(self, guests):
-        groupToAmountPerTable, guestToTable, groupTables, amountPerTable = self.calcHelpers(guests)
-        score = sum([self.happinesFunc(guest, i, groupToAmountPerTable, guestToTable, groupTables, amountPerTable) for i, guest in enumerate(guests) if guest.group != "_"])
+        groupToAmountPerTable, guestToTable, amountPerTable = self.calcHelpers(guests, lambda i, guest: self.seatToTable[i])
+        score = sum([self.happinesFunc(guest, self.seatToTable[i], groupToAmountPerTable, guestToTable) for i, guest in enumerate(guests) if guest.group != "_"])
 
         std_dev = np.std([amount / self.tableToNumOfSeats[table] for table, amount in amountPerTable.items()])
         score -= std_dev
@@ -196,6 +196,32 @@ class Algorithm:
         contestants = random.sample(list(zip(population, fitnesses)), tournament_size)
         return max(contestants, key=lambda x: x[1])[0]
     
+    def calcGroupTables(self, guests):
+        groupTables = {}
+        isGroupSplitHelper = {}
+
+        for i, guest in enumerate(guests):
+            if guest.group == "_":
+                continue
+
+            table = self.seatToTable[i]
+
+            if guest.group not in isGroupSplitHelper:
+                isGroupSplitHelper[guest.group] = set()
+            isGroupSplitHelper[guest.group].add(table)
+
+        for group, tables in isGroupSplitHelper.items():
+            groupTables[group] = len(tables)
+
+        return groupTables
+    
+    def setSatisfactory(self, guests):
+        groupToAmountPerTable, guestToTable, amountPerTable = self.calcHelpers(guests, lambda i, guest: guest.table)
+        for guest in guests:
+            if guest.group == "_": continue
+            guest.satisfaction = self.happinesFunc(guest, guest.table, groupToAmountPerTable, guestToTable) / self.maxHappinesFunc(guest)
+        return guests
+    
     def solve(self, pop_size=100, elite_rate=0.1, mutation_rate=0.01, generations=100):
         population = self.create_population(pop_size)
         elite_size = round(pop_size * elite_rate)
@@ -213,7 +239,7 @@ class Algorithm:
                 best_fitness = currBest
                 best_individual = currBestIndividual
                 
-                groupToAmountPerTable, guestToTable, groupTables, amountPerTable = self.calcHelpers(best_individual)
+                groupTables = self.calcGroupTables(best_individual)
                 if all(tables == 1 or self.isGroupMustSplit[group] for group, tables in groupTables.items()):
                     break
 
@@ -232,4 +258,4 @@ class Algorithm:
 
             population = next_gen
 
-        return self.setTables(best_individual), best_fitness
+        return self.setSatisfactory(self.setTables(best_individual)), best_fitness
