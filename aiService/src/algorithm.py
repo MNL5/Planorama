@@ -109,40 +109,6 @@ class Algorithm:
 
         return  score
 
-    def sortGuests(self, guests, isReverse = False):
-        numOfPrevSeats = 0
-        result = []
-        for table in self.tables:
-            tableList = sorted(guests[numOfPrevSeats:numOfPrevSeats + table.numOfSeats], key=lambda x: x.group)
-            if isReverse: tableList.reverse()
-            numOfPrevSeats += table.numOfSeats
-            for guest in tableList:
-                result.append(guest)
-
-        return result
-
-    def createFirstArrangement(self, guests):
-        individual = [None] * len(guests)
-        shuffledGuests = guests.copy()
-        random.shuffle(shuffledGuests)
-        withoutTableGuests = []
-        for guest in shuffledGuests:
-            if guest.table is None:
-                withoutTableGuests.append(guest)
-                continue
-            for i in range(len(individual)):
-                if individual[i] is None and self.seatToTable[i] == guest.table:
-                    individual[i] = guest
-                    break
-
-        for guest in withoutTableGuests:
-            for i in range(len(individual)):
-                if individual[i] is None:
-                    individual[i] = guest
-                    break
-
-        return individual
-
     def create_population(self, pop_size):
         population = []
         for i in range(pop_size):
