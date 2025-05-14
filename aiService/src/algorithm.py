@@ -205,11 +205,8 @@ class Algorithm:
         for generation in range(generations):
             fitnesses = [self.fitness(individual) for individual in population]
             fitnessSortedIndexes = np.argsort(fitnesses)
-            elites = [population[idx] for idx in fitnessSortedIndexes[-elite_size:]]
 
             currBest = fitnesses[fitnessSortedIndexes[-1]]
-            if (generation % 10 == 0):
-                print(currBest)
             currBestIndividual = population[fitnessSortedIndexes[-1]]
 
             if currBest > best_fitness:
@@ -218,21 +215,20 @@ class Algorithm:
                 
                 groupToAmountPerTable, guestToTable, groupTables, amountPerTable = self.calcHelpers(best_individual)
                 if all(tables == 1 or self.isGroupMustSplit[group] for group, tables in groupTables.items()):
-                    print(generation)
                     break
 
             if generations - 1 == generation:
                 break
 
+            elites = [population[idx] for idx in fitnessSortedIndexes[-elite_size:]]
             next_gen = elites.copy()
             while len(next_gen) < pop_size:
-                parent1 = self.selection(population, fitnesses, tournament_size=3)
-                parent2 = self.selection(population, fitnesses, tournament_size=3)
+                parent1 = self.selection(population, fitnesses)
+                parent2 = self.selection(population, fitnesses)
                 
                 child1, child2 = self.crossover(parent1, parent2)
 
                 next_gen.append(self.mutate(child1, mutation_rate))
-                next_gen.append(self.mutate(child2, mutation_rate))
 
             population = next_gen
 
