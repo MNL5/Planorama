@@ -83,10 +83,9 @@ function CustomTable<T extends { id: string }>({
   }, [filterableColumns, selectedField]);
 
   const searchedData = useMemo(
-    () =>
+    () => isEmpty(searchableColumns) ? data :
       data.filter(
         (row) =>
-          isEmpty(searchableColumns) ||
           searchableColumns.some((col) => {
             const cellValue = row[col.key];
             return (
@@ -299,7 +298,7 @@ function CustomTable<T extends { id: string }>({
           </Table.Thead>
 
           <Table.Tbody>
-            {!isEmpty(searchedData) ? (
+            {isEmpty(searchableColumns) || !isEmpty(searchedData) ? (
               searchedData.map((row) => (
                 <Table.Tr key={row.id} bg={"gray.0"}>
                   {columns.map((col) => (
