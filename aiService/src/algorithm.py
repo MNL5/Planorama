@@ -64,22 +64,6 @@ class Algorithm:
                 withMustNot = getNumOf(RelationType.MUST_NOT)
                 score -= withMustNot * 5
 
-        # notSeatingWithPrecent = ((self.groupToAmount[guest.group] - 1) - seatWithMe) / (self.groupToAmount[guest.group] - 1)
-        # groupSizeFactor = self.maxGroupSize / self.groupToAmount[guest.group]
-        # score -= notSeatingWithPrecent * groupSizeFactor * 5
-
-        # if '_' in groupToAmountPerTable[table] and groupToAmountPerTable[table]['_'] >= amountPerTable[table]:
-        #     score -= groupToAmountPerTable[table]['_'] * 0.3 / amountPerTable[table]
-
-        # if groupToAmountPerTable[table][guest.group] == 1:
-        #     score -= 15
-
-        # if groupToAmountPerTable[table][guest.group] == self.tableToNumOfSeats[table] or groupTables[guest.group] == 1:
-        #     score += 10 / self.groupToAmount[guest.group]
-
-        # if groupTables[guest.group] > 1 and not self.isGroupMustSplit[guest.group]:
-        #     score -= groupTables[guest.group] * 2 / self.groupToAmount[guest.group]
-
         return score
     
     def calcHelpers(self, guests):
@@ -118,7 +102,12 @@ class Algorithm:
 
     def fitness(self, guests):
         groupToAmountPerTable, guestToTable, groupTables, amountPerTable = self.calcHelpers(guests)
-        return sum([self.happinesFunc(guest, i, groupToAmountPerTable, guestToTable, groupTables, amountPerTable) for i, guest in enumerate(guests) if guest.group != "_"])
+        score = sum([self.happinesFunc(guest, i, groupToAmountPerTable, guestToTable, groupTables, amountPerTable) for i, guest in enumerate(guests) if guest.group != "_"])
+
+        std_dev = np.std([amount / self.tableToNumOfSeats[table] for table, amount in amountPerTable.items()])
+        score -= std_dev
+
+        return  score
 
     def sortGuests(self, guests, isReverse = False):
         numOfPrevSeats = 0
@@ -198,7 +187,10 @@ class Algorithm:
     
         return guests
 
-    def crossover(self, parent1, parent2):
+    def crossover(self, parent1, parent2, crossover_rate=1):
+        if random.random() >= crossover_rate:
+            return parent1, parent2
+
         child1 = [None] * len(parent1)
         child2 = [None] * len(parent1)
         chlid1Set = set()
@@ -234,16 +226,13 @@ class Algorithm:
                 individual[i], individual[j] = individual[j], individual[i]
         return individual
     
-    def selection(self, population, fitnesses, elite_size, tournament_size=3):
-        selected = []
-        for _ in range(len(population) - elite_size):
-            tournament = random.sample(list(zip(population, fitnesses)), tournament_size)
-            winner = max(tournament, key=lambda x: x[1])[0]
-            selected.append(winner)
-        return selected
+    def selection(self, population, fitnesses, tournament_size=3):
+        contestants = random.sample(list(zip(population, fitnesses)), tournament_size)
+        return max(contestants, key=lambda x: x[1])[0]
     
-    def solve(self, pop_size=100, elite_size=10, mutation_rate=0.01, generations=100):
+    def solve(self, pop_size=100, elite_rate=0.1, mutation_rate=0.01, generations=100):
         population = self.create_population(pop_size)
+        elite_size = round(pop_size * elite_rate)
         best_fitness = 0
         best_individual = None
 
@@ -253,6 +242,8 @@ class Algorithm:
             elites = [population[idx] for idx in fitnessSortedIndexes[-elite_size:]]
 
             currBest = fitnesses[fitnessSortedIndexes[-1]]
+            if (generation % 10 == 0):
+                print(currBest)
             currBestIndividual = population[fitnessSortedIndexes[-1]]
 
             if currBest > best_fitness:
@@ -261,18 +252,17 @@ class Algorithm:
                 
                 groupToAmountPerTable, guestToTable, groupTables, amountPerTable = self.calcHelpers(best_individual)
                 if all(tables == 1 or self.isGroupMustSplit[group] for group, tables in groupTables.items()):
+                    print(generation)
                     break
 
             if generations - 1 == generation:
                 break
 
-            population = self.selection(population, fitnesses, elite_size, tournament_size=3)
-
             next_gen = elites.copy()
-            for i in range(0, len(population), 2):
-                parent1 = population[i]
-                parent2 = population[i + 1]
-
+            while len(next_gen) < pop_size:
+                parent1 = self.selection(population, fitnesses, tournament_size=3)
+                parent2 = self.selection(population, fitnesses, tournament_size=3)
+                
                 child1, child2 = self.crossover(parent1, parent2)
 
                 next_gen.append(self.mutate(child1, mutation_rate))

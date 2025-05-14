@@ -52,7 +52,7 @@ def create_app(test_config=None):
             guests.append(Guest(i, "_"))
 
         algorithm = Algorithm(guests, tables, relations)
-        result, best_fitness = algorithm.solve(generations=500, pop_size=200, elite_size=20, mutation_rate=0.01)
+        result, best_fitness = algorithm.solve(generations=1000, pop_size=200, elite_rate=0.05, mutation_rate=0.01)
 
         response = {
             "guests": [guest.to_dict() for guest in result if guest.group != "_"],
