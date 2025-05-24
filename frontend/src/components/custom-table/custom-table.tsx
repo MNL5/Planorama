@@ -20,7 +20,7 @@ import {
   IconSearch,
   IconFilter,
 } from "@tabler/icons-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { isEmpty, uniq } from "lodash";
 import { useDisclosure } from "@mantine/hooks";
 
@@ -35,6 +35,7 @@ interface CustomTableProps<T> {
   createRow?: (row: T) => Promise<T>;
   updateRow?: (row: T) => Promise<T>;
   deleteRow?: (id: string) => Promise<T>;
+  onDragStart?: (e: React.DragEvent<HTMLDivElement>, guestId: string) => void;
 }
 
 function CustomTable<T extends { id: string }>({
@@ -43,12 +44,15 @@ function CustomTable<T extends { id: string }>({
   createRow,
   updateRow,
   deleteRow,
+  onDragStart,
 }: CustomTableProps<T>) {
   const [opened, { open, close }] = useDisclosure();
   const [data, setData] = useState<T[]>(initialData);
   const [editRowId, setEditRowId] = useState<string | null>(null);
   const [editFormData, setEditFormData] = useState<Partial<T>>({});
   const [searchQuery, setSearchQuery] = useState<string>("");
+
+  useEffect(() => setData(initialData), [initialData]);
 
   const [
     filterModalOpened,
@@ -296,14 +300,19 @@ function CustomTable<T extends { id: string }>({
               {columns.map((col) => (
                 <Table.Th key={String(col.key)}>{col.label}</Table.Th>
               ))}
-              <Table.Th />
+              {updateRow && <Table.Th />}
             </Table.Tr>
           </Table.Thead>
 
           <Table.Tbody>
             {isEmpty(searchableColumns) || !isEmpty(searchedData)
               ? searchedData.map((row) => (
-                  <Table.Tr key={row.id} bg={"gray.0"}>
+                  <Table.Tr
+                    key={row.id}
+                    bg={"gray.0"}
+                    draggable
+                    onDragStart={(e) => onDragStart && onDragStart(e, row.id)}
+                  >
                     {columns.map((col) => (
                       <Table.Td
                         key={String(col.key)}

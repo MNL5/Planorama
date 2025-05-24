@@ -1,6 +1,6 @@
 import { useMemo } from "react";
+import { Box } from "@mui/material";
 import { Title } from "@mantine/core";
-import { Box, Stack } from "@mui/material";
 
 import { Guest } from "../../types/guest";
 import { CustomTable } from "../custom-table/custom-table";
@@ -16,24 +16,20 @@ const GuestSeatingList: React.FC<GuestListProps> = ({
   onDragStart,
 }) => {
   const guestsTable = useMemo(
-    () => <CustomTable<Guest> data={guests} columns={seatingGuestColumns} />,
-    [guests]
+    () => (
+      <CustomTable<Guest>
+        data={guests}
+        columns={seatingGuestColumns}
+        onDragStart={onDragStart}
+      />
+    ),
+    [guests, onDragStart]
   );
+
   return (
-    <Box style={{ width: 240, padding: 16, borderRight: "1px solid #ddd" }}>
+    <Box style={{ width: 300, padding: 16, borderRight: "1px solid #ddd" }}>
       <Title order={4}>Guests</Title>
-      <Stack spacing="xs">
-        {guestsTable}
-        {guests.map((guest) => (
-          <Box
-            key={guest.id}
-            draggable
-            onDragStart={(e) => onDragStart(e, guest.id)}
-          >
-            {guest.name}
-          </Box>
-        ))}
-      </Stack>
+      {guestsTable}
     </Box>
   );
 };
