@@ -129,12 +129,12 @@ const TableArrangement = () => {
       </Box>
 
       <Stack
-        w={340}
+        w={240}
         p={"lg"}
         ta={"center"}
         align={"center"}
-        bg={"primary.0"}
         justify={"space-between"}
+        bg={"linear-gradient(to right, #e9dbf1, #e6c8fa)"}
       >
         <div style={{ padding: 16 }}>
           <Title order={2} c={"primary"} py={"lg"}>
@@ -157,10 +157,9 @@ const TableArrangement = () => {
         </div>
 
         <Button
-          w={200}
-          fz={"16px"}
+          size={"md"}
           radius={"md"}
-          color={"green"}
+          variant={"light"}
           onClick={handleSave}
         >
           Save

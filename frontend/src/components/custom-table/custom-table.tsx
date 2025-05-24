@@ -36,6 +36,7 @@ interface CustomTableProps<T> {
   updateRow?: (row: T) => Promise<T>;
   deleteRow?: (id: string) => Promise<T>;
   onDragStart?: (e: React.DragEvent<HTMLDivElement>, guestId: string) => void;
+  rowStyle?: React.CSSProperties;
 }
 
 function CustomTable<T extends { id: string }>({
@@ -45,6 +46,7 @@ function CustomTable<T extends { id: string }>({
   updateRow,
   deleteRow,
   onDragStart,
+  rowStyle = {},
 }: CustomTableProps<T>) {
   const [opened, { open, close }] = useDisclosure();
   const [data, setData] = useState<T[]>(initialData);
@@ -318,6 +320,7 @@ function CustomTable<T extends { id: string }>({
                     bg={"gray.0"}
                     draggable
                     onDragStart={(e) => onDragStart && onDragStart(e, row.id)}
+                    style={rowStyle}
                   >
                     {columns.map((col) => (
                       <Table.Td

@@ -1,6 +1,6 @@
 import { toast } from "react-toastify";
 import { useQuery } from "@tanstack/react-query";
-import { Flex, Button, Box, Text, Stack } from "@mantine/core";
+import { Flex, Button, Box, Text, Stack, Title } from "@mantine/core";
 import React, { useEffect, useState, useTransition } from "react";
 import { useEventContext } from "../../contexts/event-context";
 import {
@@ -9,10 +9,11 @@ import {
 } from "../../services/guest-service/guest-service";
 import ElementType from "../../types/Element";
 import { Guest } from "../../types/guest";
-import GuestSeatingList from "../guest-seating-list/guest-seating-list";
 import GuestTable from "../guest-table/guest-table";
 import MainLoader from "../mainLoader/MainLoader";
 import { RsvpStatus } from "../../types/rsvp-status";
+import { CustomTable } from "../custom-table/custom-table";
+import { seatingGuestColumns } from "../../utils/seating-guest-columns";
 
 const GuestSeating: React.FC = () => {
   const { currentEvent } = useEventContext();
@@ -83,21 +84,26 @@ const GuestSeating: React.FC = () => {
   if (isError) return <Text>Error loading guests</Text>;
 
   return (
-    <Flex bg={"primary.0"} flex={"1 1"} onClick={() => setOpenTableId(null)}>
+    <Flex bg={"primary.0"} flex={"1 1"} style={{overflow: "hidden"}} onClick={() => setOpenTableId(null)}>
       <MainLoader isPending={isPending} />
-      <Stack p={"lg"} align={"center"} justify={"space-between"}>
-        <GuestSeatingList
-          guests={guests.filter(
-            (guest) => !guest.tableId && guest.status === RsvpStatus.ACCEPTED,
+      <Stack p={"lg"} align={"center"} bg={"linear-gradient(to right, #e9dbf1, #e6c8fa)"}>
+        <Title order={2} py={"lg"} c={"primary"}>
+                Guests
+        </Title>
+        <CustomTable<Guest>
+          data={guests.filter(
+            (guest) => !guest.tableId && guest.status !== RsvpStatus.DECLINE,
           )}
+          columns={seatingGuestColumns}
           onDragStart={handleGuestDragStart}
+          rowStyle={{ cursor: "pointer" }}
         />
         <Button
-          w={200}
-          fz={"16px"}
+          size={"md"}
           radius={"md"}
-          color={"green"}
+          variant={"light"}
           onClick={handleSave}
+          mt={"auto"}
         >
           Save Seating
         </Button>
