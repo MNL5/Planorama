@@ -54,7 +54,13 @@ const SignIn = () => {
               className="auth-input"
               {...form.getInputProps("password")}
             />
-            <Button type="submit" fullWidth mt="md" className="auth-button">
+            <Button
+              fullWidth
+              mt={"md"}
+              radius={"md"}
+              type={"submit"}
+              className="auth-button"
+            >
               Sign In
             </Button>
           </form>

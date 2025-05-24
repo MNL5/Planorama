@@ -1,7 +1,7 @@
-import { Box, Button, Text } from "@mantine/core";
-import { useQuery } from "@tanstack/react-query";
-import React, { useEffect, useState, useTransition } from "react";
 import { toast } from "react-toastify";
+import { useQuery } from "@tanstack/react-query";
+import { Box, Button, Text, Stack } from "@mantine/core";
+import React, { useEffect, useState, useTransition } from "react";
 import { useEventContext } from "../../contexts/event-context";
 import {
   getAllGuests,
@@ -88,23 +88,17 @@ const GuestSeating: React.FC = () => {
       onClick={() => setOpenTableId(null)}
     >
       <MainLoader isPending={isPending} />
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-between",
-        }}
-      >
+      <Stack p={"lg"} align={"center"} justify={"space-between"}>
         <GuestSeatingList
           guests={guests.filter(
             (guest) => !guest.tableId && guest.status === RsvpStatus.ACCEPTED
           )}
           onDragStart={handleGuestDragStart}
         />
-        <Button fullWidth mt="md" onClick={handleSave} color="green">
+        <Button w={200} radius={"md"} onClick={handleSave} color={"green"}>
           Save Seating
         </Button>
-      </div>
+      </Stack>
       <Box style={{ flex: 1, position: "relative", background: "#fff" }}>
         {tables.map((table) => (
           <GuestTable

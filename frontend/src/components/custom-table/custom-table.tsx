@@ -277,10 +277,10 @@ function CustomTable<T extends { id: string }>({
             />
           </Flex>
           <Group align={"center"} justify={"flex-end"} mt={"lg"}>
-            <Button variant={"outline"} onClick={handleClearFilter}>
+            <Button variant={"outline"} radius={"md"} onClick={handleClearFilter}>
               Clear Filter
             </Button>
-            <Button onClick={handleApplyFilter}>Apply Filter</Button>
+            <Button radius={"md"} onClick={handleApplyFilter}>Apply Filter</Button>
           </Group>
         </Modal>
       )}

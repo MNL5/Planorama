@@ -121,10 +121,10 @@ function AddRowModal<T>({
           </div>
         ))}
         <Group justify={"flex-end"} mt={"md"}>
-          <Button onClick={onClose} variant="outline">
+          <Button onClick={onClose} variant={"outline"} radius={"md"}>
             Cancel
           </Button>
-          <Button onClick={handleSubmit}>Add</Button>
+          <Button onClick={handleSubmit} radius={"md"}>Add</Button>
         </Group>
       </form>
     </Modal>

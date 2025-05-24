@@ -40,7 +40,7 @@ const EventList: React.FC = () => {
   };
 
   const searchedEvents = eventsList?.filter((eventItem) =>
-    eventItem.name.toLowerCase().includes(searchQuery.toLowerCase()),
+    eventItem.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -105,10 +105,10 @@ const EventList: React.FC = () => {
                 </Text>
 
                 <Button
-                  color="primary"
+                  mt={"md"}
                   fullWidth
-                  mt="md"
-                  radius="md"
+                  radius={"md"}
+                  color="primary"
                   onClick={() => handleSelectEvent(eventItem)}
                 >
                   Select Event

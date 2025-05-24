@@ -67,12 +67,12 @@ const Preferences: React.FC = () => {
             value: guest.id,
           }))
         : [],
-    [guests],
+    [guests]
   );
 
   const selectedGuestId = useMemo(() => {
     const selectedOption = completeGuestOptionList.find(
-      (guest) => guest.label === selectedGuest,
+      (guest) => guest.label === selectedGuest
     );
 
     return selectedOption?.value ?? "";
@@ -80,7 +80,7 @@ const Preferences: React.FC = () => {
 
   const secondSelectedGuestId = useMemo(() => {
     const selectedOption = completeGuestOptionList.find(
-      (guest) => guest.label === secondSelectedGuest,
+      (guest) => guest.label === secondSelectedGuest
     );
 
     return selectedOption?.value ?? "";
@@ -89,17 +89,17 @@ const Preferences: React.FC = () => {
   const guestOptionList: OptionType[] = useMemo(
     () =>
       completeGuestOptionList.filter(
-        (option) => option.value !== secondSelectedGuestId,
+        (option) => option.value !== secondSelectedGuestId
       ),
-    [completeGuestOptionList, secondSelectedGuestId],
+    [completeGuestOptionList, secondSelectedGuestId]
   );
 
   const secondGuestOptionList = useMemo(
     () =>
       completeGuestOptionList.filter(
-        (option) => option.value !== selectedGuestId,
+        (option) => option.value !== selectedGuestId
       ),
-    [completeGuestOptionList, selectedGuestId],
+    [completeGuestOptionList, selectedGuestId]
   );
 
   const {
@@ -121,7 +121,7 @@ const Preferences: React.FC = () => {
         (relation.firstGuestId === selectedGuestId &&
           relation.secondGuestId === secondSelectedGuestId) ||
         (relation.firstGuestId === secondSelectedGuestId &&
-          relation.secondGuestId === selectedGuestId),
+          relation.secondGuestId === selectedGuestId)
     );
   }, [selectedGuestId, secondSelectedGuestId, relationsData]);
 
@@ -177,7 +177,7 @@ const Preferences: React.FC = () => {
         updateRelation(
           currentEvent?.id as string,
           updatedRelation,
-          updatedRelation.id,
+          updatedRelation.id
         ),
       onSuccess: () => {
         toast.success("Preference updated successfully");
@@ -236,7 +236,7 @@ const Preferences: React.FC = () => {
               onOptionSubmit={(preference) => {
                 setSelectedPreference(preference);
                 const selectedOption = preferenceOptions.find(
-                  (option) => option.label === preference,
+                  (option) => option.label === preference
                 );
                 setSelectedRelation(selectedOption?.value);
                 combobox.closeDropdown();
@@ -274,7 +274,7 @@ const Preferences: React.FC = () => {
           />
         </Flex>
         <Group mt={"md"}>
-          <Button onClick={reset} variant={"outline"}>
+          <Button radius={"md"} onClick={reset} variant={"outline"}>
             Clear
           </Button>
           <Tooltip
@@ -282,12 +282,13 @@ const Preferences: React.FC = () => {
               isEmptyField
                 ? "Please select both guests and a preference"
                 : isGuestRelationExist
-                  ? "Preference for these guests already exists"
-                  : null
+                ? "Preference for these guests already exists"
+                : null
             }
             disabled={!isEmptyField && !isGuestRelationExist}
           >
             <Button
+              radius={"md"}
               onClick={onAdd}
               disabled={isEmptyField || isGuestRelationExist}
             >
