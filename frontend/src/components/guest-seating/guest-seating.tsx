@@ -84,11 +84,20 @@ const GuestSeating: React.FC = () => {
   if (isError) return <Text>Error loading guests</Text>;
 
   return (
-    <Flex bg={"primary.0"} flex={"1 1"} style={{overflow: "hidden"}} onClick={() => setOpenTableId(null)}>
+    <Flex
+      bg={"primary.0"}
+      flex={"1 1"}
+      style={{ overflow: "hidden" }}
+      onClick={() => setOpenTableId(null)}
+    >
       <MainLoader isPending={isPending} />
-      <Stack p={"lg"} align={"center"} bg={"linear-gradient(to right, #e9dbf1, #e6c8fa)"}>
+      <Stack
+        p={"lg"}
+        align={"center"}
+        bg={"linear-gradient(to right, #e9dbf1, #e6c8fa)"}
+      >
         <Title order={2} py={"lg"} c={"primary"}>
-                Guests
+          Guests
         </Title>
         <CustomTable<Guest>
           data={guests.filter(
