@@ -6,7 +6,7 @@ interface Column<T> {
   label: string;
   isEdit: boolean;
   isMulti: boolean;
-  isNullable: boolean;
+  isNullable?: boolean;
   footer?: (value: T[]) => string;
   values?: OptionType[];
   validationFunction?: (value: unknown) => boolean;

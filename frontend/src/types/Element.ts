@@ -7,7 +7,7 @@ interface Element {
   x: number;
   y: number;
   color: string;
-  seatCount: number;
+  seatCount: string | number;
   ids: string[];
 }
 
