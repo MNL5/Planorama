@@ -1,6 +1,6 @@
 import { toast } from "react-toastify";
 import { useQuery } from "@tanstack/react-query";
-import { Box, Button, Text, Stack } from "@mantine/core";
+import { Flex, Button, Box, Text, Stack } from "@mantine/core";
 import React, { useEffect, useState, useTransition } from "react";
 import { useEventContext } from "../../contexts/event-context";
 import {
@@ -83,10 +83,7 @@ const GuestSeating: React.FC = () => {
   if (isError) return <Text>Error loading guests</Text>;
 
   return (
-    <Box
-      style={{ display: "flex", flex: "1 1" }}
-      onClick={() => setOpenTableId(null)}
-    >
+    <Flex bg={"primary.0"} flex={"1 1"} onClick={() => setOpenTableId(null)}>
       <MainLoader isPending={isPending} />
       <Stack p={"lg"} align={"center"} justify={"space-between"}>
         <GuestSeatingList
@@ -105,7 +102,7 @@ const GuestSeating: React.FC = () => {
           Save Seating
         </Button>
       </Stack>
-      <Box style={{ flex: 1, position: "relative", background: "#fff" }}>
+      <Box flex={1} pos={"relative"} bg={"#fff"}>
         {tables.map((table) => (
           <GuestTable
             key={table.id}
@@ -119,7 +116,7 @@ const GuestSeating: React.FC = () => {
           />
         ))}
       </Box>
-    </Box>
+    </Flex>
   );
 };
 

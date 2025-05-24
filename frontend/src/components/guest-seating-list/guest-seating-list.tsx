@@ -26,11 +26,7 @@ const GuestSeatingList: React.FC<GuestListProps> = ({
   );
 
   return (
-    <Stack
-      align={"center"}
-      justify={"center"}
-      style={{ width: 300, padding: 16, borderRight: "1px solid #ddd" }}
-    >
+    <Stack p={16} w={300} align={"center"} justify={"center"}>
       <Title order={2} py={"lg"} c={"primary"}>
         Guests
       </Title>
