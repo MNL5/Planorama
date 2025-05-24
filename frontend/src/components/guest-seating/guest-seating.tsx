@@ -12,6 +12,7 @@ import { Guest } from "../../types/guest";
 import GuestSeatingList from "../guest-seating-list/guest-seating-list";
 import GuestTable from "../guest-table/guest-table";
 import MainLoader from "../mainLoader/MainLoader";
+import { RsvpStatus } from "../../types/rsvp-status";
 
 const GuestSeating: React.FC = () => {
   const { currentEvent } = useEventContext();
@@ -42,13 +43,13 @@ const GuestSeating: React.FC = () => {
 
   const handleDrop = (tableId: string, guestId: string) => {
     setGuests((prev) =>
-      prev.map((g) => (g.id === guestId ? { ...g, tableId } : g)),
+      prev.map((g) => (g.id === guestId ? { ...g, tableId } : g))
     );
   };
 
   const handleRemove = (guestId: string) => {
     setGuests((prev) =>
-      prev.map((g) => (g.id === guestId ? { ...g, tableId: undefined } : g)),
+      prev.map((g) => (g.id === guestId ? { ...g, tableId: undefined } : g))
     );
   };
 
@@ -73,7 +74,7 @@ const GuestSeating: React.FC = () => {
 
   const handleGuestDragStart = (
     e: React.DragEvent<HTMLDivElement>,
-    id: string,
+    id: string
   ) => {
     e.dataTransfer.setData("guestId", id);
   };
@@ -95,7 +96,9 @@ const GuestSeating: React.FC = () => {
         }}
       >
         <GuestSeatingList
-          guests={guests.filter((g) => !g.tableId)}
+          guests={guests.filter(
+            (guest) => !guest.tableId && guest.status === RsvpStatus.ACCEPTED
+          )}
           onDragStart={handleGuestDragStart}
         />
         <Button fullWidth mt="md" onClick={handleSave} color="green">

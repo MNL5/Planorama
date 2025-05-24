@@ -1,6 +1,5 @@
 import { useMemo } from "react";
-import { Box } from "@mui/material";
-import { Title } from "@mantine/core";
+import { Stack, Title } from "@mantine/core";
 
 import { Guest } from "../../types/guest";
 import { CustomTable } from "../custom-table/custom-table";
@@ -27,10 +26,12 @@ const GuestSeatingList: React.FC<GuestListProps> = ({
   );
 
   return (
-    <Box style={{ width: 300, padding: 16, borderRight: "1px solid #ddd" }}>
-      <Title order={4}>Guests</Title>
+    <Stack align={'center'} justify={'center'} style={{ width: 300, padding: 16, borderRight: "1px solid #ddd" }}>
+      <Title order={2} py={"lg"} c={"primary"}>
+        Guests
+      </Title>
       {guestsTable}
-    </Box>
+    </Stack>
   );
 };
 
