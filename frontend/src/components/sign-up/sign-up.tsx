@@ -60,7 +60,13 @@ const SignUp = () => {
               className="auth-input"
               {...form.getInputProps("confirmPassword")}
             />
-            <Button type="submit" fullWidth mt="md" className="auth-button">
+            <Button
+              mt={"md"}
+              fullWidth
+              radius={"md"}
+              type={"submit"}
+              className={"auth-button"}
+            >
               Sign Up
             </Button>
           </form>

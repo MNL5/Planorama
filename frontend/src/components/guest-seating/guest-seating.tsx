@@ -1,7 +1,7 @@
-import { Box, Button, Text } from "@mantine/core";
-import { useQuery } from "@tanstack/react-query";
-import React, { useEffect, useState, useTransition } from "react";
 import { toast } from "react-toastify";
+import { useQuery } from "@tanstack/react-query";
+import { Flex, Button, Box, Text, Stack, Title } from "@mantine/core";
+import React, { useEffect, useState, useTransition } from "react";
 import { useEventContext } from "../../contexts/event-context";
 import {
   getAllGuests,
@@ -9,9 +9,11 @@ import {
 } from "../../services/guest-service/guest-service";
 import ElementType from "../../types/Element";
 import { Guest } from "../../types/guest";
-import GuestSeatingList from "../guest-seating-list/guest-seating-list";
 import GuestTable from "../guest-table/guest-table";
 import MainLoader from "../mainLoader/MainLoader";
+import { RsvpStatus } from "../../types/rsvp-status";
+import { CustomTable } from "../custom-table/custom-table";
+import { seatingGuestColumns } from "../../utils/seating-guest-columns";
 
 const GuestSeating: React.FC = () => {
   const { currentEvent } = useEventContext();
@@ -82,27 +84,40 @@ const GuestSeating: React.FC = () => {
   if (isError) return <Text>Error loading guests</Text>;
 
   return (
-    <Box
-      style={{ display: "flex", flex: "1 1" }}
+    <Flex
+      bg={"primary.0"}
+      flex={"1 1"}
+      style={{ overflow: "hidden" }}
       onClick={() => setOpenTableId(null)}
     >
       <MainLoader isPending={isPending} />
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-between",
-        }}
+      <Stack
+        p={"lg"}
+        align={"center"}
+        bg={"linear-gradient(to right, #e9dbf1, #e6c8fa)"}
       >
-        <GuestSeatingList
-          guests={guests.filter((g) => !g.tableId)}
+        <Title order={2} py={"lg"} c={"primary"}>
+          Guests
+        </Title>
+        <CustomTable<Guest>
+          data={guests.filter(
+            (guest) => !guest.tableId && guest.status !== RsvpStatus.DECLINE,
+          )}
+          columns={seatingGuestColumns}
           onDragStart={handleGuestDragStart}
+          rowStyle={{ cursor: "pointer" }}
         />
-        <Button fullWidth mt="md" onClick={handleSave} color="green">
+        <Button
+          size={"md"}
+          radius={"md"}
+          variant={"light"}
+          onClick={handleSave}
+          mt={"auto"}
+        >
           Save Seating
         </Button>
-      </div>
-      <Box style={{ flex: 1, position: "relative", background: "#fff" }}>
+      </Stack>
+      <Box flex={1} pos={"relative"} bg={"#fff"}>
         {tables.map((table) => (
           <GuestTable
             key={table.id}
@@ -116,7 +131,7 @@ const GuestSeating: React.FC = () => {
           />
         ))}
       </Box>
-    </Box>
+    </Flex>
   );
 };
 

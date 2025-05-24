@@ -56,6 +56,7 @@ const RndElement = ({
         color="#951818"
         h={"20px"}
         p={"5px"}
+        radius={"md"}
         style={{
           position: "absolute",
           top: "5px",

@@ -1,7 +1,15 @@
 import { v4 as uuidv4 } from "uuid";
 import { toast } from "react-toastify";
 import { useEffect, useRef, useState, useTransition } from "react";
-import { Box, Button, Drawer, NumberInput, Text } from "@mantine/core";
+import {
+  Flex,
+  Box,
+  Button,
+  Stack,
+  Drawer,
+  NumberInput,
+  Title,
+} from "@mantine/core";
 
 import Element from "../../types/Element";
 import RndElement from "../RndElement/RndElement";
@@ -100,16 +108,14 @@ const TableArrangement = () => {
   }, []);
 
   return (
-    <Box style={{ display: "flex", direction: "rtl", flex: "1 1" }}>
+    <Flex style={{ direction: "rtl", flex: "1 1" }}>
       <MainLoader isPending={isPending} />
       <Box
+        flex={1}
+        bg={"#fff"}
         ref={canvasRef}
-        style={{
-          flex: 1,
-          position: "relative",
-          backgroundColor: "#fff",
-          border: "1px solid rgb(230, 229, 229)",
-        }}
+        pos={"relative"}
+        bd={"1px solid rgb(230, 229, 229)"}
       >
         {elements.map((el, index) => (
           <RndElement
@@ -122,19 +128,18 @@ const TableArrangement = () => {
         ))}
       </Box>
 
-      <Box
-        style={{
-          padding: "1.5rem",
-          backgroundColor: "#f8f8f8",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          textAlign: "center",
-          justifyContent: "space-between",
-        }}
+      <Stack
+        w={240}
+        p={"lg"}
+        ta={"center"}
+        align={"center"}
+        justify={"space-between"}
+        bg={"linear-gradient(to right, #e9dbf1, #e6c8fa)"}
       >
-        <div>
-          <Text fw={700}>Menu</Text>
+        <div style={{ padding: 16 }}>
+          <Title order={2} c={"primary"} py={"lg"}>
+            Menu
+          </Title>
           {elementTypes.map((el) => (
             <Button
               key={el.type}
@@ -152,14 +157,14 @@ const TableArrangement = () => {
         </div>
 
         <Button
-          className="primary-btn"
-          style={{ fontSize: "14px" }}
-          fullWidth
+          size={"md"}
+          radius={"md"}
+          variant={"light"}
           onClick={handleSave}
         >
           Save
         </Button>
-      </Box>
+      </Stack>
 
       <Drawer
         opened={drawerOpened}
@@ -175,11 +180,17 @@ const TableArrangement = () => {
             min={1}
           />
         )}
-        <Button color="#6a0572" fullWidth mt="md" onClick={addElement}>
+        <Button
+          mt={"md"}
+          fullWidth
+          radius={"md"}
+          color={"#6a0572"}
+          onClick={addElement}
+        >
           Add
         </Button>
       </Drawer>
-    </Box>
+    </Flex>
   );
 };
 

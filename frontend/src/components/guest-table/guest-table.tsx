@@ -34,7 +34,7 @@ const GuestTable: React.FC<GuestTableProps> = ({
   onDrop,
   onRemove,
 }) => {
-  const isFull = assignedGuests.length >= table.seatCount;
+  const isFull = assignedGuests.length >= Number(table.seatCount);
 
   return (
     <Popover
@@ -111,9 +111,10 @@ const GuestTable: React.FC<GuestTableProps> = ({
                     {g.name}
                   </Box>
                   <Button
-                    size="xs"
-                    variant="outline"
-                    color="red"
+                    size={"xs"}
+                    color={"red"}
+                    radius={"md"}
+                    variant={"outline"}
                     onClick={() => onRemove(g.id)}
                   >
                     Remove
