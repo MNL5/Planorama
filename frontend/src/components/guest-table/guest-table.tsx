@@ -21,7 +21,7 @@ interface GuestTableProps {
   isOpen: boolean;
   onOpen: (id: string) => void;
   onClose: () => void;
-  onDrop: (tableId: string, guestId: string) => void;
+  onDrop: (tableId: string, ids: string[]) => void;
   onRemove: (guestId: string) => void;
 }
 
@@ -60,9 +60,9 @@ const GuestTable: React.FC<GuestTableProps> = ({
           }}
           onDrop={(e) => {
             e.preventDefault();
-            const guestId = e.dataTransfer.getData("guestId");
-            if (isFull) toast.error("Table is full");
-            else onDrop(table.id, guestId);
+            const ids = JSON.parse(e.dataTransfer.getData("ids"));
+            if (ids.length + assignedGuests.length > Number(table.seatCount)) toast.error("Table has not enough seats");
+            else onDrop(table.id, ids);
           }}
           onDragOver={(e) => e.preventDefault()}
           style={{
