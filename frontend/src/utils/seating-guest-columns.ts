@@ -19,14 +19,6 @@ const seatingGuestColumns: Column<Guest>[] = [
     isFilterable: true,
     filterOperators: [FilterOperator.EQUALS, FilterOperator.NOT_EQUALS],
   },
-  {
-    key: "tableId",
-    label: "Table Number",
-    isEdit: false,
-    isMulti: false,
-    isFilterable: true,
-    filterOperators: [FilterOperator.EQUALS, FilterOperator.NOT_EQUALS],
-  },
 ];
 
 export { seatingGuestColumns };
