@@ -22,9 +22,13 @@ const GuestSeating: React.FC = () => {
   const [openTableId, setOpenTableId] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
-  const geustsToShow = useMemo(() => guests.filter(
-            (guest) => !guest.tableId && guest.status !== RsvpStatus.DECLINE,
-          ), [guests]);
+  const geustsToShow = useMemo(
+    () =>
+      guests.filter(
+        (guest) => !guest.tableId && guest.status !== RsvpStatus.DECLINE,
+      ),
+    [guests],
+  );
 
   const {
     data: guestsData = [],

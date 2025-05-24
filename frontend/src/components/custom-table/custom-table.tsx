@@ -59,7 +59,7 @@ function CustomTable<T extends { id: string }>({
   const lastId = useRef<string>(null);
 
   useEffect(() => {
-    setData(initialData)
+    setData(initialData);
     if (selectedIds.size > 0) {
       const dataIds = new Set(initialData.map((row) => row.id));
       const newSelectedIds = new Set(
@@ -248,7 +248,7 @@ function CustomTable<T extends { id: string }>({
         onDragStart(e, [id]);
       }
     }
-  }
+  };
 
   return (
     <Paper

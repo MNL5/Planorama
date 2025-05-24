@@ -61,7 +61,8 @@ const GuestTable: React.FC<GuestTableProps> = ({
           onDrop={(e) => {
             e.preventDefault();
             const ids = JSON.parse(e.dataTransfer.getData("ids"));
-            if (ids.length + assignedGuests.length > Number(table.seatCount)) toast.error("Table has not enough seats");
+            if (ids.length + assignedGuests.length > Number(table.seatCount))
+              toast.error("Table has not enough seats");
             else onDrop(table.id, ids);
           }}
           onDragOver={(e) => e.preventDefault()}
