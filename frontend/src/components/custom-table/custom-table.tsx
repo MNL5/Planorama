@@ -72,7 +72,7 @@ function CustomTable<T extends { id: string }>({
         value: col.key as string,
         label: col.label,
       })),
-    [filterableColumns]
+    [filterableColumns],
   );
 
   const operatorOptions = useMemo(() => {
@@ -99,9 +99,9 @@ function CustomTable<T extends { id: string }>({
                   .toLowerCase()
                   .includes(searchQuery.toLowerCase())
               );
-            })
+            }),
           ),
-    [data, searchQuery, searchableColumns]
+    [data, searchQuery, searchableColumns],
   );
 
   const valuesOptions = useMemo(() => {
@@ -112,9 +112,9 @@ function CustomTable<T extends { id: string }>({
         (value) => ({
           value: String(value),
           label: String(
-            value ? (column.alt ? column.alt[String(value)] : value) : ""
+            value ? (column.alt ? column.alt[String(value)] : value) : "",
           ),
-        })
+        }),
       );
     }
   }, [selectedField, searchedData, filterableColumns]);
@@ -126,7 +126,7 @@ function CustomTable<T extends { id: string }>({
 
         return FilterOperatorFunctions[selectedOperator](
           cellValue,
-          selectedValue
+          selectedValue,
         );
       });
       setData(filteredData);
@@ -172,7 +172,7 @@ function CustomTable<T extends { id: string }>({
       } as T);
 
       setData((prev: T[]) =>
-        prev.map((row: T) => (row.id === updatedRow.id ? updatedRow : row))
+        prev.map((row: T) => (row.id === updatedRow.id ? updatedRow : row)),
       );
       setEditRowId(null);
       setEditFormData({});
@@ -277,10 +277,16 @@ function CustomTable<T extends { id: string }>({
             />
           </Flex>
           <Group align={"center"} justify={"flex-end"} mt={"lg"}>
-            <Button variant={"outline"} radius={"md"} onClick={handleClearFilter}>
+            <Button
+              variant={"outline"}
+              radius={"md"}
+              onClick={handleClearFilter}
+            >
               Clear Filter
             </Button>
-            <Button radius={"md"} onClick={handleApplyFilter}>Apply Filter</Button>
+            <Button radius={"md"} onClick={handleApplyFilter}>
+              Apply Filter
+            </Button>
           </Group>
         </Modal>
       )}
@@ -327,7 +333,7 @@ function CustomTable<T extends { id: string }>({
                               onChange={(e) =>
                                 handleInputChange(
                                   col.key,
-                                  e.currentTarget.value
+                                  e.currentTarget.value,
                                 )
                               }
                             />
@@ -379,16 +385,16 @@ function CustomTable<T extends { id: string }>({
                             />
                           )
                         ) : col.isMulti ? (
-                          (row[col.key] as string[])
+                          ((row[col.key] as string[])
                             ?.map((val) => (col.alt ? col.alt[val] : val))
-                            .join(", ") ?? ""
+                            .join(", ") ?? "")
                         ) : (
                           String(
                             row[col.key]
                               ? col.alt
                                 ? col.alt[String(row[col.key] as string)]
                                 : row[col.key]
-                              : ""
+                              : "",
                           )
                         )}
                       </Table.Td>

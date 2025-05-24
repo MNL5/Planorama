@@ -124,7 +124,9 @@ function AddRowModal<T>({
           <Button onClick={onClose} variant={"outline"} radius={"md"}>
             Cancel
           </Button>
-          <Button onClick={handleSubmit} radius={"md"}>Add</Button>
+          <Button onClick={handleSubmit} radius={"md"}>
+            Add
+          </Button>
         </Group>
       </form>
     </Modal>

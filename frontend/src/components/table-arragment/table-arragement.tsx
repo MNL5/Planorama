@@ -29,7 +29,7 @@ const TableArrangement = () => {
   const [drawerOpened, setDrawerOpened] = useState(false);
   const [seatCount, setSeatCount] = useState<number | string>(1);
   const [selectedType, setSelectedType] = useState<Element["type"] | null>(
-    null
+    null,
   );
   const { currentEvent, setCurrentEvent } = useEventContext();
   const [isPending, startTransition] = useTransition();
@@ -60,7 +60,7 @@ const TableArrangement = () => {
 
   const updateElement = (updated: Element) => {
     setElements((prev) =>
-      prev.map((el) => (el.id === updated.id ? updated : el))
+      prev.map((el) => (el.id === updated.id ? updated : el)),
     );
   };
 
@@ -75,8 +75,8 @@ const TableArrangement = () => {
           setCurrentEvent(
             await updateEvent(
               { ...currentEvent, diagram: { elements } },
-              currentEvent.id
-            )
+              currentEvent.id,
+            ),
           );
           toast.success("Seating arrangement saved");
         } else {

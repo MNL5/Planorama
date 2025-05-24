@@ -22,7 +22,7 @@ const GuestSeatingList: React.FC<GuestListProps> = ({
         onDragStart={onDragStart}
       />
     ),
-    [guests, onDragStart]
+    [guests, onDragStart],
   );
 
   return (
