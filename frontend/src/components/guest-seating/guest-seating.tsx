@@ -95,7 +95,13 @@ const GuestSeating: React.FC = () => {
           )}
           onDragStart={handleGuestDragStart}
         />
-        <Button w={200} radius={"md"} onClick={handleSave} color={"green"}>
+        <Button
+          w={200}
+          fz={"16px"}
+          radius={"md"}
+          color={"green"}
+          onClick={handleSave}
+        >
           Save Seating
         </Button>
       </Stack>
