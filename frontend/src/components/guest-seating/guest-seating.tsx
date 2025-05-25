@@ -133,8 +133,11 @@ const GuestSeating: React.FC = () => {
           Save Seating
         </Button>
       </Stack>
-      <Box flex={1} pos={"relative"} style={{ backgroundImage: `url(${gridCanvas})` }}
->
+      <Box
+        flex={1}
+        pos={"relative"}
+        style={{ backgroundImage: `url(${gridCanvas})` }}
+      >
         {elements
           .filter((element) => element.elementType === "table")
           .map((table) => (
