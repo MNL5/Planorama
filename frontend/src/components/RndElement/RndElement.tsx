@@ -30,6 +30,7 @@ const RndElement = ({
             })
         }
         style={{
+            border: '1px dashed #ccc',
             backgroundColor: element.color,
             borderRadius: element.type === 'circle' ? '50%' : '8px',
             display: 'flex',
