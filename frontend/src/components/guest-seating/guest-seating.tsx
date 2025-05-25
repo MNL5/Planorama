@@ -22,7 +22,7 @@ const GuestSeating: React.FC = () => {
   const [openTableId, setOpenTableId] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
-  const geustsToShow = useMemo(
+  const guestsToShow = useMemo(
     () =>
       guests.filter(
         (guest) => !guest.tableId && guest.status !== RsvpStatus.DECLINE,
@@ -109,7 +109,7 @@ const GuestSeating: React.FC = () => {
           Guests
         </Title>
         <CustomTable<Guest>
-          data={geustsToShow}
+          data={guestsToShow}
           columns={seatingGuestColumns}
           onDragStart={handleGuestDragStart}
           rowStyle={{ cursor: "pointer" }}
