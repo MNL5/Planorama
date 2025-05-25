@@ -34,7 +34,10 @@ const TableArrangement = () => {
     );
     const { currentEvent, setCurrentEvent } = useEventContext();
     const [isPending, startTransition] = useTransition();
-
+    const [editDrawerOpened, setEditDrawerOpened] = useState(false);
+    const [selectedElement, setSelectedElement] = useState<Element | null>(
+        null
+    );
     const addElement = () => {
         if (!canvasRef.current || !selectedType) return;
 
@@ -127,6 +130,10 @@ const TableArrangement = () => {
                         tableNumber={index + 1}
                         onUpdate={updateElement}
                         onDelete={deleteElement}
+                        onEdit={() => {
+                            setSelectedElement(el);
+                            setEditDrawerOpened(true); //todo: when meging my PR fix this to only tables
+                        }}
                     />
                 ))}
             </Box>
@@ -192,6 +199,50 @@ const TableArrangement = () => {
                 >
                     Add
                 </Button>
+            </Drawer>
+
+            <Drawer
+                opened={editDrawerOpened}
+                onClose={() => {
+                    setEditDrawerOpened(false);
+                    setSelectedElement(null);
+                }}
+                title="Edit Table"
+                position="left"
+            >
+                {selectedElement && (
+                    <>
+                        <NumberInput
+                            label="No. of Seats"
+                            value={selectedElement.seatCount}
+                            onChange={(value) => {
+                                if (selectedElement) {
+                                    setSelectedElement({
+                                        ...selectedElement,
+                                        seatCount: value || 1,
+                                        label: `(${value})`,
+                                    });
+                                }
+                            }}
+                            min={1}
+                        />
+                        <Button
+                            mt={'md'}
+                            fullWidth
+                            radius={'md'}
+                            color={'#6a0572'}
+                            onClick={() => {
+                                if (selectedElement) {
+                                    updateElement(selectedElement);
+                                    setEditDrawerOpened(false);
+                                    setSelectedElement(null);
+                                }
+                            }}
+                        >
+                            Save
+                        </Button>
+                    </>
+                )}
             </Drawer>
         </Flex>
     );
