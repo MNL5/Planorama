@@ -1,7 +1,7 @@
 import { toast } from "react-toastify";
 import { useQuery } from "@tanstack/react-query";
 import { Flex, Button, Box, Text, Stack, Title } from "@mantine/core";
-import React, { useEffect, useState, useTransition } from "react";
+import React, { useEffect, useMemo, useState, useTransition } from "react";
 import { useEventContext } from "../../contexts/event-context";
 import {
   getAllGuests,
@@ -21,6 +21,14 @@ const GuestSeating: React.FC = () => {
   const [guests, setGuests] = useState<Guest[]>([]);
   const [openTableId, setOpenTableId] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+
+  const guestsToShow = useMemo(
+    () =>
+      guests.filter(
+        (guest) => !guest.tableId && guest.status !== RsvpStatus.DECLINE,
+      ),
+    [guests],
+  );
 
   const {
     data: guestsData = [],
@@ -42,9 +50,10 @@ const GuestSeating: React.FC = () => {
     setGuests(guestsData);
   }, [guestsData]);
 
-  const handleDrop = (tableId: string, guestId: string) => {
+  const handleDrop = (tableId: string, ids: string[]) => {
+    const idsSet = new Set(ids);
     setGuests((prev) =>
-      prev.map((g) => (g.id === guestId ? { ...g, tableId } : g)),
+      prev.map((g) => (idsSet.has(g.id) ? { ...g, tableId } : g)),
     );
   };
 
@@ -77,9 +86,9 @@ const GuestSeating: React.FC = () => {
 
   const handleGuestDragStart = (
     e: React.DragEvent<HTMLDivElement>,
-    id: string,
+    ids: string[],
   ) => {
-    e.dataTransfer.setData("guestId", id);
+    e.dataTransfer.setData("ids", JSON.stringify(ids));
   };
 
   if (isLoading) return <MainLoader isPending />;
@@ -102,12 +111,11 @@ const GuestSeating: React.FC = () => {
           Guests
         </Title>
         <CustomTable<Guest>
-          data={guests.filter(
-            (guest) => !guest.tableId && guest.status !== RsvpStatus.DECLINE,
-          )}
+          data={guestsToShow}
           columns={seatingGuestColumns}
           onDragStart={handleGuestDragStart}
           rowStyle={{ cursor: "pointer" }}
+          selectable
         />
         <Button
           size={"md"}
