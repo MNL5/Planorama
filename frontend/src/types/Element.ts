@@ -9,7 +9,6 @@ interface Element {
     y: number;
     color: string;
     seatCount?: string | number;
-    ids?: string[];
 }
 
 export default Element;

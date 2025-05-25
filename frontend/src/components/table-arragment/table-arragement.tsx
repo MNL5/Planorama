@@ -65,9 +65,7 @@ const TableArrangement = () => {
             y: centerY,
             color: selectedType.elementType === 'table' ? '#d0b9e0' : '#e9dbf1',
             elementType: selectedType.elementType,
-            ...(selectedType.elementType === 'table'
-                ? { seatCount, ids: [] }
-                : {}),
+            ...(selectedType.elementType === 'table' ? { seatCount } : {}),
         };
 
         setElements((prev) => [...prev, newElement]);
