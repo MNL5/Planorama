@@ -18,7 +18,6 @@ import { useEventContext } from '../../contexts/event-context';
 import { updateEvent } from '../../services/event-service/event-service';
 import MainLoader from '../mainLoader/MainLoader';
 
-// Element type definitions
 const ELEMENT_TYPES = [
     { type: 'square', label: 'Square Table', elementType: 'table' },
     { type: 'rectangle', label: 'Rectangle Table', elementType: 'table' },
@@ -42,7 +41,6 @@ const TableArrangement = () => {
     const { currentEvent, setCurrentEvent } = useEventContext();
     const [isPending, startTransition] = useTransition();
 
-    // Add new element to canvas
     const handleAddElement = () => {
         if (!canvasRef.current || !selectedType) return;
 
