@@ -145,14 +145,15 @@ const TableArrangement = () => {
             </Box>
 
             <Stack
-                w={240}
+                w={200}
+                color="white"
                 p="lg"
                 align="center"
                 justify="space-between"
                 bg="linear-gradient(to right, #e9dbf1, #e6c8fa)"
             >
-                <div style={{ padding: 16 }}>
-                    <Title order={2} color="primary" py="lg">
+                <div style={{ padding: 16, textAlign: 'center' }}>
+                    <Title order={2} py={'lg'} c={'primary'}>
                         Menu
                     </Title>
                     {ELEMENT_TYPES.map(({ type, elementType, label }, i) => (
@@ -160,7 +161,7 @@ const TableArrangement = () => {
                             key={i}
                             fullWidth
                             className="primary-btn"
-                            style={{ fontSize: 14 }}
+                            style={{ fontSize: 12, fontWeight: 'lighter' }}
                             onClick={() => {
                                 setSelectedType({ type, elementType });
                                 setDrawerOpened(true);
