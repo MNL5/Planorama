@@ -32,7 +32,7 @@ public class EventNotifierTask implements Runnable {
     @Override
     public void run() {
         final OffsetDateTime now = OffsetDateTime.now();
-        eventAPI.getEventBetweenDates(now, now.plusDays(1))
+        Flux.fromIterable(eventAPI.getEventBetweenDates(now, now.plusDays(1)))
                 .filter(event -> Objects.nonNull(event.diagram()))
                 .flatMap(event -> {
                     final AtomicInteger index = new AtomicInteger(1);
@@ -42,16 +42,16 @@ public class EventNotifierTask implements Runnable {
                             .collect(Collectors.toMap(
                                     DiagramTableDTO::id,
                                     table -> index.getAndIncrement()));
-                    return guestAPI.getAllGuestsByEventIDAndRsvpStatus(event.id().toString(), Set.of(RSVPStatusDTO.ACCEPTED))
+                    return Flux.fromIterable(guestAPI.getAllGuestsByEventIDAndRsvpStatus(event.id().toString(), Set.of(RSVPStatusDTO.ACCEPTED)))
                             .doOnNext(guest -> messagingUtil.sendReminder(event, guest, tablesNumberMap.getOrDefault(guest.tableId(), 0)));
                 })
                 .subscribe();
         final OffsetDateTime weekFromNow = now.plusWeeks(1);
         OffsetDateTime monthFromNow = now.plusMonths(1);
-        Flux.merge(eventAPI.getEventBetweenDates(weekFromNow, weekFromNow.plusDays(1)),
-                        eventAPI.getEventBetweenDates(monthFromNow, monthFromNow.plusDays(1)))
+        Flux.merge(Flux.fromIterable(eventAPI.getEventBetweenDates(weekFromNow, weekFromNow.plusDays(1))),
+                        Flux.fromIterable(eventAPI.getEventBetweenDates(monthFromNow, monthFromNow.plusDays(1))))
                 .flatMap(event ->
-                        guestAPI.getAllGuestsByEventIDAndRsvpStatus(event.id().toString(), Set.of(RSVPStatusDTO.TENTATIVE, RSVPStatusDTO.ACCEPTED))
+                        Flux.fromIterable(guestAPI.getAllGuestsByEventIDAndRsvpStatus(event.id().toString(), Set.of(RSVPStatusDTO.TENTATIVE, RSVPStatusDTO.ACCEPTED)))
                                 .doOnNext(guest -> messagingUtil.sendInvitation(event, guest)))
                 .subscribe();
     }

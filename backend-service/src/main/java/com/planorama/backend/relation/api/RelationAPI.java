@@ -1,7 +1,9 @@
 package com.planorama.backend.relation.api;
 
-import reactor.core.publisher.Flux;
+import com.planorama.backend.common.EventEntityAPI;
 
-public interface RelationAPI {
-    Flux<RelationDTO> getAllRelationsByEventID(String eventId);
+import java.util.List;
+
+public interface RelationAPI extends EventEntityAPI<RelationDTO> {
+    List<RelationDTO> getAllRelationsByEventID(String eventId);
 }

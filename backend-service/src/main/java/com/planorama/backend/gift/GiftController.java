@@ -3,9 +3,10 @@ package com.planorama.backend.gift;
 import com.planorama.backend.gift.api.GiftDTO;
 import com.planorama.backend.gift.api.UpsertGiftDTO;
 import com.planorama.backend.gift.mapper.GiftMapper;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("gifts")
@@ -20,14 +21,18 @@ public class GiftController {
     }
 
     @GetMapping
-    public Flux<GiftDTO> getGiftsByEventId(@RequestParam("event") String eventID) {
+    @PreAuthorize("hasAuthority(#eventID)")
+    public List<GiftDTO> getGiftsByEventId(@RequestParam("event") String eventID) {
         return giftService.findGiftByEventID(eventID)
-                .map(giftMapper::daoToDTO);
+                .map(giftMapper::daoToDTO)
+                .collectList()
+                .block();
     }
 
     @PostMapping
-    public Mono<GiftDTO> upsertGift(@RequestBody UpsertGiftDTO upsertGiftDTO) {
+    public GiftDTO upsertGift(@RequestBody UpsertGiftDTO upsertGiftDTO) {
         return giftService.upsertGift(upsertGiftDTO)
-                .map(giftMapper::daoToDTO);
+                .map(giftMapper::daoToDTO)
+                .block();
     }
 }

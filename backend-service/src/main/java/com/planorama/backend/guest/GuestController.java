@@ -1,17 +1,19 @@
 package com.planorama.backend.guest;
 
+import com.planorama.backend.common.EventEntityAPI;
 import com.planorama.backend.guest.api.*;
 import com.planorama.backend.guest.mapper.GuestMapper;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-@RestController
+@RestController("guests")
 @RequestMapping("guests")
-public class GuestController implements GuestAPI {
+public class GuestController implements GuestAPI, EventEntityAPI<GuestDTO> {
     private final GuestService guestService;
     private final GuestMapper guestMapper;
 
@@ -21,55 +23,80 @@ public class GuestController implements GuestAPI {
     }
 
     @GetMapping("/{guestId}")
+    @PreAuthorize("@securityUtils.canAccessEntity('guests', #guestId, authentication)")
+    public GuestDTO getGuest(@PathVariable("guestId") UUID guestId) {
+        return findById(guestId);
+    }
+
     @Override
-    public Mono<GuestDTO> getGuest(@PathVariable("guestId") UUID guestId) {
-        return guestService.getGuest(guestId)
-                .map(guestMapper::daoToDTO);
+    public GuestDTO findById(UUID id) {
+        return guestService.getGuest(id)
+                .map(guestMapper::daoToDTO)
+                .block();
     }
 
     @GetMapping
-    public Flux<GuestDTO> getAllGuestByEventID(@RequestParam("event") String eventId) {
+    @Override
+    @PreAuthorize("hasAuthority(#eventId)")
+    public List<GuestDTO> getAllGuestByEventID(@RequestParam("event") String eventId) {
         return guestService.findAllByEventId(eventId)
-                .map(guestMapper::daoToDTO);
+                .map(guestMapper::daoToDTO)
+                .collectList()
+                .block();
     }
 
     @GetMapping("/byTable")
-    public Flux<GuestDTO> getAllGuestByEventIdAndTableId(@RequestParam("event") String eventId,
+    @PreAuthorize("hasAuthority(#eventId)")
+    public List<GuestDTO> getAllGuestByEventIdAndTableId(@RequestParam("event") String eventId,
                                                          @RequestParam("table") String tableId) {
         return guestService.findAllByEventIdAndTableId(eventId, tableId)
-                .map(guestMapper::daoToDTO);
+                .map(guestMapper::daoToDTO)
+                .collectList()
+                .block();
     }
 
     @Override
-    public Flux<GuestDTO> getAllGuestsByEventIDAndRsvpStatus(String eventId, Set<RSVPStatusDTO> rsvpStatus) {
+    public List<GuestDTO> getAllGuestsByEventIDAndRsvpStatus(String eventId, Set<RSVPStatusDTO> rsvpStatus) {
         return guestService.findAllByEventIdAndRsvpStatus(eventId, rsvpStatus)
-                .map(guestMapper::daoToDTO);
+                .map(guestMapper::daoToDTO)
+                .collectList()
+                .block();
     }
 
     @PostMapping
-    public Mono<GuestDTO> createGuest(@RequestBody CreateGuestDTO createGuestDTO) {
+    @PreAuthorize("hasAuthority(#createGuestDTO.eventId)")
+    public GuestDTO createGuest(@RequestBody CreateGuestDTO createGuestDTO) {
         return guestService.createGuest(createGuestDTO)
-                .map(guestMapper::daoToDTO);
+                .map(guestMapper::daoToDTO)
+                .block();
     }
 
     @PutMapping
-    public Mono<String> updateGuests(@RequestBody GuestsUpdateDTO guestsUpdateDTO) {
+    @PreAuthorize("hasAuthority(#guestsUpdateDTO.eventId)")
+    public String updateGuests(@RequestBody GuestsUpdateDTO guestsUpdateDTO) {
         return guestService.updateGuests(guestsUpdateDTO)
                 .filter(result -> result.getModifiedCount() != guestsUpdateDTO.guests().size())
                 .map(result -> String.format("Updated %d guests", result.getModifiedCount()))
-                .switchIfEmpty(Mono.error(new RuntimeException(String.format("Failed to update %d guests", guestsUpdateDTO.guests().size()))));
+                .switchIfEmpty(Mono.error(new RuntimeException(String.format("Failed to update %d guests", guestsUpdateDTO.guests().size()))))
+                .block();
     }
 
     @PutMapping("/{guestId}")
-    public Mono<GuestDTO> updateGuest(@RequestBody UpdateGuestDTO updateGuestDTO,
-                                      @PathVariable("guestId") UUID guestId) {
+    @PreAuthorize("@securityUtils.canAccessEntity('guests', #guestId, authentication)")
+    public GuestDTO updateGuest(@RequestBody UpdateGuestDTO updateGuestDTO,
+                                @PathVariable("guestId") UUID guestId) {
         return guestService.updateGuest(updateGuestDTO, guestId)
-                .map(guestMapper::daoToDTO);
+                .map(guestMapper::daoToDTO)
+                .block();
     }
 
+    // TODO: add API for update just meal and rsvp status
+
     @DeleteMapping("/{guestId}")
-    public Mono<GuestDTO> deleteGuest(@PathVariable("guestId") UUID guestId) {
+    @PreAuthorize("@securityUtils.canAccessEntity('guests', #guestId, authentication)")
+    public GuestDTO deleteGuest(@PathVariable("guestId") UUID guestId) {
         return guestService.deleteGuest(guestId)
-                .map(guestMapper::daoToDTO);
+                .map(guestMapper::daoToDTO)
+                .block();
     }
 }
