@@ -20,7 +20,7 @@ import {
   IconSearch,
   IconFilter,
 } from "@tabler/icons-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { isEmpty, uniq } from "lodash";
 import { useDisclosure } from "@mantine/hooks";
 
@@ -35,8 +35,9 @@ interface CustomTableProps<T> {
   createRow?: (row: T) => Promise<T>;
   updateRow?: (row: T) => Promise<T>;
   deleteRow?: (id: string) => Promise<T>;
-  onDragStart?: (e: React.DragEvent<HTMLDivElement>, guestId: string) => void;
+  onDragStart?: (e: React.DragEvent<HTMLDivElement>, ids: string[]) => void;
   rowStyle?: React.CSSProperties;
+  selectable?: boolean;
 }
 
 function CustomTable<T extends { id: string }>({
@@ -47,14 +48,26 @@ function CustomTable<T extends { id: string }>({
   deleteRow,
   onDragStart,
   rowStyle = {},
+  selectable = false,
 }: CustomTableProps<T>) {
   const [opened, { open, close }] = useDisclosure();
   const [data, setData] = useState<T[]>(initialData);
   const [editRowId, setEditRowId] = useState<string | null>(null);
   const [editFormData, setEditFormData] = useState<Partial<T>>({});
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const lastId = useRef<string>(null);
 
-  useEffect(() => setData(initialData), [initialData]);
+  useEffect(() => {
+    setData(initialData);
+    if (selectedIds.size > 0) {
+      const dataIds = new Set(initialData.map((row) => row.id));
+      const newSelectedIds = new Set(
+        Array.from(selectedIds).filter((id) => dataIds.has(id)),
+      );
+      setSelectedIds(newSelectedIds);
+    }
+  }, [initialData]);
 
   const [
     filterModalOpened,
@@ -191,6 +204,52 @@ function CustomTable<T extends { id: string }>({
     setSearchQuery(event.target.value);
   };
 
+  const handleRowSelect = (e: React.MouseEvent, index: number, id: string) => {
+    const newSelectedIds = new Set(selectedIds);
+
+    if (e.shiftKey) {
+      let lastIndex = searchedData.findIndex(
+        (row) => row.id === lastId.current,
+      );
+      if (lastIndex === -1) lastIndex = 0;
+
+      if (!e.ctrlKey && !e.metaKey) {
+        newSelectedIds.clear();
+      }
+
+      const start = Math.min(lastIndex, index);
+      const end = Math.max(lastIndex, index);
+      for (let i = start; i <= end; i++) {
+        newSelectedIds.add(searchedData[i].id);
+      }
+    } else if (e.ctrlKey || e.metaKey) {
+      if (!newSelectedIds.delete(id)) {
+        newSelectedIds.add(id);
+      }
+      lastId.current = id;
+    } else {
+      newSelectedIds.clear();
+      newSelectedIds.add(id);
+      lastId.current = id;
+    }
+
+    setSelectedIds(newSelectedIds);
+  };
+
+  const handleRowDragStart = (
+    e: React.DragEvent<HTMLDivElement>,
+    id: string,
+  ) => {
+    if (onDragStart) {
+      if (selectedIds.has(id)) {
+        onDragStart(e, [...selectedIds]);
+      } else {
+        setSelectedIds(new Set([id]));
+        onDragStart(e, [id]);
+      }
+    }
+  };
+
   return (
     <Paper
       mah={"100%"}
@@ -314,13 +373,18 @@ function CustomTable<T extends { id: string }>({
 
           <Table.Tbody>
             {isEmpty(searchableColumns) || !isEmpty(searchedData)
-              ? searchedData.map((row) => (
+              ? searchedData.map((row, index) => (
                   <Table.Tr
                     key={row.id}
-                    bg={"gray.0"}
-                    draggable
-                    onDragStart={(e) => onDragStart && onDragStart(e, row.id)}
+                    bg={selectedIds.has(row.id) ? "#e6c8fa" : "gray.0"}
+                    draggable={!!onDragStart}
+                    onDragStart={(e) => handleRowDragStart(e, row.id)}
                     style={rowStyle}
+                    onClick={(e) => {
+                      if (selectable) {
+                        handleRowSelect(e, index, row.id);
+                      }
+                    }}
                   >
                     {columns.map((col) => (
                       <Table.Td
