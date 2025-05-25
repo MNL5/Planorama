@@ -7,7 +7,7 @@ import {
   getAllGuests,
   updateGuests,
 } from "../../services/guest-service/guest-service";
-import ElementType from "../../types/Element";
+import Element from "../../types/Element";
 import { Guest } from "../../types/guest";
 import GuestTable from "../guest-table/guest-table";
 import MainLoader from "../mainLoader/MainLoader";
@@ -17,7 +17,7 @@ import { seatingGuestColumns } from "../../utils/seating-guest-columns";
 
 const GuestSeating: React.FC = () => {
   const { currentEvent } = useEventContext();
-  const [tables, setTables] = useState<ElementType[]>([]);
+  const [tables, setTables] = useState<Element[]>([]);
   const [guests, setGuests] = useState<Guest[]>([]);
   const [openTableId, setOpenTableId] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
