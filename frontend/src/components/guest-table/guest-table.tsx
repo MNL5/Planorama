@@ -67,6 +67,7 @@ const GuestTable: React.FC<GuestTableProps> = ({
           }}
           onDragOver={(e) => e.preventDefault()}
           style={{
+            border: "1px dashed #ccc",
             position: "absolute",
             top: table.y,
             left: table.x,

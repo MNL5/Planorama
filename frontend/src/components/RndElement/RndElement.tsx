@@ -33,13 +33,13 @@ const RndElement = ({
       })
     }
     style={{
+      border: "1px dashed #ccc",
       backgroundColor: element.color,
       borderRadius: element.type === "circle" ? "50%" : "8px",
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
       color: "#000",
-      fontWeight: "bold",
       cursor: "move",
       position: "absolute",
       boxShadow: "rgb(0 0 0 / 16%) 0px 4px 16px",
@@ -53,7 +53,7 @@ const RndElement = ({
       }}
     >
       <span style={{ fontSize: "1.3rem" }}>{tableNumber}</span>
-      <span>{`(${element.seatCount})`}</span>
+      <span>{element.label}</span>
       <Button
         size="xs"
         color="#951818"
