@@ -33,9 +33,7 @@ const TableArrangement = () => {
     const canvasRef = useRef<HTMLDivElement>(null);
     const [elements, setElements] = useState<Element[]>([]);
     const [drawerOpened, setDrawerOpened] = useState(false);
-    const [seatCount, setSeatCount] = useState<number | string>(
-        INITIAL_SEAT_COUNT
-    );
+    const [seatCount, setSeatCount] = useState<number>(INITIAL_SEAT_COUNT);
     const [textLabel, setTextLabel] = useState('');
     const [selectedType, setSelectedType] = useState<{
         type: Element['type'];
@@ -195,7 +193,7 @@ const TableArrangement = () => {
                         label="Number of Seats"
                         min={1}
                         value={seatCount}
-                        onChange={setSeatCount}
+                        onChange={(value) => setSeatCount(Number(value))}
                     />
                 ) : (
                     <TextInput

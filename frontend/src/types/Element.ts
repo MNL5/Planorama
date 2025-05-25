@@ -8,7 +8,7 @@ interface Element {
     x: number;
     y: number;
     color: string;
-    seatCount?: string | number;
+    seatCount?: number;
 }
 
 export default Element;
