@@ -126,11 +126,25 @@ const TableArrangement = () => {
         bg="#fff"
         bd={"1px solid rgb(230, 229, 229)"}
       >
-        {elements.map((el, i) => (
+        {elements
+          .filter((ele) => ele.seatCount)
+          .map((el, i) => (
           <RndElement
             key={el.id}
             element={el}
             tableNumber={i + 1}
+            onUpdate={handleUpdate}
+            onDelete={handleDelete}
+            onEdit={() => {
+              setSelectedElement(el);
+              setEditDrawerOpened(true);
+            }}
+          />
+        ))}
+        {elements.filter((ele) => !ele.seatCount).map((el, i) => (
+          <RndElement
+            key={el.id}
+            element={el}
             onUpdate={handleUpdate}
             onDelete={handleDelete}
             onEdit={() => {

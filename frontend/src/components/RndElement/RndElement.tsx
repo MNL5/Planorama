@@ -4,7 +4,7 @@ import Element from "../../types/Element";
 
 interface RndElementProps {
   element: Element;
-  tableNumber: number;
+  tableNumber?: number;
   onUpdate: (updated: Element) => void;
   onDelete: (id: string) => void;
   onEdit: () => void;
@@ -52,7 +52,9 @@ const RndElement = ({
         alignItems: "center",
       }}
     >
-      <span style={{ fontSize: "1.3rem" }}>{tableNumber}</span>
+      {tableNumber !== undefined && (
+        <span style={{ fontSize: "1.3rem" }}>{tableNumber}</span>
+      )}
       <span>{element.label}</span>
       <Button
         size="xs"
