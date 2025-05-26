@@ -45,7 +45,7 @@ public class SecurityConfiguration {
         return http
                 .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
-                .securityMatcher("/users/**")
+                .securityMatcher("/users/**", "/guests/rsvp/**")
                 .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
                 .build();
     }

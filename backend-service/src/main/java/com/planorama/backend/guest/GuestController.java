@@ -90,7 +90,13 @@ public class GuestController implements GuestAPI, EventEntityAPI<GuestDTO> {
                 .block();
     }
 
-    // TODO: add API for update just meal and rsvp status
+    @PutMapping("/rsvp/{guestId}")
+    public GuestDTO updateGuestRSVP(@RequestBody UpdateRsvpGuestDTO updateRsvpGuestDTO,
+                                    @PathVariable("guestId") UUID guestId) {
+        return guestService.updateGuest(guestMapper.extendUpdate(updateRsvpGuestDTO), guestId)
+                .map(guestMapper::daoToDTO)
+                .block();
+    }
 
     @DeleteMapping("/{guestId}")
     @PreAuthorize("@securityUtils.canAccessEntity('guests', #guestId, authentication)")
