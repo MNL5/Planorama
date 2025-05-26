@@ -83,19 +83,20 @@ function CustomTable<T extends { id: string }>({
   }, [filterableColumns, selectedField]);
 
   const searchedData = useMemo(
-    () => isEmpty(searchableColumns) ? data :
-      data.filter(
-        (row) =>
-          searchableColumns.some((col) => {
-            const cellValue = row[col.key];
-            return (
-              cellValue &&
-              String(cellValue)
-                .toLowerCase()
-                .includes(searchQuery.toLowerCase())
-            );
-          }),
-      ),
+    () =>
+      isEmpty(searchableColumns)
+        ? data
+        : data.filter((row) =>
+            searchableColumns.some((col) => {
+              const cellValue = row[col.key];
+              return (
+                cellValue &&
+                String(cellValue)
+                  .toLowerCase()
+                  .includes(searchQuery.toLowerCase())
+              );
+            }),
+          ),
     [data, searchQuery, searchableColumns],
   );
 
