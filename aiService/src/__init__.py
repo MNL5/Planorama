@@ -27,8 +27,7 @@ def create_app(test_config=None):
     except OSError:
         pass
 
-    @app.route('/seating', methods = ['POST'])
-    def calculate():
+    def parse(request):
         data = request.get_json()
         if not data:
             return jsonify({"error": "No data provided"}), 400
@@ -51,12 +50,27 @@ def create_app(test_config=None):
         for i in range(numOfSeats - len(guests)):
             guests.append(Guest(i, "_"))
 
-        algorithm = Algorithm(guests, tables, relations)
-        result = algorithm.solve(guests, generations=500, pop_size=200, elite_size=20)
+        return Algorithm(guests, tables, relations)
+
+    @app.route('/seating', methods = ['POST'])
+    def calculate():
+        algorithm = parse(request)
+        result, best_fitness = algorithm.solve(generations=1000, pop_size=200, elite_rate=0.05, mutation_rate=0.01)
 
         response = {
             "guests": [guest.to_dict() for guest in result if guest.group != "_"],
-            "totalFitness": algorithm.fitness(result),
+            "totalFitness": best_fitness,
+        }
+
+        return jsonify(response), 200
+    
+    @app.route('/satisfaction', methods = ['POST'])
+    def satisfaction():
+        algorithm = parse(request)
+        guests = algorithm.setSatisfactory(algorithm.guests)
+
+        response = {
+            "guests": [guest.to_dict() for guest in guests if guest.group != "_"],
         }
 
         return jsonify(response), 200

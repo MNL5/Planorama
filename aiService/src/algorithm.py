@@ -38,10 +38,23 @@ class Algorithm:
             self.groupToAmount[guest.group] += 1
         self.maxGroupSize = max(self.groupToAmount.values())
 
-    def happinesFunc(self, guest, i, groupToAmountPerTable, guestToTable):
-        table = self.seatToTable[i]
-        seatWithMe = groupToAmountPerTable[table][guest.group] - 1
-        score = seatWithMe
+        self.isGroupMustSplit = {}
+        for group, amount in self.groupToAmount.items():
+            self.isGroupMustSplit[group] = all(amount > table.numOfSeats for table in self.tables)
+
+    def maxHappinesFunc(self, guest):
+        score = self.groupToAmount[guest.group] - 1
+
+        if guest.id in self.relations:
+            if RelationType.MUST in self.relations[guest.id]:
+                score += len(self.relations[guest.id][RelationType.MUST]) * 1.5
+            if RelationType.LIKE in self.relations[guest.id]:
+                score += len(self.relations[guest.id][RelationType.LIKE])
+
+        return score
+
+    def happinesFunc(self, guest, table, groupToAmountPerTable, guestToTable):
+        score = groupToAmountPerTable[table][guest.group] - 1
 
         def getNumOf(type):
             return reduce(lambda acc, guestId: acc + (1 if guestToTable[guestId] == table else 0), self.relations[guest.id][type], 0)
@@ -60,24 +73,18 @@ class Algorithm:
                 withMustNot = getNumOf(RelationType.MUST_NOT)
                 score -= withMustNot * 5
 
-        notSeatingWithPrecent = ((self.groupToAmount[guest.group] - 1) - seatWithMe) / (self.groupToAmount[guest.group] - 1)
-        groupSizeFactor = self.maxGroupSize / self.groupToAmount[guest.group]
-        score -= notSeatingWithPrecent * groupSizeFactor * 5
-
-        if '_' in groupToAmountPerTable[table] and groupToAmountPerTable[table]['_'] > groupToAmountPerTable[table][guest.group]:
-            score -= groupToAmountPerTable[table]['_'] * 0.3
-
-        if groupToAmountPerTable[table][guest.group] == 1:
-            score -= 5
-
         return score
     
-    def calcHelpers(self, guests):
+    def calcHelpers(self, guests, seatToTable):
         groupToAmountPerTable = {}
         guestToTable = {}
+        amountPerTable = {}
 
         for i, guest in enumerate(guests):
-            table = self.seatToTable[i]
+            if guest.group == "_":
+                continue
+
+            table = seatToTable(i, guest)
             guestToTable[guest.id] = table
 
             if table not in groupToAmountPerTable:
@@ -87,50 +94,25 @@ class Algorithm:
                 groupToAmountPerTable[table][guest.group] = 0
             groupToAmountPerTable[table][guest.group] += 1
 
-        return groupToAmountPerTable, guestToTable
+            if table not in amountPerTable:
+                amountPerTable[table] = 0
+            amountPerTable[table] += 1
+        
+        return groupToAmountPerTable, guestToTable, amountPerTable
 
     def fitness(self, guests):
-        groupToAmountPerTable, guestToTable = self.calcHelpers(guests)
-        return sum([self.happinesFunc(guest, i, groupToAmountPerTable, guestToTable) for i, guest in enumerate(guests) if guests[i].group != "_"])
+        groupToAmountPerTable, guestToTable, amountPerTable = self.calcHelpers(guests, lambda i, guest: self.seatToTable[i])
+        score = sum([self.happinesFunc(guest, self.seatToTable[i], groupToAmountPerTable, guestToTable) for i, guest in enumerate(guests) if guest.group != "_"])
 
-    def sortGuests(self, guests, isReverse = False):
-        numOfPrevSeats = 0
-        result = []
-        for table in self.tables:
-            tableList = sorted(guests[numOfPrevSeats:numOfPrevSeats + table.numOfSeats], key=lambda x: x.group)
-            if isReverse: tableList.reverse()
-            numOfPrevSeats += table.numOfSeats
-            for guest in tableList:
-                result.append(guest)
+        std_dev = np.std([amount / self.tableToNumOfSeats[table] for table, amount in amountPerTable.items()])
+        score -= std_dev
 
-        return result
+        return  score
 
-    def createFirstArrangement(self, guests):
-        individual = [None] * len(guests)
-        shuffledGuests = guests.copy()
-        random.shuffle(shuffledGuests)
-        withoutTableGuests = []
-        for guest in shuffledGuests:
-            if guest.table is None:
-                withoutTableGuests.append(guest)
-                continue
-            for i in range(len(individual)):
-                if individual[i] is None and self.seatToTable[i] == guest.table:
-                    individual[i] = guest
-                    break
-
-        for guest in withoutTableGuests:
-            for i in range(len(individual)):
-                if individual[i] is None:
-                    individual[i] = guest
-                    break
-
-        return individual
-
-    def create_population(self, guests, pop_size):
-        population = [self.createFirstArrangement(guests)]
-        for i in range(pop_size - 1):
-            individual = guests.copy()
+    def create_population(self, pop_size):
+        population = []
+        for i in range(pop_size):
+            individual = self.guests.copy()
             random.shuffle(individual)
             population.append(individual)
         return population
@@ -171,7 +153,10 @@ class Algorithm:
     
         return guests
 
-    def crossover(self, parent1, parent2):
+    def crossover(self, parent1, parent2, crossover_rate=1):
+        if random.random() >= crossover_rate:
+            return parent1, parent2
+
         child1 = [None] * len(parent1)
         child2 = [None] * len(parent1)
         chlid1Set = set()
@@ -207,27 +192,45 @@ class Algorithm:
                 individual[i], individual[j] = individual[j], individual[i]
         return individual
     
-    def selection(self, population, fitnesses, elite_size, tournament_size=3):
-        selected = []
-        for _ in range(len(population) - elite_size):
-            tournament = random.sample(list(zip(population, fitnesses)), tournament_size)
-            winner = max(tournament, key=lambda x: x[1])[0]
-            selected.append(winner)
-        return selected
+    def selection(self, population, fitnesses, tournament_size=3):
+        contestants = random.sample(list(zip(population, fitnesses)), tournament_size)
+        return max(contestants, key=lambda x: x[1])[0]
     
-    def solve(self, guests, pop_size=100, elite_size=10, mutation_rate=0.01, generations=100):
-        population = self.create_population(guests, pop_size)
+    def calcGroupTables(self, guests):
+        groupTables = {}
+        isGroupSplitHelper = {}
+
+        for i, guest in enumerate(guests):
+            if guest.group == "_":
+                continue
+
+            table = self.seatToTable[i]
+
+            if guest.group not in isGroupSplitHelper:
+                isGroupSplitHelper[guest.group] = set()
+            isGroupSplitHelper[guest.group].add(table)
+
+        for group, tables in isGroupSplitHelper.items():
+            groupTables[group] = len(tables)
+
+        return groupTables
+    
+    def setSatisfactory(self, guests):
+        groupToAmountPerTable, guestToTable, amountPerTable = self.calcHelpers(guests, lambda i, guest: guest.table)
+        for guest in guests:
+            if guest.group == "_" or guest.table == None: continue
+            guest.satisfaction = self.happinesFunc(guest, guest.table, groupToAmountPerTable, guestToTable) / self.maxHappinesFunc(guest)
+        return guests
+    
+    def solve(self, pop_size=100, elite_rate=0.1, mutation_rate=0.01, generations=100):
+        population = self.create_population(pop_size)
+        elite_size = round(pop_size * elite_rate)
         best_fitness = 0
         best_individual = None
 
         for generation in range(generations):
             fitnesses = [self.fitness(individual) for individual in population]
-            minFitness = min(fitnesses)
-            if minFitness < 0:
-                fitnesses = [f - minFitness for f in fitnesses]
-
             fitnessSortedIndexes = np.argsort(fitnesses)
-            elites = [population[idx] for idx in fitnessSortedIndexes[-elite_size:]]
 
             currBest = fitnesses[fitnessSortedIndexes[-1]]
             currBestIndividual = population[fitnessSortedIndexes[-1]]
@@ -235,22 +238,24 @@ class Algorithm:
             if currBest > best_fitness:
                 best_fitness = currBest
                 best_individual = currBestIndividual
+                
+                groupTables = self.calcGroupTables(best_individual)
+                if all(tables == 1 or self.isGroupMustSplit[group] for group, tables in groupTables.items()):
+                    break
 
             if generations - 1 == generation:
                 break
 
-            population = self.selection(population, fitnesses, elite_size, tournament_size=10)
-
+            elites = [population[idx] for idx in fitnessSortedIndexes[-elite_size:]]
             next_gen = elites.copy()
-            for i in range(0, len(population), 2):
-                parent1 = population[i]
-                parent2 = population[i + 1]
-
+            while len(next_gen) < pop_size:
+                parent1 = self.selection(population, fitnesses)
+                parent2 = self.selection(population, fitnesses)
+                
                 child1, child2 = self.crossover(parent1, parent2)
 
                 next_gen.append(self.mutate(child1, mutation_rate))
-                next_gen.append(self.mutate(child2, mutation_rate))
 
             population = next_gen
 
-        return self.setTables(best_individual)
+        return self.setSatisfactory(self.setTables(best_individual)), best_fitness
