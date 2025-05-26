@@ -74,9 +74,6 @@ const GuestSeating: React.FC = () => {
           updatedGuestsTables[guest.id] = {
             tableId: guest?.tableId || "",
           };
-          updatedGuestsTables[guest.id] = {
-            tableId: guest?.tableId || "",
-          };
         });
 
         await updateGuests(currentEvent.id, updatedGuestsTables);

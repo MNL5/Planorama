@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useTransition } from "react";
+import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { toast } from "react-toastify";
 import {
@@ -18,6 +18,7 @@ import { useEventContext } from "../../contexts/event-context";
 import { updateEvent } from "../../services/event-service/event-service";
 import MainLoader from "../mainLoader/MainLoader";
 import gridCanvas from "../../assets/grid-canvas.png";
+import { useFetchAllGuests } from "../../hooks/use-fetch-all-guests";
 
 const ELEMENT_TYPES = [
   { type: "square", label: "Square Table", elementType: "table" },
@@ -32,44 +33,65 @@ const INITIAL_SEAT_COUNT = 1;
 const TableArrangement = () => {
   const canvasRef = useRef<HTMLDivElement>(null);
   const [elements, setElements] = useState<Element[]>([]);
-  const [drawerOpened, setDrawerOpened] = useState(false);
   const [seatCount, setSeatCount] = useState<number>(INITIAL_SEAT_COUNT);
   const [textLabel, setTextLabel] = useState("");
   const [selectedType, setSelectedType] = useState<{
     type: Element["type"];
     elementType: Element["elementType"];
+    id?: string;
   } | null>(null);
   const { currentEvent, setCurrentEvent } = useEventContext();
   const [isPending, startTransition] = useTransition();
-  const [editDrawerOpened, setEditDrawerOpened] = useState(false);
-  const [selectedElement, setSelectedElement] = useState<Element | null>(null);
+
+  const {
+      guestsData: guests
+  } = useFetchAllGuests(true);
+
   const handleAddElement = () => {
     if (!canvasRef.current || !selectedType) return;
 
-    const { width, height } = canvasRef.current.getBoundingClientRect();
-    const centerX = width / 2 - 50;
-    const centerY = height / 2 - 50;
+    if (selectedType.id) {
+      const updatedElement = elements.find((el) => el.id === selectedType.id);
+      if (updatedElement) {
+        setElements(prev => prev.map((el) =>
+          el.id === selectedType.id
+            ? {
+                ...el,
+                label:
+                  selectedType.elementType === "table"
+                    ? `(${seatCount})`
+                    : textLabel,
+                seatCount: selectedType.elementType === "table" ? seatCount : undefined,
+              }
+            : el,
+        ));
+      }
+    } else {
+      const { width, height } = canvasRef.current.getBoundingClientRect();
+      const centerX = width / 2 - 50;
+      const centerY = height / 2 - 50;
 
-    const newElement: Element = {
-      id: uuidv4(),
-      type: selectedType.type,
-      label:
-        selectedType.elementType === "table" ? `(${seatCount})` : textLabel,
-      width: selectedType.type === "rectangle" ? 160 : 100,
-      height: 100,
-      x: centerX,
-      y: centerY,
-      color: selectedType.elementType === "table" ? "#d0b9e0" : "#e9dbf1",
-      elementType: selectedType.elementType,
-      ...(selectedType.elementType === "table" ? { seatCount } : {}),
-    };
+      const newElement: Element = {
+        id: uuidv4(),
+        type: selectedType.type,
+        label:
+          selectedType.elementType === "table" ? `(${seatCount})` : textLabel,
+        width: selectedType.type === "rectangle" ? 160 : 100,
+        height: 100,
+        x: centerX,
+        y: centerY,
+        color: selectedType.elementType === "table" ? "#d0b9e0" : "#e9dbf1",
+        elementType: selectedType.elementType,
+        ...(selectedType.elementType === "table" ? { seatCount } : {}),
+      };
 
-    setElements((prev) => [...prev, newElement]);
+      setElements((prev) => [...prev, newElement]);
+    }
+
     resetDrawer();
   };
 
   const resetDrawer = () => {
-    setDrawerOpened(false);
     setSeatCount(INITIAL_SEAT_COUNT);
     setTextLabel("");
     setSelectedType(null);
@@ -114,6 +136,10 @@ const TableArrangement = () => {
     loadLayout();
   }, []);
 
+  const guestsCount = useMemo(() => guests?.filter(
+    (guest) => guest.tableId === selectedType?.id,
+  ).length || INITIAL_SEAT_COUNT, [guests, selectedType]);
+
   return (
     <Flex style={{ direction: "rtl", flex: "1 1" }}>
       <MainLoader isPending={isPending} />
@@ -136,20 +162,20 @@ const TableArrangement = () => {
             onUpdate={handleUpdate}
             onDelete={handleDelete}
             onEdit={() => {
-              setSelectedElement(el);
-              setEditDrawerOpened(true);
+              setSelectedType({elementType: "table", type: el.type, id: el.id});
+              setSeatCount(el.seatCount || INITIAL_SEAT_COUNT);
             }}
           />
         ))}
-        {elements.filter((ele) => !ele.seatCount).map((el, i) => (
+        {elements.filter((ele) => !ele.seatCount).map((el) => (
           <RndElement
             key={el.id}
             element={el}
             onUpdate={handleUpdate}
             onDelete={handleDelete}
             onEdit={() => {
-              setSelectedElement(el);
-              setEditDrawerOpened(true);
+              setSelectedType({elementType: "text", type: el.type, id: el.id});
+              setTextLabel(el.label || "");
             }}
           />
         ))}
@@ -175,7 +201,6 @@ const TableArrangement = () => {
               style={{ fontSize: 12, fontWeight: "lighter" }}
               onClick={() => {
                 setSelectedType({ type, elementType });
-                setDrawerOpened(true);
               }}
             >
               {label}
@@ -189,15 +214,15 @@ const TableArrangement = () => {
       </Stack>
 
       <Drawer
-        opened={drawerOpened}
-        onClose={() => setDrawerOpened(false)}
+        opened={!!selectedType}
+        onClose={resetDrawer}
         title={selectedType?.elementType === "table" ? "Add Table" : "Add Text"}
         position="left"
       >
         {selectedType?.elementType === "table" ? (
           <NumberInput
             label="Number of Seats"
-            min={1}
+            min={guestsCount || 1}
             value={seatCount}
             onChange={(value) => setSeatCount(Number(value))}
           />
@@ -217,50 +242,6 @@ const TableArrangement = () => {
         >
           Add
         </Button>
-      </Drawer>
-
-      <Drawer
-        opened={editDrawerOpened}
-        onClose={() => {
-          setEditDrawerOpened(false);
-          setSelectedElement(null);
-        }}
-        title="Edit Table"
-        position="left"
-      >
-        {selectedElement && (
-          <>
-            <NumberInput
-              label="No. of Seats"
-              value={selectedElement.seatCount}
-              onChange={(value) => {
-                if (selectedElement) {
-                  setSelectedElement({
-                    ...selectedElement,
-                    seatCount: value || 1,
-                    label: `(${value})`,
-                  });
-                }
-              }}
-              min={1}
-            />
-            <Button
-              mt={"md"}
-              fullWidth
-              radius={"md"}
-              color={"#6a0572"}
-              onClick={() => {
-                if (selectedElement) {
-                  updateElement(selectedElement);
-                  setEditDrawerOpened(false);
-                  setSelectedElement(null);
-                }
-              }}
-            >
-              Save
-            </Button>
-          </>
-        )}
       </Drawer>
     </Flex>
   );

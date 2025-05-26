@@ -8,7 +8,7 @@ import { FilterOperator } from "../types/filter-operator";
 
 const guestColumns: (event: Event) => Column<Guest>[] = (event: Event) => {
   const tables =
-    event.diagram?.elements?.map((table, index) => ({
+    event.diagram?.elements?.filter((element) => element.seatCount).map((table, index) => ({
       label: `${index + 1}`,
       value: table.id,
     })) || [];
