@@ -49,7 +49,9 @@ const RndElement = ({
         alignItems: "center",
       }}
     >
-      {tableNumber !== undefined && <span style={{ fontSize: "1.3rem" }}>{tableNumber}</span>}
+      {tableNumber !== undefined && (
+        <span style={{ fontSize: "1.3rem" }}>{tableNumber}</span>
+      )}
       <span>{element.label}</span>
       <Button
         size="xs"
