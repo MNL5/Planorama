@@ -43,9 +43,7 @@ const TableArrangement = () => {
   const { currentEvent, setCurrentEvent } = useEventContext();
   const [isPending, startTransition] = useTransition();
 
-  const {
-      guestsData: guests
-  } = useFetchAllGuests(true);
+  const { guestsData: guests } = useFetchAllGuests(true);
 
   const handleAddElement = () => {
     if (!canvasRef.current || !selectedType) return;
@@ -53,18 +51,23 @@ const TableArrangement = () => {
     if (selectedType.id) {
       const updatedElement = elements.find((el) => el.id === selectedType.id);
       if (updatedElement) {
-        setElements(prev => prev.map((el) =>
-          el.id === selectedType.id
-            ? {
-                ...el,
-                label:
-                  selectedType.elementType === "table"
-                    ? `(${seatCount})`
-                    : textLabel,
-                seatCount: selectedType.elementType === "table" ? seatCount : undefined,
-              }
-            : el,
-        ));
+        setElements((prev) =>
+          prev.map((el) =>
+            el.id === selectedType.id
+              ? {
+                  ...el,
+                  label:
+                    selectedType.elementType === "table"
+                      ? `(${seatCount})`
+                      : textLabel,
+                  seatCount:
+                    selectedType.elementType === "table"
+                      ? seatCount
+                      : undefined,
+                }
+              : el,
+          ),
+        );
       }
     } else {
       const { width, height } = canvasRef.current.getBoundingClientRect();
@@ -136,9 +139,12 @@ const TableArrangement = () => {
     loadLayout();
   }, []);
 
-  const guestsCount = useMemo(() => guests?.filter(
-    (guest) => guest.tableId === selectedType?.id,
-  ).length || INITIAL_SEAT_COUNT, [guests, selectedType]);
+  const guestsCount = useMemo(
+    () =>
+      guests?.filter((guest) => guest.tableId === selectedType?.id).length ||
+      INITIAL_SEAT_COUNT,
+    [guests, selectedType],
+  );
 
   return (
     <Flex style={{ direction: "rtl", flex: "1 1" }}>
@@ -155,30 +161,40 @@ const TableArrangement = () => {
         {elements
           .filter((ele) => ele.seatCount)
           .map((el, i) => (
-          <RndElement
-            key={el.id}
-            element={el}
-            tableNumber={i + 1}
-            onUpdate={handleUpdate}
-            onDelete={handleDelete}
-            onEdit={() => {
-              setSelectedType({elementType: "table", type: el.type, id: el.id});
-              setSeatCount(el.seatCount || INITIAL_SEAT_COUNT);
-            }}
-          />
-        ))}
-        {elements.filter((ele) => !ele.seatCount).map((el) => (
-          <RndElement
-            key={el.id}
-            element={el}
-            onUpdate={handleUpdate}
-            onDelete={handleDelete}
-            onEdit={() => {
-              setSelectedType({elementType: "text", type: el.type, id: el.id});
-              setTextLabel(el.label || "");
-            }}
-          />
-        ))}
+            <RndElement
+              key={el.id}
+              element={el}
+              tableNumber={i + 1}
+              onUpdate={handleUpdate}
+              onDelete={handleDelete}
+              onEdit={() => {
+                setSelectedType({
+                  elementType: "table",
+                  type: el.type,
+                  id: el.id,
+                });
+                setSeatCount(el.seatCount || INITIAL_SEAT_COUNT);
+              }}
+            />
+          ))}
+        {elements
+          .filter((ele) => !ele.seatCount)
+          .map((el) => (
+            <RndElement
+              key={el.id}
+              element={el}
+              onUpdate={handleUpdate}
+              onDelete={handleDelete}
+              onEdit={() => {
+                setSelectedType({
+                  elementType: "text",
+                  type: el.type,
+                  id: el.id,
+                });
+                setTextLabel(el.label || "");
+              }}
+            />
+          ))}
       </Box>
 
       <Stack
