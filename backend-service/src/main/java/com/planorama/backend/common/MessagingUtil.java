@@ -44,7 +44,7 @@ public class MessagingUtil {
     @Value("${twilio.whatsapp.enable}")
     private boolean isWhatsappEnable;
 
-    @Value("${client.dns}")
+    @Value("${CLIENT_URL:http://localhost:5173/}")
     private String clientDNS;
 
     @PostConstruct
