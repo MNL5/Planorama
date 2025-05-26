@@ -9,7 +9,7 @@ import { Event } from "../../types/event";
 import { Guest } from "../../types/guest";
 import style from "./invitation.module.css";
 import mealOptions from "../../utils/meal-options";
-import { updateGuest } from "../../services/guest-service/guest-service";
+import { updateGuestRSVP } from "../../services/guest-service/guest-service";
 import MainLoader from "../mainLoader/MainLoader";
 
 const Invitation: React.FC<{ event: Event; guestId?: string }> = ({
@@ -35,7 +35,7 @@ const Invitation: React.FC<{ event: Event; guestId?: string }> = ({
     Guest
   >({
     mutationFn: (updatedGuest) =>
-      updateGuest(event.id as string, updatedGuest, updatedGuest.id),
+      updateGuestRSVP(event.id as string, updatedGuest, updatedGuest.id),
     onSuccess: () => {
       toast.success("Your RSVP has been updated successfully");
     },
