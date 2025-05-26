@@ -4,7 +4,7 @@ import Element from "../../types/Element";
 
 interface RndElementProps {
   element: Element;
-  tableNumber: number;
+  tableNumber?: number;
   onUpdate: (updated: Element) => void;
   onDelete: (id: string) => void;
 }
@@ -30,13 +30,13 @@ const RndElement = ({
       })
     }
     style={{
+      border: "1px dashed #ccc",
       backgroundColor: element.color,
       borderRadius: element.type === "circle" ? "50%" : "8px",
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
       color: "#000",
-      fontWeight: "bold",
       cursor: "move",
       position: "absolute",
       boxShadow: "rgb(0 0 0 / 16%) 0px 4px 16px",
@@ -49,8 +49,10 @@ const RndElement = ({
         alignItems: "center",
       }}
     >
-      <span style={{ fontSize: "1.3rem" }}>{tableNumber}</span>
-      <span>{`(${element.seatCount})`}</span>
+      {tableNumber !== undefined && (
+        <span style={{ fontSize: "1.3rem" }}>{tableNumber}</span>
+      )}
+      <span>{element.label}</span>
       <Button
         size="xs"
         color="#951818"

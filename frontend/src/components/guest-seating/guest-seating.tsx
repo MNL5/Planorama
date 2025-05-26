@@ -7,7 +7,7 @@ import {
   getAllGuests,
   updateGuests,
 } from "../../services/guest-service/guest-service";
-import ElementType from "../../types/Element";
+import Element from "../../types/Element";
 import { Guest } from "../../types/guest";
 import GuestTable from "../guest-table/guest-table";
 import MainLoader from "../mainLoader/MainLoader";
@@ -17,7 +17,7 @@ import { seatingGuestColumns } from "../../utils/seating-guest-columns";
 
 const GuestSeating: React.FC = () => {
   const { currentEvent } = useEventContext();
-  const [tables, setTables] = useState<ElementType[]>([]);
+  const [elements, setTables] = useState<Element[]>([]);
   const [guests, setGuests] = useState<Guest[]>([]);
   const [openTableId, setOpenTableId] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -70,7 +70,9 @@ const GuestSeating: React.FC = () => {
         const updatedGuestsTables: Record<string, { tableId?: string }> = {};
 
         guests.forEach((guest) => {
-          updatedGuestsTables[guest.id] = { tableId: guest?.tableId || "" };
+          updatedGuestsTables[guest.id] = {
+            tableId: guest?.tableId || "",
+          };
         });
 
         await updateGuests(currentEvent.id, updatedGuestsTables);
@@ -126,18 +128,47 @@ const GuestSeating: React.FC = () => {
         </Button>
       </Stack>
       <Box flex={1} pos={"relative"} bg={"#fff"}>
-        {tables.map((table) => (
-          <GuestTable
-            key={table.id}
-            table={table}
-            assignedGuests={guests.filter((g) => g.tableId === table.id)}
-            isOpen={openTableId === table.id}
-            onOpen={(id) => setOpenTableId(id)}
-            onClose={() => setOpenTableId(null)}
-            onDrop={handleDrop}
-            onRemove={handleRemove}
-          />
-        ))}
+        {elements
+          .filter((element) => element.seatCount)
+          .map((table) => (
+            <GuestTable
+              key={table.id}
+              table={table}
+              assignedGuests={guests.filter((g) => g.tableId === table.id)}
+              isOpen={openTableId === table.id}
+              onOpen={(id) => setOpenTableId(id)}
+              onClose={() => setOpenTableId(null)}
+              onDrop={handleDrop}
+              onRemove={handleRemove}
+            />
+          ))}
+
+        {elements
+          .filter((element) => !element.seatCount)
+          .map((objective) => (
+            <Box
+              key={objective.id}
+              style={{
+                position: "absolute",
+                top: objective.y,
+                left: objective.x,
+                width: objective.width,
+                height: objective.height,
+                backgroundColor: objective.color,
+                border: "1px dashed #ccc",
+                borderRadius: objective.type === "circle" ? "50%" : 4,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "#666",
+                padding: 4,
+                boxShadow: "0 1px 4px rgba(0,0,0,0.1)",
+                cursor: "default",
+              }}
+            >
+              <Text size="sm">{objective.label}</Text>
+            </Box>
+          ))}
       </Box>
     </Flex>
   );
