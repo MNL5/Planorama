@@ -14,6 +14,7 @@ import MainLoader from "../mainLoader/MainLoader";
 import { RsvpStatus } from "../../types/rsvp-status";
 import { CustomTable } from "../custom-table/custom-table";
 import { seatingGuestColumns } from "../../utils/seating-guest-columns";
+import gridCanvas from "../../assets/grid-canvas.png";
 
 const GuestSeating: React.FC = () => {
   const { currentEvent } = useEventContext();
@@ -98,7 +99,9 @@ const GuestSeating: React.FC = () => {
     <Flex
       bg={"primary.0"}
       flex={"1 1"}
-      style={{ overflow: "hidden" }}
+      style={{
+        overflow: "hidden",
+      }}
       onClick={() => setOpenTableId(null)}
     >
       <MainLoader isPending={isPending} />
@@ -127,7 +130,11 @@ const GuestSeating: React.FC = () => {
           Save Seating
         </Button>
       </Stack>
-      <Box flex={1} pos={"relative"} bg={"#fff"}>
+      <Box
+        flex={1}
+        pos={"relative"}
+        style={{ backgroundImage: `url(${gridCanvas})` }}
+      >
         {elements
           .filter((element) => element.seatCount)
           .map((table) => (

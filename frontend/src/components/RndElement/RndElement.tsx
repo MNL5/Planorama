@@ -7,6 +7,7 @@ interface RndElementProps {
   tableNumber?: number;
   onUpdate: (updated: Element) => void;
   onDelete: (id: string) => void;
+  onEdit: () => void;
 }
 
 const RndElement = ({
@@ -14,11 +15,13 @@ const RndElement = ({
   tableNumber,
   onUpdate,
   onDelete,
+  onEdit,
 }: RndElementProps) => (
   <Rnd
     bounds="parent"
     size={{ width: element.width, height: element.height }}
     position={{ x: element.x, y: element.y }}
+    onDoubleClick={onEdit}
     onDragStop={(_, d) => onUpdate({ ...element, x: d.x, y: d.y })}
     onResizeStop={(_, __, ref, ___, position) =>
       onUpdate({
