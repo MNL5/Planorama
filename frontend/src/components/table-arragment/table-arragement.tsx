@@ -123,11 +123,19 @@ const TableArrangement = () => {
         bg="#fff"
         style={{ border: "1px solid rgb(230, 229, 229)" }}
       >
-        {elements.map((el, i) => (
+        {elements.filter(ele => ele.seatCount).map((el, i) => (
           <RndElement
             key={el.id}
             element={el}
             tableNumber={i + 1}
+            onUpdate={handleUpdate}
+            onDelete={handleDelete}
+          />
+        ))}
+        {elements.filter(ele => !ele.seatCount).map((el) => (
+          <RndElement
+            key={el.id}
+            element={el}
             onUpdate={handleUpdate}
             onDelete={handleDelete}
           />

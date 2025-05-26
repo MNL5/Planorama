@@ -129,7 +129,7 @@ const GuestSeating: React.FC = () => {
       </Stack>
       <Box flex={1} pos={"relative"} bg={"#fff"}>
         {elements
-          .filter((element) => element.elementType === "table")
+          .filter((element) => element.seatCount)
           .map((table) => (
             <GuestTable
               key={table.id}
@@ -144,7 +144,7 @@ const GuestSeating: React.FC = () => {
           ))}
 
         {elements
-          .filter((elements) => elements.elementType === "text")
+          .filter((element) => !element.seatCount)
           .map((objective) => (
             <Box
               key={objective.id}
