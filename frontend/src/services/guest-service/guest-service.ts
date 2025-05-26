@@ -65,4 +65,11 @@ const deleteGuest = async (id: string) => {
   return response.data;
 };
 
-export { createGuest, updateGuest, updateGuests, getAllGuests, deleteGuest, updateGuestRSVP };
+export {
+  createGuest,
+  updateGuest,
+  updateGuests,
+  getAllGuests,
+  deleteGuest,
+  updateGuestRSVP,
+};
