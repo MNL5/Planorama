@@ -1,4 +1,4 @@
-package com.planorama.backend.common;
+package com.planorama.backend.common.security;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;

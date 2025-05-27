@@ -4,6 +4,8 @@ import com.auth0.jwt.algorithms.Algorithm;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -41,25 +43,29 @@ public class SecurityConfiguration {
     }
 
     @Bean
+    @Order(1)
     public SecurityFilterChain publicSecurityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
-                .securityMatcher("/users/**", "/guests/rsvp/**")
+                .securityMatcher("/users/**")
                 .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
                 .build();
     }
 
     @Bean
+    @Order(2)
     public SecurityFilterChain apiSecurityFilterChain(HttpSecurity http, JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
         return http
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .securityMatcher("/events/**", "/gifts/**", "/guests/**", "/relations/**", "/schedules/**", "/tasks/**", "/seating/**")
                 .csrf(AbstractHttpConfigurer::disable)
-                .anonymous(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.PUT, "/guests/rsvp/**").permitAll()
+                        .requestMatchers(request -> "/events".equals(request.getRequestURI()) && request.getParameter("guest") != null).permitAll()
+                        .anyRequest().authenticated())
                 .build();
     }
 }

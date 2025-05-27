@@ -1,6 +1,5 @@
 package com.planorama.backend.common.security;
 
-import com.planorama.backend.common.JWTUtil;
 import com.planorama.backend.event.api.EventAPI;
 import com.planorama.backend.event.api.EventDTO;
 import jakarta.servlet.FilterChain;

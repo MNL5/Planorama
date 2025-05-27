@@ -1,6 +1,6 @@
 package com.planorama.backend.user;
 
-import com.planorama.backend.common.JWTUtil;
+import com.planorama.backend.common.security.JWTUtil;
 import com.planorama.backend.common.exceptions.EntityNotFoundException;
 import com.planorama.backend.user.api.CreateUserAction;
 import com.planorama.backend.user.entity.UserAccess;
