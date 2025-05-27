@@ -9,6 +9,8 @@ RUN for FILE in tsconfig.app.json tsconfig.node.json; do \
         echo "Patching $FILE to disable strict mode..."; \
         sed -i 's/"strict": *true/"strict": false/' $FILE || true; \
         grep -q '"strict":' $FILE || sed -i '/"compilerOptions": {/a \    "strict": false,' $FILE; \
+        echo "--- $FILE contents after patch ---"; \
+        cat "$FILE"; \
       fi \
     done
 
