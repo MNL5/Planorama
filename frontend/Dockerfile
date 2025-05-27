@@ -5,14 +5,17 @@ RUN npm ci
 COPY . .
 
 RUN for FILE in tsconfig.app.json tsconfig.node.json; do \
-      if [ -f "$FILE" ]; then \
-        echo "Patching $FILE to disable strict mode..."; \
-        sed -i 's/"strict": *true/"strict": false/' $FILE || true; \
-        grep -q '"strict":' $FILE || sed -i '/"compilerOptions": {/a \    "strict": false,' $FILE; \
-        echo "--- $FILE contents after patch ---"; \
-        cat "$FILE"; \
-      fi \
-    done
+  if [ -f "$FILE" ]; then \
+    echo "Patching $FILE to disable strict mode..."; \
+    # Remove any existing "strict": true or false lines
+    sed -i '/"strict": *\(true\|false\),*/d' "$FILE"; \
+    # Insert "strict": false inside "compilerOptions"
+    sed -i '/"compilerOptions": {/a \    "strict": false,' "$FILE"; \
+    echo "--- $FILE contents after patch ---"; \
+    cat "$FILE"; \
+    echo "----------------------------------"; \
+  fi \
+done
 
 RUN npm run build
 
