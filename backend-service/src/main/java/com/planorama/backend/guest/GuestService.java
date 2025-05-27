@@ -2,7 +2,10 @@ package com.planorama.backend.guest;
 
 import com.mongodb.bulk.BulkWriteResult;
 import com.planorama.backend.event.api.DeleteEvent;
-import com.planorama.backend.guest.api.*;
+import com.planorama.backend.guest.api.CreateGuestDTO;
+import com.planorama.backend.guest.api.GuestsUpdateDTO;
+import com.planorama.backend.guest.api.RSVPStatusDTO;
+import com.planorama.backend.guest.api.UpdateGuestDTO;
 import com.planorama.backend.guest.entity.GuestDAO;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -52,15 +55,6 @@ public class GuestService {
     public void removeEvent(DeleteEvent deleteEvent) {
         reactiveMongoTemplate.remove(Query.query(Criteria.where(GuestDAO.EVENT_ID_FIELD)
                         .is(deleteEvent.getEventId())))
-                .retry()
-                .subscribe();
-    }
-
-    @Async
-    @EventListener
-    public void updateGuestSeat(SeatGuests seatGuests) {
-        reactiveMongoTemplate.updateMulti(Query.query(Criteria.where(GuestDAO.ID_FIELD).in(seatGuests.getGuestIds())),
-                        new Update().set(GuestDAO.TABLE_FIELD, seatGuests.getTableId()), GuestDAO.class)
                 .retry()
                 .subscribe();
     }
