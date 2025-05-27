@@ -1,10 +1,10 @@
 package com.planorama.backend.seating;
 
+import com.planorama.backend.seating.api.SeatingResponse;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import reactor.core.publisher.Mono;
 
 import java.util.UUID;
 
@@ -18,8 +18,7 @@ public class SeatingController {
     }
 
     @GetMapping("/{eventId}")
-    public Mono<String> autoSeat(@PathVariable("eventId") UUID eventId) {
-        return seatingService.autoSeat(eventId)
-                .map(tableChanges -> String.format("%n Tables changed"));
+    public SeatingResponse autoSeat(@PathVariable("eventId") UUID eventId) {
+        return seatingService.autoSeat(eventId).block();
     }
 }
