@@ -1,13 +1,19 @@
 FROM python:3.11-slim
+
+RUN pip install poetry
+
 WORKDIR /app
 
-# Install dependencies
-COPY aiService/requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+COPY pyproject.toml poetry.lock* ./
 
-# Copy application code
-COPY aiService/ .
+RUN poetry config virtualenvs.create false \
+  && poetry install --no-dev --no-interaction --no-ansi
 
+# Copy the rest of your application code
+COPY . .
+
+# Expose the port your Flask app runs on
 EXPOSE 5000
+
 ENV FLASK_APP=__init__.py
 CMD ["flask", "run", "--host=0.0.0.0", "--port=5000"]
