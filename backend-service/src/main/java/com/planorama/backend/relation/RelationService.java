@@ -53,6 +53,10 @@ public class RelationService {
                 .subscribe();
     }
 
+    public Mono<RelationDAO> findById(UUID relationId) {
+        return reactiveMongoTemplate.findById(relationId, RelationDAO.class);
+    }
+
     public Flux<RelationDAO> findAllByEventId(String eventId) {
         return reactiveMongoTemplate.find(Query.query(Criteria.where(RelationDAO.EVENT_ID_FIELD).is(eventId)), RelationDAO.class);
     }

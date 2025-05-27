@@ -113,7 +113,7 @@ public class EventService {
     }
 
     public Mono<EventDAO> findEventByGuestID(UUID guestID) {
-        Mono<GuestDTO> guest = guestAPI.getGuest(guestID);
+        Mono<GuestDTO> guest = Mono.just(guestAPI.findById(guestID));
         return guest.flatMap(guestDTO ->
                 reactiveMongoTemplate.findById(UUID.fromString(guestDTO.eventID()), EventDAO.class)
         );

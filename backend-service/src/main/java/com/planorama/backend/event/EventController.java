@@ -7,11 +7,11 @@ import com.planorama.backend.event.api.UpdateEventDTO;
 import com.planorama.backend.event.mapper.EventMapper;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -28,49 +28,62 @@ public class EventController implements EventAPI {
 
     @GetMapping("/{eventId}")
     @Override
-    public Mono<EventDTO> getEventByID(@PathVariable("eventId") UUID eventUUID) {
+    @PreAuthorize("hasAuthority(#eventUUID)")
+    public EventDTO getEventByID(@PathVariable("eventId") UUID eventUUID) {
         return eventService.findByID(eventUUID)
-                .map(eventMapper::daoToDTO);
+                .map(eventMapper::daoToDTO)
+                .block();
     }
 
     @GetMapping("/list")
-    public Flux<EventDTO> getAllEvents(@NotNull @NotEmpty @RequestAttribute("userID") String userID) {
+    @Override
+    public List<EventDTO> getAllEvents(@NotNull @NotEmpty @RequestAttribute("userID") String userID) {
         return eventService.findAllByUserID(userID)
-                .map(eventMapper::daoToDTO);
+                .map(eventMapper::daoToDTO)
+                .collectList()
+                .block();
     }
 
     @GetMapping
-    public Mono<EventDTO> getEventByGuestID(@RequestParam("guest") UUID guestID) {
+    public EventDTO getEventByGuestID(@RequestParam("guest") UUID guestID) {
         return eventService.findEventByGuestID(guestID)
-                .map(eventMapper::daoToDTO);
+                .map(eventMapper::daoToDTO)
+                .block();
     }
 
     @Override
-    public Flux<EventDTO> getEventBetweenDates(@NotNull OffsetDateTime from,
+    public List<EventDTO> getEventBetweenDates(@NotNull OffsetDateTime from,
                                                @NotNull OffsetDateTime to) {
         return eventService.findEventsBetweenDates(from, to)
-                .map(eventMapper::daoToDTO);
+                .map(eventMapper::daoToDTO)
+                .collectList()
+                .block();
     }
 
     @PostMapping
-    public Mono<EventDTO> createEvent(@RequestBody CreateEventDTO createEventDTO,
-                                      @NotNull @NotEmpty @RequestAttribute("userID") String userID) {
+    public EventDTO createEvent(@RequestBody CreateEventDTO createEventDTO,
+                                @NotNull @NotEmpty @RequestAttribute("userID") String userID) {
         return eventService.createEvent(createEventDTO, userID)
-                .map(eventMapper::daoToDTO);
+                .map(eventMapper::daoToDTO)
+                .block();
     }
 
     @PutMapping("/{eventId}")
-    public Mono<EventDTO> updateEvent(@PathVariable("eventId") UUID eventUUID,
-                                      @RequestBody UpdateEventDTO updateEventDTO,
-                                      @NotNull @NotEmpty @RequestAttribute("userID") String userID) {
+    @PreAuthorize("hasAuthority(#eventUUID)")
+    public EventDTO updateEvent(@PathVariable("eventId") UUID eventUUID,
+                                @RequestBody UpdateEventDTO updateEventDTO,
+                                @NotNull @NotEmpty @RequestAttribute("userID") String userID) {
         return eventService.updateEvent(eventUUID, updateEventDTO, userID)
-                .map(eventMapper::daoToDTO);
+                .map(eventMapper::daoToDTO)
+                .block();
     }
 
     @DeleteMapping("/{eventId}")
-    public Mono<EventDTO> deleteEvent(@PathVariable("eventId") UUID eventID,
-                                      @NotNull @NotEmpty @RequestAttribute("userID") String userID) {
+    @PreAuthorize("hasAuthority(#eventUUID)")
+    public EventDTO deleteEvent(@PathVariable("eventId") UUID eventID,
+                                @NotNull @NotEmpty @RequestAttribute("userID") String userID) {
         return eventService.deleteEvent(eventID, userID)
-                .map(eventMapper::daoToDTO);
+                .map(eventMapper::daoToDTO)
+                .block();
     }
 }

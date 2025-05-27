@@ -1,15 +1,12 @@
 package com.planorama.backend.guest.api;
 
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
+import com.planorama.backend.common.EventEntityAPI;
 
+import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
-public interface GuestAPI {
-    Mono<GuestDTO> getGuest(UUID guestId);
+public interface GuestAPI extends EventEntityAPI<GuestDTO> {
+    List<GuestDTO> getAllGuestByEventID(String eventId);
 
-    Flux<GuestDTO> getAllGuestByEventID(String eventId);
-
-    Flux<GuestDTO> getAllGuestsByEventIDAndRsvpStatus(String eventId, Set<RSVPStatusDTO> rsvpStatus);
+    List<GuestDTO> getAllGuestsByEventIDAndRsvpStatus(String eventId, Set<RSVPStatusDTO> rsvpStatus);
 }

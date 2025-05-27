@@ -39,6 +39,18 @@ const updateGuests = async (
   return response.data;
 };
 
+const updateGuestRSVP = async (
+  eventId: string,
+  guestToEdit: Omit<Guest, "id">,
+  id: string,
+) => {
+  const response = await abortablePutRequest<Guest>(`guests/rsvp/${id}`, {
+    eventId,
+    ...guestToEdit,
+  }).request;
+  return response.data;
+};
+
 const getAllGuests = async (eventId: string) => {
   const response: AxiosResponse<Guest[]> = await abortableGetRequest<Guest[]>(
     `guests?event=${eventId}`,
@@ -53,4 +65,11 @@ const deleteGuest = async (id: string) => {
   return response.data;
 };
 
-export { createGuest, updateGuest, updateGuests, getAllGuests, deleteGuest };
+export {
+  createGuest,
+  updateGuest,
+  updateGuests,
+  getAllGuests,
+  deleteGuest,
+  updateGuestRSVP,
+};

@@ -1,20 +1,21 @@
 package com.planorama.backend.task;
 
+import com.planorama.backend.common.EventEntityAPI;
 import com.planorama.backend.task.api.CreateTaskDTO;
 import com.planorama.backend.task.api.TaskDTO;
 import com.planorama.backend.task.api.UpdateTaskDTO;
 import com.planorama.backend.task.mapper.TaskMapper;
 import jakarta.validation.Valid;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
+import java.util.List;
 import java.util.UUID;
 
 
-@RestController
+@RestController("tasks")
 @RequestMapping("/tasks")
-public class TaskController {
+public class TaskController implements EventEntityAPI<TaskDTO> {
     private final TaskService taskService;
     private final TaskMapper taskMapper;
 
@@ -24,28 +25,44 @@ public class TaskController {
         this.taskMapper = taskMapper;
     }
 
+    @Override
+    public TaskDTO findById(UUID id) {
+        return taskService.findById(id)
+                .map(taskMapper::daoToDTO)
+                .block();
+    }
+
     @GetMapping
-    public Flux<TaskDTO> getTasksByEvent(@RequestParam("event") String eventId) {
+    @PreAuthorize("hasAuthority(#eventId)")
+    public List<TaskDTO> getTasksByEvent(@RequestParam("event") String eventId) {
         return taskService.getAllTaskByEvent(eventId)
-                .map(taskMapper::daoToDTO);
+                .map(taskMapper::daoToDTO)
+                .collectList()
+                .block();
     }
 
     @PostMapping
-    public Mono<TaskDTO> createTask(@Valid CreateTaskDTO createTaskDTO) {
+    @PreAuthorize("hasAuthority(#createTaskDTO.eventId)")
+    public TaskDTO createTask(@Valid CreateTaskDTO createTaskDTO) {
         return taskService.createTask(createTaskDTO)
-                .map(taskMapper::daoToDTO);
+                .map(taskMapper::daoToDTO)
+                .block();
     }
 
     @PutMapping("/{taskId}")
-    public Mono<TaskDTO> updateTask(@PathVariable("taskId") UUID taskId,
-                                    @Valid UpdateTaskDTO updateTaskDTO) {
+    @PreAuthorize("@securityUtils.canAccessEntity('tasks', #taskId, authentication)")
+    public TaskDTO updateTask(@PathVariable("taskId") UUID taskId,
+                              @Valid UpdateTaskDTO updateTaskDTO) {
         return taskService.updateTask(taskId, updateTaskDTO)
-                .map(taskMapper::daoToDTO);
+                .map(taskMapper::daoToDTO)
+                .block();
     }
 
     @DeleteMapping("/{taskId}")
-    public Mono<TaskDTO> deleteTask(@PathVariable("taskId") UUID taskId) {
+    @PreAuthorize("@securityUtils.canAccessEntity('tasks', #taskId, authentication)")
+    public TaskDTO deleteTask(@PathVariable("taskId") UUID taskId) {
         return taskService.deleteTask(taskId)
-                .map(taskMapper::daoToDTO);
+                .map(taskMapper::daoToDTO)
+                .block();
     }
 }

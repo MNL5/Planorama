@@ -11,6 +11,8 @@ import com.planorama.backend.seating.api.*;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Objects;
@@ -35,11 +37,11 @@ public class SeatingService {
     }
 
     public Mono<SeatingResponse> autoSeat(UUID eventId) {
-        return Mono.zip(guestAPI.getAllGuestByEventID(eventId.toString())
+        return Mono.zip(Flux.fromIterable(guestAPI.getAllGuestByEventID(eventId.toString()))
                                 .filter(guest -> !RSVPStatusDTO.DECLINE.equals(guest.status()))
                                 .map(guest -> new GuestApiDto(guest.id(), guest.group(), guest.tableId(), null))
                                 .collectList(),
-                        eventAPI.getEventByID(eventId)
+                        Mono.just(eventAPI.getEventByID(eventId))
                                 .map(EventDTO::diagram)
                                 .map(DiagramDTO::elements)
                                 .filter(Objects::isNull)
@@ -48,7 +50,7 @@ public class SeatingService {
                                 .map(DiagramTableDTO.class::cast)
                                 .map(table -> new TableApiDto(table.id(), table.seatCount()))
                                 .collectList(),
-                        relationAPI.getAllRelationsByEventID(eventId.toString())
+                        Flux.fromIterable(relationAPI.getAllRelationsByEventID(eventId.toString()))
                                 .map(relation -> new RelationApiDto(relation.firstGuestId(), relation.secondGuestId(), relation.relation().name()))
                                 .collectList())
                 .map(tuple -> new SeatingRequest(tuple.getT1(), tuple.getT2(), tuple.getT3()))
