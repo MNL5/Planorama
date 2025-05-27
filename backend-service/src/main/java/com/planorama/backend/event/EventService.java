@@ -3,6 +3,7 @@ package com.planorama.backend.event;
 import com.planorama.backend.event.api.*;
 import com.planorama.backend.event.entity.DiagramObjectDAO;
 import com.planorama.backend.event.entity.DiagramTableDAO;
+import com.planorama.backend.event.entity.DiagramTextDAO;
 import com.planorama.backend.event.entity.EventDAO;
 import com.planorama.backend.guest.api.GuestAPI;
 import com.planorama.backend.guest.api.GuestDTO;
@@ -51,11 +52,15 @@ public class EventService {
     }
 
     private List<DiagramObjectDAO> convertDiagram(List<DiagramObjectDTO> diagramObjectDTO) {
-        return diagramObjectDTO.stream().map(object -> switch (object) {
+        return diagramObjectDTO.stream().map(object -> (DiagramObjectDAO) switch (object) {
             case DiagramTableDTO(
                     String color, Double height, String id, String label, Integer seatCount, String type,
                     Double width, Double x, Double y
-            ) -> (DiagramObjectDAO) new DiagramTableDAO(color, height, id, label, seatCount, type, width, x, y);
+            ) -> new DiagramTableDAO(color, height, id, label, seatCount, type, width, x, y);
+            case DiagramTextDTO(
+                    String color, Double height, String id, String label, String type,
+                    Double width, Double x, Double y
+            ) -> new DiagramTextDAO(color, height, id, label, type, width, x, y);
         }).toList();
     }
 

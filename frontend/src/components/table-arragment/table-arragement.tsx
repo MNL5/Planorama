@@ -1,62 +1,112 @@
+import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { toast } from "react-toastify";
-import { useEffect, useRef, useState, useTransition } from "react";
-import { Box, Button, Drawer, NumberInput, Text } from "@mantine/core";
+import {
+  Box,
+  Button,
+  Drawer,
+  Flex,
+  NumberInput,
+  Stack,
+  TextInput,
+  Title,
+} from "@mantine/core";
 
 import Element from "../../types/Element";
 import RndElement from "../RndElement/RndElement";
 import { useEventContext } from "../../contexts/event-context";
 import { updateEvent } from "../../services/event-service/event-service";
 import MainLoader from "../mainLoader/MainLoader";
+import gridCanvas from "../../assets/grid-canvas.png";
+import { useFetchAllGuests } from "../../hooks/use-fetch-all-guests";
 
-const elementTypes = [
-  { type: "square", label: "Square Table" },
-  { type: "rectangle", label: "Rectangle Table" },
-  { type: "circle", label: "Circular Table" },
+const ELEMENT_TYPES = [
+  { type: "square", label: "Square Table", elementType: "table" },
+  { type: "rectangle", label: "Rectangle Table", elementType: "table" },
+  { type: "circle", label: "Circular Table", elementType: "table" },
+  { type: "rectangle", label: "Rectangle Text", elementType: "text" },
+  { type: "circle", label: "Circular Text", elementType: "text" },
 ] as const;
+
+const INITIAL_SEAT_COUNT = 1;
 
 const TableArrangement = () => {
   const canvasRef = useRef<HTMLDivElement>(null);
   const [elements, setElements] = useState<Element[]>([]);
-  const [drawerOpened, setDrawerOpened] = useState(false);
-  const [seatCount, setSeatCount] = useState<number | string>(1);
-  const [selectedType, setSelectedType] = useState<Element["type"] | null>(
-    null,
-  );
+  const [seatCount, setSeatCount] = useState<number>(INITIAL_SEAT_COUNT);
+  const [textLabel, setTextLabel] = useState("");
+  const [selectedType, setSelectedType] = useState<{
+    type: Element["type"];
+    elementType: Element["elementType"];
+    id?: string;
+  } | null>(null);
   const { currentEvent, setCurrentEvent } = useEventContext();
   const [isPending, startTransition] = useTransition();
 
-  const addElement = () => {
+  const { guestsData: guests } = useFetchAllGuests(true);
+
+  const handleAddElement = () => {
     if (!canvasRef.current || !selectedType) return;
 
-    const canvasRect = canvasRef.current.getBoundingClientRect();
+    if (selectedType.id) {
+      const updatedElement = elements.find((el) => el.id === selectedType.id);
+      if (updatedElement) {
+        setElements((prev) =>
+          prev.map((el) =>
+            el.id === selectedType.id
+              ? {
+                  ...el,
+                  label:
+                    selectedType.elementType === "table"
+                      ? `(${seatCount})`
+                      : textLabel,
+                  seatCount:
+                    selectedType.elementType === "table"
+                      ? seatCount
+                      : undefined,
+                }
+              : el,
+          ),
+        );
+      }
+    } else {
+      const { width, height } = canvasRef.current.getBoundingClientRect();
+      const centerX = width / 2 - 50;
+      const centerY = height / 2 - 50;
 
-    const newElement: Element = {
-      id: uuidv4(),
-      type: selectedType,
-      label: `(${seatCount})`,
-      width: selectedType === "rectangle" ? 160 : 100,
-      height: 100,
-      x: canvasRect.width / 2 - 50,
-      y: canvasRect.height / 2 - 50,
-      color: "#d0b9e0",
-      ids: [],
-      seatCount,
-    };
+      const newElement: Element = {
+        id: uuidv4(),
+        type: selectedType.type,
+        label:
+          selectedType.elementType === "table" ? `(${seatCount})` : textLabel,
+        width: selectedType.type === "rectangle" ? 160 : 100,
+        height: 100,
+        x: centerX,
+        y: centerY,
+        color: selectedType.elementType === "table" ? "#d0b9e0" : "#e9dbf1",
+        elementType: selectedType.elementType,
+        ...(selectedType.elementType === "table" ? { seatCount } : {}),
+      };
 
-    setElements((prev) => [...prev, newElement]);
-    setDrawerOpened(false);
-    setSeatCount(1);
+      setElements((prev) => [...prev, newElement]);
+    }
+
+    resetDrawer();
+  };
+
+  const resetDrawer = () => {
+    setSeatCount(INITIAL_SEAT_COUNT);
+    setTextLabel("");
     setSelectedType(null);
   };
 
-  const updateElement = (updated: Element) => {
+  const handleUpdate = (updated: Element) => {
     setElements((prev) =>
       prev.map((el) => (el.id === updated.id ? updated : el)),
     );
   };
 
-  const deleteElement = (id: string) => {
+  const handleDelete = (id: string) => {
     setElements((prev) => prev.filter((el) => el.id !== id));
   };
 
@@ -64,122 +114,152 @@ const TableArrangement = () => {
     startTransition(async () => {
       try {
         if (currentEvent?.id) {
-          setCurrentEvent(
-            await updateEvent(
-              { ...currentEvent, diagram: { elements } },
-              currentEvent.id,
-            ),
+          const updatedEvent = await updateEvent(
+            { ...currentEvent, diagram: { elements } },
+            currentEvent.id,
           );
+          setCurrentEvent(updatedEvent);
           toast.success("Seating arrangement saved");
         } else {
-          console.error("no current event id");
+          console.error("No current event ID");
         }
-      } catch (error) {
-        console.error(error);
-        const innerError = error as {
-          response: { data: { error: string } };
-          message: string;
-        };
-        toast.error(innerError.response?.data?.error || "Problem has occured");
+      } catch (error: any) {
+        console.error("Save failed:", error);
+        toast.error(error?.response?.data?.error || "An error occurred");
       }
     });
   };
 
-  const loadLayout = async () => {
-    try {
-      const loadedElements = currentEvent?.diagram?.elements;
-      setElements(loadedElements || []);
-    } catch (error) {
-      console.error("Failed to load layout:", error);
-      setElements([]);
-    }
+  const loadLayout = () => {
+    const loadedElements = currentEvent?.diagram?.elements;
+    setElements(loadedElements || []);
   };
 
   useEffect(() => {
     loadLayout();
   }, []);
 
+  const guestsCount = useMemo(
+    () =>
+      guests?.filter((guest) => guest.tableId === selectedType?.id).length ||
+      INITIAL_SEAT_COUNT,
+    [guests, selectedType],
+  );
+
   return (
-    <Box style={{ display: "flex", direction: "rtl", flex: "1 1" }}>
+    <Flex style={{ direction: "rtl", flex: "1 1" }}>
       <MainLoader isPending={isPending} />
-      <Box
-        ref={canvasRef}
-        style={{
-          flex: 1,
-          position: "relative",
-          backgroundColor: "#fff",
-          border: "1px solid rgb(230, 229, 229)",
-        }}
-      >
-        {elements.map((el, index) => (
-          <RndElement
-            key={el.id}
-            element={el}
-            tableNumber={index + 1}
-            onUpdate={updateElement}
-            onDelete={deleteElement}
-          />
-        ))}
-      </Box>
 
       <Box
-        style={{
-          padding: "1.5rem",
-          backgroundColor: "#f8f8f8",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          textAlign: "center",
-          justifyContent: "space-between",
-        }}
+        flex={1}
+        style={{ backgroundImage: `url(${gridCanvas})` }}
+        ref={canvasRef}
+        pos="relative"
+        bg="#fff"
+        bd={"1px solid rgb(230, 229, 229)"}
       >
-        <div>
-          <Text fw={700}>Menu</Text>
-          {elementTypes.map((el) => (
+        {elements
+          .filter((ele) => ele.seatCount)
+          .map((el, i) => (
+            <RndElement
+              key={el.id}
+              element={el}
+              tableNumber={i + 1}
+              onUpdate={handleUpdate}
+              onDelete={handleDelete}
+              onEdit={() => {
+                setSelectedType({
+                  elementType: "table",
+                  type: el.type,
+                  id: el.id,
+                });
+                setSeatCount(el.seatCount || INITIAL_SEAT_COUNT);
+              }}
+            />
+          ))}
+        {elements
+          .filter((ele) => !ele.seatCount)
+          .map((el) => (
+            <RndElement
+              key={el.id}
+              element={el}
+              onUpdate={handleUpdate}
+              onDelete={handleDelete}
+              onEdit={() => {
+                setSelectedType({
+                  elementType: "text",
+                  type: el.type,
+                  id: el.id,
+                });
+                setTextLabel(el.label || "");
+              }}
+            />
+          ))}
+      </Box>
+
+      <Stack
+        w={200}
+        color="white"
+        p="lg"
+        align="center"
+        justify="space-between"
+        bg="linear-gradient(to right, #e9dbf1, #e6c8fa)"
+      >
+        <div style={{ padding: 16, textAlign: "center" }}>
+          <Title order={2} py={"lg"} c={"primary"}>
+            Menu
+          </Title>
+          {ELEMENT_TYPES.map(({ type, elementType, label }, i) => (
             <Button
-              key={el.type}
+              key={i}
               fullWidth
               className="primary-btn"
-              style={{ fontSize: "14px" }}
+              style={{ fontSize: 12, fontWeight: "lighter" }}
               onClick={() => {
-                setSelectedType(el.type);
-                setDrawerOpened(true);
+                setSelectedType({ type, elementType });
               }}
             >
-              {el.label}
+              {label}
             </Button>
           ))}
         </div>
 
-        <Button
-          className="primary-btn"
-          style={{ fontSize: "14px" }}
-          fullWidth
-          onClick={handleSave}
-        >
+        <Button variant="light" size="md" radius="md" onClick={handleSave}>
           Save
         </Button>
-      </Box>
+      </Stack>
 
       <Drawer
-        opened={drawerOpened}
-        onClose={() => setDrawerOpened(false)}
-        title="Add Table"
+        opened={!!selectedType}
+        onClose={resetDrawer}
+        title={selectedType?.elementType === "table" ? "Add Table" : "Add Text"}
         position="left"
       >
-        {selectedType && (
+        {selectedType?.elementType === "table" ? (
           <NumberInput
-            label="No. of Seats"
+            label="Number of Seats"
+            min={guestsCount || 1}
             value={seatCount}
-            onChange={setSeatCount}
-            min={1}
+            onChange={(value) => setSeatCount(Number(value))}
+          />
+        ) : (
+          <TextInput
+            label="Text"
+            value={textLabel}
+            onChange={({ target }) => setTextLabel(target.value || "")}
           />
         )}
-        <Button color="#6a0572" fullWidth mt="md" onClick={addElement}>
+        <Button
+          mt="md"
+          fullWidth
+          radius="md"
+          color="#6a0572"
+          onClick={handleAddElement}
+        >
           Add
         </Button>
       </Drawer>
-    </Box>
+    </Flex>
   );
 };
 

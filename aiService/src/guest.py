@@ -3,6 +3,7 @@ class Guest:
         self.group = group
         self.id = id
         self.table = table
+        self.satisfaction = None
     
     def __str__(self) -> str:
         return self.group + str(self.id)
@@ -11,9 +12,9 @@ class Guest:
     def __lt__(self, other):
         return self.group < other.group
     def to_json(self):
-        return {"group": self.group, "id": self.id, "table": self.table}
+        return self.to_dict()
     def to_dict(self):
-        return {"group": self.group, "id": self.id, "table": self.table}
+        return {"group": self.group, "id": self.id, "table": self.table, "satisfaction": self.satisfaction}
     
     @classmethod
     def from_dict(cls, data):

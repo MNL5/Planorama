@@ -1,24 +1,35 @@
-import { Box, Button, Text } from "@mantine/core";
-import { useQuery } from "@tanstack/react-query";
-import React, { useEffect, useState, useTransition } from "react";
 import { toast } from "react-toastify";
+import { useQuery } from "@tanstack/react-query";
+import { Flex, Button, Box, Text, Stack, Title } from "@mantine/core";
+import React, { useEffect, useMemo, useState, useTransition } from "react";
 import { useEventContext } from "../../contexts/event-context";
 import {
   getAllGuests,
   updateGuests,
 } from "../../services/guest-service/guest-service";
-import ElementType from "../../types/Element";
+import Element from "../../types/Element";
 import { Guest } from "../../types/guest";
-import GuestSeatingList from "../guest-seating-list/guest-seating-list";
 import GuestTable from "../guest-table/guest-table";
 import MainLoader from "../mainLoader/MainLoader";
+import { RsvpStatus } from "../../types/rsvp-status";
+import { CustomTable } from "../custom-table/custom-table";
+import { seatingGuestColumns } from "../../utils/seating-guest-columns";
+import gridCanvas from "../../assets/grid-canvas.png";
 
 const GuestSeating: React.FC = () => {
   const { currentEvent } = useEventContext();
-  const [tables, setTables] = useState<ElementType[]>([]);
+  const [elements, setTables] = useState<Element[]>([]);
   const [guests, setGuests] = useState<Guest[]>([]);
   const [openTableId, setOpenTableId] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+
+  const guestsToShow = useMemo(
+    () =>
+      guests.filter(
+        (guest) => !guest.tableId && guest.status !== RsvpStatus.DECLINE,
+      ),
+    [guests],
+  );
 
   const {
     data: guestsData = [],
@@ -40,9 +51,10 @@ const GuestSeating: React.FC = () => {
     setGuests(guestsData);
   }, [guestsData]);
 
-  const handleDrop = (tableId: string, guestId: string) => {
+  const handleDrop = (tableId: string, ids: string[]) => {
+    const idsSet = new Set(ids);
     setGuests((prev) =>
-      prev.map((g) => (g.id === guestId ? { ...g, tableId } : g)),
+      prev.map((g) => (idsSet.has(g.id) ? { ...g, tableId } : g)),
     );
   };
 
@@ -59,7 +71,9 @@ const GuestSeating: React.FC = () => {
         const updatedGuestsTables: Record<string, { tableId?: string }> = {};
 
         guests.forEach((guest) => {
-          updatedGuestsTables[guest.id] = { tableId: guest?.tableId || "" };
+          updatedGuestsTables[guest.id] = {
+            tableId: guest?.tableId || "",
+          };
         });
 
         await updateGuests(currentEvent.id, updatedGuestsTables);
@@ -73,50 +87,97 @@ const GuestSeating: React.FC = () => {
 
   const handleGuestDragStart = (
     e: React.DragEvent<HTMLDivElement>,
-    id: string,
+    ids: string[],
   ) => {
-    e.dataTransfer.setData("guestId", id);
+    e.dataTransfer.setData("ids", JSON.stringify(ids));
   };
 
   if (isLoading) return <MainLoader isPending />;
   if (isError) return <Text>Error loading guests</Text>;
 
   return (
-    <Box
-      style={{ display: "flex", flex: "1 1" }}
+    <Flex
+      bg={"primary.0"}
+      flex={"1 1"}
+      style={{
+        overflow: "hidden",
+      }}
       onClick={() => setOpenTableId(null)}
     >
       <MainLoader isPending={isPending} />
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-between",
-        }}
+      <Stack
+        p={"lg"}
+        align={"center"}
+        bg={"linear-gradient(to right, #e9dbf1, #e6c8fa)"}
       >
-        <GuestSeatingList
-          guests={guests.filter((g) => !g.tableId)}
+        <Title order={2} py={"lg"} c={"primary"}>
+          Guests
+        </Title>
+        <CustomTable<Guest>
+          data={guestsToShow}
+          columns={seatingGuestColumns}
           onDragStart={handleGuestDragStart}
+          rowStyle={{ cursor: "pointer" }}
+          selectable
         />
-        <Button fullWidth mt="md" onClick={handleSave} color="green">
+        <Button
+          size={"md"}
+          radius={"md"}
+          variant={"light"}
+          onClick={handleSave}
+          mt={"auto"}
+        >
           Save Seating
         </Button>
-      </div>
-      <Box style={{ flex: 1, position: "relative", background: "#fff" }}>
-        {tables.map((table) => (
-          <GuestTable
-            key={table.id}
-            table={table}
-            assignedGuests={guests.filter((g) => g.tableId === table.id)}
-            isOpen={openTableId === table.id}
-            onOpen={(id) => setOpenTableId(id)}
-            onClose={() => setOpenTableId(null)}
-            onDrop={handleDrop}
-            onRemove={handleRemove}
-          />
-        ))}
+      </Stack>
+      <Box
+        flex={1}
+        pos={"relative"}
+        style={{ backgroundImage: `url(${gridCanvas})` }}
+      >
+        {elements
+          .filter((element) => element.seatCount)
+          .map((table) => (
+            <GuestTable
+              key={table.id}
+              table={table}
+              assignedGuests={guests.filter((g) => g.tableId === table.id)}
+              isOpen={openTableId === table.id}
+              onOpen={(id) => setOpenTableId(id)}
+              onClose={() => setOpenTableId(null)}
+              onDrop={handleDrop}
+              onRemove={handleRemove}
+            />
+          ))}
+
+        {elements
+          .filter((element) => !element.seatCount)
+          .map((objective) => (
+            <Box
+              key={objective.id}
+              style={{
+                position: "absolute",
+                top: objective.y,
+                left: objective.x,
+                width: objective.width,
+                height: objective.height,
+                backgroundColor: objective.color,
+                border: "1px dashed #ccc",
+                borderRadius: objective.type === "circle" ? "50%" : 4,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "#666",
+                padding: 4,
+                boxShadow: "0 1px 4px rgba(0,0,0,0.1)",
+                cursor: "default",
+              }}
+            >
+              <Text size="sm">{objective.label}</Text>
+            </Box>
+          ))}
       </Box>
-    </Box>
+    </Flex>
   );
 };
 

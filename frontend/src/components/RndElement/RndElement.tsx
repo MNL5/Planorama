@@ -4,9 +4,10 @@ import Element from "../../types/Element";
 
 interface RndElementProps {
   element: Element;
-  tableNumber: number;
+  tableNumber?: number;
   onUpdate: (updated: Element) => void;
   onDelete: (id: string) => void;
+  onEdit: () => void;
 }
 
 const RndElement = ({
@@ -14,11 +15,13 @@ const RndElement = ({
   tableNumber,
   onUpdate,
   onDelete,
+  onEdit,
 }: RndElementProps) => (
   <Rnd
     bounds="parent"
     size={{ width: element.width, height: element.height }}
     position={{ x: element.x, y: element.y }}
+    onDoubleClick={onEdit}
     onDragStop={(_, d) => onUpdate({ ...element, x: d.x, y: d.y })}
     onResizeStop={(_, __, ref, ___, position) =>
       onUpdate({
@@ -30,13 +33,13 @@ const RndElement = ({
       })
     }
     style={{
+      border: "1px dashed #ccc",
       backgroundColor: element.color,
       borderRadius: element.type === "circle" ? "50%" : "8px",
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
       color: "#000",
-      fontWeight: "bold",
       cursor: "move",
       position: "absolute",
       boxShadow: "rgb(0 0 0 / 16%) 0px 4px 16px",
@@ -49,13 +52,16 @@ const RndElement = ({
         alignItems: "center",
       }}
     >
-      <span style={{ fontSize: "1.3rem" }}>{tableNumber}</span>
-      <span>{`(${element.seatCount})`}</span>
+      {tableNumber !== undefined && (
+        <span style={{ fontSize: "1.3rem" }}>{tableNumber}</span>
+      )}
+      <span>{element.label}</span>
       <Button
         size="xs"
         color="#951818"
         h={"20px"}
         p={"5px"}
+        radius={"md"}
         style={{
           position: "absolute",
           top: "5px",

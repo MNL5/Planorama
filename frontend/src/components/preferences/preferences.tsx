@@ -274,7 +274,7 @@ const Preferences: React.FC = () => {
           />
         </Flex>
         <Group mt={"md"}>
-          <Button onClick={reset} variant={"outline"}>
+          <Button radius={"md"} onClick={reset} variant={"outline"}>
             Clear
           </Button>
           <Tooltip
@@ -288,6 +288,7 @@ const Preferences: React.FC = () => {
             disabled={!isEmptyField && !isGuestRelationExist}
           >
             <Button
+              radius={"md"}
               onClick={onAdd}
               disabled={isEmptyField || isGuestRelationExist}
             >

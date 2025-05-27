@@ -33,7 +33,7 @@ body {
 .logo {
   font-size: 28px;
   font-weight: bold;
-  color: #6a0572;
+  color: #6b1fa2;
 }
 
 .home-navbar nav a {
@@ -45,7 +45,7 @@ body {
 }
 
 .home-navbar nav a:hover {
-  color: #6a0572;
+  color: #5d1a91;
 }
 
 .auth-links {
@@ -54,7 +54,7 @@ body {
 
 .auth-links a {
   text-decoration: none;
-  color: #6a0572;
+  color: #6b1fa2;
 }
 
 /* Main Content */
@@ -72,7 +72,7 @@ body {
 .main-title {
   font-size: 42px;
   font-weight: bold;
-  color: #6a0572;
+  color: #6b1fa2;
   text-transform: uppercase;
 }
 
@@ -83,7 +83,7 @@ body {
 }
 
 .primary-btn {
-  background: #6a0572;
+  background: #6b1fa2;
   color: white;
   font-size: 18px;
   margin-top: 20px;
@@ -95,7 +95,7 @@ body {
 }
 
 .primary-btn:hover {
-  background: #4e024c;
+  background: #5d1a91;
 }
 
 /* Image Section */
@@ -114,8 +114,8 @@ body {
 .business-btn {
   margin-top: 10px;
   padding: 10px 20px;
-  border: 2px solid #6a0572;
-  color: #6a0572;
+  border: 2px solid #6b1fa2;
+  color: #6b1fa2;
   font-weight: bold;
   border-radius: 8px;
   transition: all 0.3s ease;
@@ -123,7 +123,7 @@ body {
 }
 
 .business-btn:hover {
-  background: #6a0572;
+  background: #5d1a91;
   color: white;
 }
 
