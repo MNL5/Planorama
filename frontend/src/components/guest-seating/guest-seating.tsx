@@ -4,6 +4,7 @@ import { Flex, Button, Box, Text, Stack, Title } from "@mantine/core";
 import React, { useEffect, useMemo, useState, useTransition } from "react";
 import { useEventContext } from "../../contexts/event-context";
 import {
+  autoAssign,
   getAllGuests,
   updateGuests,
 } from "../../services/guest-service/guest-service";
@@ -85,6 +86,42 @@ const GuestSeating: React.FC = () => {
     });
   };
 
+  const handleAutoAssign = async () => {
+    if (!currentEvent) return;
+
+    const numOfSeats = elements.reduce(
+      (acc, table) => acc + (table.seatCount || 0),
+      0,
+    );
+    const numOfGuests = guests.filter(
+      (guest) => guest.status !== RsvpStatus.DECLINE,
+    ).length;
+    if (numOfGuests > numOfSeats) {
+      toast.error("Not enough seats for all guests");
+      return;
+    }
+
+    startTransition(async () => {
+      try {
+        const response = await autoAssign(currentEvent.id);
+
+        const assignedGuests: { [key: string]: string } = {};
+        response.guests.forEach((guest) => {
+          assignedGuests[guest.id] = guest.table;
+        });
+
+        setGuests((prev) =>
+          prev.map((guest) => {
+            return { ...guest, tableId: assignedGuests[guest.id] };
+          }),
+        );
+      } catch (err) {
+        console.error(err);
+        toast.error("Failed to auto assign");
+      }
+    });
+  };
+
   const handleGuestDragStart = (
     e: React.DragEvent<HTMLDivElement>,
     ids: string[],
@@ -110,9 +147,19 @@ const GuestSeating: React.FC = () => {
         align={"center"}
         bg={"linear-gradient(to right, #e9dbf1, #e6c8fa)"}
       >
-        <Title order={2} py={"lg"} c={"primary"}>
+        <Title order={2} c={"primary"}>
           Guests
         </Title>
+        <Button
+          size={"md"}
+          radius={"md"}
+          variant={"light"}
+          onClick={handleAutoAssign}
+          mih={"2rem"}
+          w={"100%"}
+        >
+          Auto Assign
+        </Button>
         <CustomTable<Guest>
           data={guestsToShow}
           columns={seatingGuestColumns}
@@ -125,6 +172,7 @@ const GuestSeating: React.FC = () => {
           radius={"md"}
           variant={"light"}
           onClick={handleSave}
+          mih={"2rem"}
           mt={"auto"}
         >
           Save Seating

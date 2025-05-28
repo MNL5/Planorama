@@ -1,5 +1,6 @@
 package com.planorama.backend.seating;
 
+import com.planorama.backend.seating.api.SeatingResponse;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,9 +20,8 @@ public class SeatingController {
 
     @GetMapping("/{eventId}")
     @PreAuthorize("hasAuthority(#eventId)")
-    public String autoSeat(@PathVariable("eventId") UUID eventId) {
+    public SeatingResponse autoSeat(@PathVariable("eventId") UUID eventId) {
         return seatingService.autoSeat(eventId)
-                .map(tableChanges -> String.format("%n Tables changed"))
                 .block();
     }
 }
