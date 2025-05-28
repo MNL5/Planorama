@@ -6,7 +6,7 @@ import {
   abortablePostRequest,
   abortableDeleteRequest,
 } from "../abortable-request";
-import { Guest } from "../../types/guest";
+import { AIGuest, Guest } from "../../types/guest";
 
 const createGuest = async (eventId: string, guest: Omit<Guest, "id">) => {
   const response = await abortablePostRequest<Guest>("guests", {
@@ -65,6 +65,13 @@ const deleteGuest = async (id: string) => {
   return response.data;
 };
 
+const autoAssign = async (eventId: string) => {
+  const response: AxiosResponse<{guests: AIGuest[]}> = await abortableGetRequest<{guests: AIGuest[]}>(
+    `seating/${eventId}`,
+  ).request;
+  return response.data;
+};
+
 export {
   createGuest,
   updateGuest,
@@ -72,4 +79,5 @@ export {
   getAllGuests,
   deleteGuest,
   updateGuestRSVP,
+  autoAssign
 };

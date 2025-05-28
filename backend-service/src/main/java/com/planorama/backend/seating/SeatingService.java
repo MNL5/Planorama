@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Objects;
@@ -44,11 +43,12 @@ public class SeatingService {
                         Mono.just(eventAPI.getEventByID(eventId))
                                 .map(EventDTO::diagram)
                                 .map(DiagramDTO::elements)
-                                .filter(Objects::isNull)
+                                .filter(Objects::nonNull)
                                 .flatMapIterable(Function.identity())
                                 .filter(DiagramTableDTO.class::isInstance)
                                 .map(DiagramTableDTO.class::cast)
                                 .map(table -> new TableApiDto(table.id(), table.seatCount()))
+                                .filter(table -> table.numOfSeats() != null)
                                 .collectList(),
                         Flux.fromIterable(relationAPI.getAllRelationsByEventID(eventId.toString()))
                                 .map(relation -> new RelationApiDto(relation.firstGuestId(), relation.secondGuestId(), relation.relation().name()))

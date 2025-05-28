@@ -12,4 +12,11 @@ type Guest = {
   tableId?: string;
 };
 
-export type { Guest };
+type AIGuest = {
+  id: string;
+  group: string;
+  table: string;
+  satisfaction: string;
+}
+
+export type { Guest, AIGuest};
