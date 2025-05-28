@@ -66,9 +66,9 @@ const deleteGuest = async (id: string) => {
 };
 
 const autoAssign = async (eventId: string) => {
-  const response: AxiosResponse<{guests: AIGuest[]}> = await abortableGetRequest<{guests: AIGuest[]}>(
-    `seating/${eventId}`,
-  ).request;
+  const response: AxiosResponse<{ guests: AIGuest[] }> =
+    await abortableGetRequest<{ guests: AIGuest[] }>(`seating/${eventId}`)
+      .request;
   return response.data;
 };
 
@@ -79,5 +79,5 @@ export {
   getAllGuests,
   deleteGuest,
   updateGuestRSVP,
-  autoAssign
+  autoAssign,
 };

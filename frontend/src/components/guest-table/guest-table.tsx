@@ -107,7 +107,9 @@ const GuestTable: React.FC<GuestTableProps> = ({
                 <Group key={g.id} style={{ padding: "4px 0" }}>
                   <Box
                     draggable
-                    onDragStart={(e) => e.dataTransfer.setData("ids", JSON.stringify([g.id]))}
+                    onDragStart={(e) =>
+                      e.dataTransfer.setData("ids", JSON.stringify([g.id]))
+                    }
                     style={{ flex: 1, cursor: "grab" }}
                   >
                     {g.name}

@@ -17,6 +17,6 @@ type AIGuest = {
   group: string;
   table: string;
   satisfaction: string;
-}
+};
 
-export type { Guest, AIGuest};
+export type { Guest, AIGuest };

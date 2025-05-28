@@ -105,15 +105,15 @@ const GuestSeating: React.FC = () => {
       try {
         const response = await autoAssign(currentEvent.id);
 
-        const assignedGuests: {[key: string]: string} = {};
+        const assignedGuests: { [key: string]: string } = {};
         response.guests.forEach((guest) => {
           assignedGuests[guest.id] = guest.table;
         });
 
         setGuests((prev) =>
           prev.map((guest) => {
-            return {...guest, tableId: assignedGuests[guest.id]};
-          })
+            return { ...guest, tableId: assignedGuests[guest.id] };
+          }),
         );
       } catch (err) {
         console.error(err);
@@ -151,14 +151,14 @@ const GuestSeating: React.FC = () => {
           Guests
         </Title>
         <Button
-            size={"md"}
-            radius={"md"}
-            variant={"light"}
-            onClick={handleAutoAssign}
-            mih={"2rem"}
-            w={"100%"}
-          >
-            Auto Assign
+          size={"md"}
+          radius={"md"}
+          variant={"light"}
+          onClick={handleAutoAssign}
+          mih={"2rem"}
+          w={"100%"}
+        >
+          Auto Assign
         </Button>
         <CustomTable<Guest>
           data={guestsToShow}
