@@ -65,4 +65,8 @@ public class TaskService {
     public Mono<TaskDAO> deleteTask(UUID taskId) {
         return reactiveMongoTemplate.findAndRemove(Query.query(Criteria.where(TaskDAO.ID_FIELD).is(taskId)), TaskDAO.class);
     }
+
+    public Mono<TaskDAO> findById(UUID id) {
+        return reactiveMongoTemplate.findById(id, TaskDAO.class);
+    }
 }
