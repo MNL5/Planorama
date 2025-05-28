@@ -1,13 +1,16 @@
-[project]
+[tool.poetry]
 name = "flaskr"
 version = "1.0.0"
-description = "Ai Service for seating arrangement."
-dependencies = [
-    "flask",
-    "python-dotenv",
-    "build"
-]
+description = "AI Service for seating arrangement."
+authors = ["Planorama"]
+packages = [{ include = "flaskr", from = "src" }]
+
+[tool.poetry.dependencies]
+python = ">=3.8"
+flask = "^2.2"
+numpy = "^1.24"
+python-dotenv = "^0.21"
 
 [build-system]
-requires = ["flit_core<4"]
-build-backend = "flit_core.buildapi"
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

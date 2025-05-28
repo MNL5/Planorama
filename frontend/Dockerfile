@@ -1,7 +1,7 @@
-FROM node:20-slim AS build
+FROM node:20 AS build
 WORKDIR /app
-COPY package.json package-lock.json ./
-RUN npm ci
+COPY package.json ./
+RUN npm install
 COPY . .
 
 RUN for FILE in tsconfig.app.json tsconfig.node.json; do \

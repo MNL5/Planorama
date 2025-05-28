@@ -18,7 +18,7 @@ import { toast } from "react-toastify";
 
 import useEventByGuest from "../../hooks/use-event-by-guest";
 import { CreateGift, Gift } from "../../types/gift";
-import { createGift } from "../../Services/gift-service/gift-service";
+import { createGift } from "../../services/gift-service/gift-service";
 import MainLoader from "../mainLoader/MainLoader";
 import { FormErrors, numberRegex, validateGift } from "../../utils/gift-utils";
 

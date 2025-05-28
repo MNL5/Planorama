@@ -7,7 +7,7 @@ import { useEventContext } from "../../contexts/event-context";
 import { useEffect, useState } from "react";
 import { Column } from "../../types/column";
 import { Gift } from "../../types/gift";
-import { getAllGifts } from "../../Services/gift-service/gift-service";
+import { getAllGifts } from "../../services/gift-service/gift-service";
 import { giftsColumns } from "../../utils/gift-columns";
 import MainLoader from "../mainLoader/MainLoader";
 import { useFetchAllGuests } from "../../hooks/use-fetch-all-guests";
