@@ -48,12 +48,14 @@ public class SecurityConfiguration {
         return http
                 .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
-                .securityMatcher("/users/**", "/gifts/**", "/guests/**", "/events/**")
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.POST, "/gifts").permitAll()
-                        .requestMatchers(HttpMethod.PUT, "/guests/rsvp/**").permitAll()
-                        .requestMatchers("/users/**").permitAll()
-                        .requestMatchers(request -> "/events".equals(request.getRequestURI()) && request.getParameter("guest") != null).permitAll())
+                .securityMatcher(request -> {
+                    final String requestURI = request.getRequestURI();
+                    final String method = request.getMethod();
+                    return (("/gifts".equals(requestURI) && HttpMethod.POST.matches(method)) ||
+                            requestURI.startsWith("/guests/rsvp/") && HttpMethod.PUT.matches(method) ||
+                            requestURI.startsWith("/users") ||
+                            "/events".equals(request.getRequestURI()) && request.getParameter("guest") != null);
+                })
                 .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
                 .build();
     }
