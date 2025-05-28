@@ -48,7 +48,12 @@ public class SecurityConfiguration {
         return http
                 .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
-                .securityMatcher("/users/**")
+                .securityMatcher("/users/**", "/gifts/**", "/guests/**", "/events/**")
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.POST, "/gifts").permitAll()
+                        .requestMatchers(HttpMethod.PUT, "/guests/rsvp/**").permitAll()
+                        .requestMatchers("/users/**").permitAll()
+                        .requestMatchers(request -> "/events".equals(request.getRequestURI()) && request.getParameter("guest") != null).permitAll())
                 .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
                 .build();
     }
@@ -62,10 +67,7 @@ public class SecurityConfiguration {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.PUT, "/guests/rsvp/**").permitAll()
-                        .requestMatchers(request -> "/events".equals(request.getRequestURI()) && request.getParameter("guest") != null).permitAll()
-                        .anyRequest().authenticated())
+                .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
                 .build();
     }
 }
