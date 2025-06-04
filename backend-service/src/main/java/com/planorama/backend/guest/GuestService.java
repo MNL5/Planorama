@@ -25,6 +25,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
@@ -34,20 +35,28 @@ import java.util.stream.Collectors;
 public class GuestService {
     private final ReactiveMongoTemplate reactiveMongoTemplate;
     private final ApplicationEventPublisher eventPublisher;
-    private final Map<String, Function<UpdateGuestDTO, Object>> updateFields;
+    private final Map<String, UpdateGuestFieldExtractor> updateFields;
+    private final PhoneNumberValidator phoneNumberValidator;
 
-    public GuestService(ReactiveMongoTemplate reactiveMongoTemplate, ApplicationEventPublisher eventPublisher) {
+    public GuestService(ReactiveMongoTemplate reactiveMongoTemplate,
+                        ApplicationEventPublisher eventPublisher,
+                        PhoneNumberValidator phoneNumberValidator) {
         this.reactiveMongoTemplate = reactiveMongoTemplate;
         this.eventPublisher = eventPublisher;
+        this.phoneNumberValidator = phoneNumberValidator;
         this.updateFields = Map.of(
-                GuestDAO.NAME_FIELD, UpdateGuestDTO::name,
-                GuestDAO.PHONE_NUMBER_FIELD, UpdateGuestDTO::phoneNumber,
-                GuestDAO.GENDER_FIELD, UpdateGuestDTO::gender,
-                GuestDAO.GROUP_FIELD, UpdateGuestDTO::group,
-                GuestDAO.MEAL_FIELD, u -> u.meal() != null ? u.meal().stream().map(Enum::name).collect(Collectors.toSet()) : null,
-                GuestDAO.STATUS_FIELD, u -> u.status() != null ? u.status().name() : null,
-                GuestDAO.TABLE_FIELD, UpdateGuestDTO::tableId
+                GuestDAO.NAME_FIELD, new UpdateGuestFieldExtractor(UpdateGuestDTO::name, UpdateGuestDTO::name),
+                GuestDAO.PHONE_NUMBER_FIELD, new UpdateGuestFieldExtractor(UpdateGuestDTO::phoneNumber, u -> phoneNumberValidator.normalize(u.phoneNumber()).orElse(null)),
+                GuestDAO.GENDER_FIELD, new UpdateGuestFieldExtractor(UpdateGuestDTO::gender, UpdateGuestDTO::gender),
+                GuestDAO.GROUP_FIELD, new UpdateGuestFieldExtractor(UpdateGuestDTO::group, UpdateGuestDTO::group),
+                GuestDAO.MEAL_FIELD, new UpdateGuestFieldExtractor(UpdateGuestDTO::meal, u -> u.meal() != null ? u.meal().stream().map(Enum::name).collect(Collectors.toSet()) : null),
+                GuestDAO.STATUS_FIELD, new UpdateGuestFieldExtractor(UpdateGuestDTO::status, u -> u.status() != null ? u.status().name() : null),
+                GuestDAO.TABLE_FIELD, new UpdateGuestFieldExtractor(UpdateGuestDTO::tableId, UpdateGuestDTO::tableId)
         );
+    }
+
+    private record UpdateGuestFieldExtractor(Function<UpdateGuestDTO, Object> rawValue,
+                                             Function<UpdateGuestDTO, Object> updateValue) {
     }
 
     @Async
@@ -78,6 +87,11 @@ public class GuestService {
     }
 
     public Mono<GuestDAO> createGuest(@Valid @NotNull CreateGuestDTO createGuestDTO) {
+        Optional<String> normalizePhoneNumber = phoneNumberValidator.normalize(createGuestDTO.phoneNumber());
+        if (normalizePhoneNumber.isEmpty()) {
+            return Mono.error(new IllegalArgumentException("Phone number format is invalid"));
+        }
+
         return reactiveMongoTemplate.save(createGuestDao(createGuestDTO))
                 .switchIfEmpty(Mono.error(new RuntimeException("Failed to create an guest")));
     }
@@ -91,7 +105,7 @@ public class GuestService {
                 createGuestDTO.group(),
                 createGuestDTO.status() != null ? createGuestDTO.status().name() : RSVPStatusDTO.TENTATIVE.name(),
                 createGuestDTO.meal() != null ? createGuestDTO.meal().stream().map(Enum::name).collect(Collectors.toSet()) : Set.of(),
-                createGuestDTO.tableId());
+                createGuestDTO.tableId() != null ? createGuestDTO.tableId() : "");
     }
 
     public Mono<GuestDAO> updateGuest(UpdateGuestDTO updateGuestDTO, UUID guestId) {
@@ -113,8 +127,15 @@ public class GuestService {
         final Update update = new Update();
 
         updateFields.forEach((key, extractor) -> {
-            Object value = extractor.apply(updateGuestDTO);
-            if (value != null) update.set(key, value);
+            Object sourceValue = extractor.rawValue().apply(updateGuestDTO);
+            if (sourceValue != null) {
+                Object valueToUpdate = extractor.updateValue().apply(updateGuestDTO);
+                if (valueToUpdate != null) {
+                    update.set(key, valueToUpdate);
+                } else {
+                    throw new IllegalArgumentException(String.format("Failed to update guest, The value of field %s is invalid", key));
+                }
+            }
         });
         return update;
     }
