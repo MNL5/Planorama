@@ -9,7 +9,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 public class SeatingConfiguration {
 
     @Bean("algoServiceClient")
-    public WebClient algoServiceClient(@Value("${ALGO_SERVICE_URL:http://localhost:5000/seating}") String algoServiceURL) {
+    public WebClient algoServiceClient(@Value("${ALGO_SERVICE_URL:http://localhost:5000}") String algoServiceURL) {
         return WebClient.builder().baseUrl(algoServiceURL).build();
     }
 }

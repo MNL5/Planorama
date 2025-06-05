@@ -36,6 +36,14 @@ public class SeatingService {
     }
 
     public Mono<SeatingResponse> autoSeat(UUID eventId) {
+        return requestAiService(eventId, "/seating");
+    }
+
+    public Mono<SeatingResponse> satisfaction(UUID eventId) {
+        return requestAiService(eventId, "/satisfaction");
+    }
+
+    public Mono<SeatingResponse> requestAiService(UUID eventId, String requestPath) {
         return Mono.zip(Flux.fromIterable(guestAPI.getAllGuestByEventID(eventId.toString()))
                                 .filter(guest -> !RSVPStatusDTO.DECLINE.equals(guest.status()))
                                 .map(guest -> new GuestApiDto(guest.id(), guest.group(), guest.tableId(), null))
@@ -55,6 +63,7 @@ public class SeatingService {
                                 .collectList())
                 .map(tuple -> new SeatingRequest(tuple.getT1(), tuple.getT2(), tuple.getT3()))
                 .flatMap(request -> algoServiceClient.post()
+                        .uri(requestPath)
                         .bodyValue(request)
                         .retrieve()
                         .bodyToMono(SeatingResponse.class))
