@@ -6,7 +6,7 @@ import { useEventContext } from '../../contexts/event-context';
 import useGuestData from '../../hooks/useGuestData';
 
 import UnassignedGuestsPanel from '../UnassignedGuestsPanel/UnassignedGuestsPanel';
-import TableCanvas from '../TableCanvas/TableCanvas';
+import ElementsCanvas from '../ElementsCanvas/ElementsCanvas';
 
 import {
     computeTableAverage,
@@ -97,7 +97,7 @@ const GuestSeating: React.FC = () => {
                     className="gs-view-switch"
                 />
 
-                <TableCanvas
+                <ElementsCanvas
                     elements={elements}
                     guests={guests}
                     satisfactionMap={satisfactionMap}
@@ -108,7 +108,6 @@ const GuestSeating: React.FC = () => {
                     onDrop={handleDrop}
                     onRemove={handleRemove}
                     computeTableAverage={computeTableAverage}
-                    satisfactionToColor={satisfactionToColor}
                 />
             </Box>
         </Flex>

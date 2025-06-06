@@ -4,6 +4,7 @@ import gridCanvas from '../../assets/grid-canvas.png';
 import { Guest } from '../../types/guest';
 import GuestTable from '../guest-table/guest-table';
 import Element from '../../types/Element';
+import { satisfactionToColor } from '../../utils/satisfactionUtils';
 
 interface TableCanvasProps {
     elements: Element[];
@@ -20,10 +21,9 @@ interface TableCanvasProps {
         guests: Guest[],
         satisfactionMap: Record<string, number>
     ) => number | null;
-    satisfactionToColor: (s: number) => string;
 }
 
-const TableCanvas: React.FC<TableCanvasProps> = ({
+const ElementsCanvas: React.FC<TableCanvasProps> = ({
     elements,
     guests,
     satisfactionMap,
@@ -34,7 +34,6 @@ const TableCanvas: React.FC<TableCanvasProps> = ({
     onDrop,
     onRemove,
     computeTableAverage,
-    satisfactionToColor,
 }) => {
     const tableElements = elements.filter((el) => el.elementType === 'table');
     const textElements = elements.filter((el) => el.elementType === 'text');
@@ -71,7 +70,7 @@ const TableCanvas: React.FC<TableCanvasProps> = ({
                     <GuestTable
                         key={table.id}
                         table={table}
-                        assignedGuests={seatedWithSatisfaction}
+                        seatedGuestsWithSatisfaction={seatedWithSatisfaction}
                         isOpen={openTableId === table.id}
                         onOpen={() => onOpenTable(table.id)}
                         onClose={onCloseTable}
@@ -102,4 +101,4 @@ const TableCanvas: React.FC<TableCanvasProps> = ({
     );
 };
 
-export default TableCanvas;
+export default ElementsCanvas;
