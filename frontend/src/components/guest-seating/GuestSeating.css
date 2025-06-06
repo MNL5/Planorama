@@ -1,83 +1,71 @@
-/* src/components/GuestSeating/GuestSeating.css */
-
-/* Container: full‐screen flex with hidden overflow */
 .gs-container {
-  display: flex;
-  flex: 1 1;
-  background-color: var(--mantine-color-primary-0);
-  overflow: hidden;
+    display: flex;
+    flex: 1 1;
+    background-color: var(--mantine-color-primary-0);
+    overflow: hidden;
 }
 
-/* Left panel (Guests + actions) */
 .gs-left-panel {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 1rem; /* equivalent to p="lg" in Mantine */
-  background: linear-gradient(to right, #e9dbf1, #e6c8fa);
-  width: 280px; /* adjust as needed */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem;
+    background: linear-gradient(to right, #e9dbf1, #e6c8fa);
+    width: 280px;
 }
 
-/* Left panel title */
 .gs-left-title {
-  color: var(--mantine-color-primary-6b208b);
-  margin-bottom: 1rem;
+    color: var(--mantine-color-primary-6b208b);
+    margin-bottom: 1rem;
 }
 
-/* Buttons in left panel */
 .gs-button {
-  min-height: 2rem;
-  width: 100%;
-  margin-bottom: 0.75rem;
-  border-radius: 0.375rem; /* radius="md" */
+    min-height: 2rem;
+    width: 100%;
+    margin-bottom: 0.75rem;
+    border-radius: 0.375rem;
 }
 
-/* Save button spacing override (push to bottom) */
 .gs-button-save {
-  margin-top: auto;
+    margin-top: auto;
 }
 
-/* Right‐side canvas wrapper */
 .gs-canvas {
-  position: relative;
-  flex: 1;
-  background-size: cover;
-  background-repeat: no-repeat;
+    position: relative;
+    flex: 1;
+    background-size: cover;
+    background-repeat: no-repeat;
 }
 
-/* Segmented control wrapper */
 .gs-view-switch {
-  position: absolute;
-  top: 0.625rem; /* 10px */
-  left: 0.625rem;
-  z-index: 10;
-  background-color: white;
+    position: absolute;
+    top: 0.625rem;
+    left: 0.625rem;
+    z-index: 10;
+    background-color: white;
 }
 
-/* Table & text elements container */
 .gs-table-canvas {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  background-size: cover;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
 }
 
-/* Individual “text” elements on canvas */
 .gs-text-element {
-  position: absolute;
-  border: 1px dashed #ccc;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #666;
-  padding: 0.25rem;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
-  cursor: default;
+    position: absolute;
+    border: 1px dashed #ccc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #666;
+    padding: 0.25rem;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+    cursor: default;
 }
 
-/* Error text style */
 .gs-error-text {
-  color: red;
-  padding: 1rem;
-  text-align: center;
+    color: red;
+    padding: 1rem;
+    text-align: center;
 }

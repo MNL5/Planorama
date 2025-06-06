@@ -1,11 +1,9 @@
-// src/components/GuestSeating/GuestSeating.tsx
-
 import React, { useState, useMemo, useTransition } from 'react';
 import { Flex, Box, SegmentedControl, Text } from '@mantine/core';
 import { toast } from 'react-toastify';
 
 import { useEventContext } from '../../contexts/event-context';
-import { useGuestData } from '../../hooks/useGuestData';
+import useGuestData from '../../hooks/useGuestData';
 
 import UnassignedGuestsPanel from '../UnassignedGuestsPanel/UnassignedGuestsPanel';
 import TableCanvas from '../TableCanvas/TableCanvas';
@@ -16,7 +14,7 @@ import {
 } from '../../utils/satisfactionUtils';
 import { RsvpStatus } from '../../types/rsvp-status';
 
-import './GuestSeating.css'; // Bring in the CSS module
+import './GuestSeating.css';
 import MainLoader from '../mainLoader/MainLoader';
 
 type ViewMode = 'regular' | 'satisfaction';
@@ -27,7 +25,6 @@ const GuestSeating: React.FC = () => {
     const [openTableId, setOpenTableId] = useState<string | null>(null);
     const [isPending, startTransition] = useTransition();
 
-    // Use our custom hook to get all relevant data & actions
     const {
         guests,
         setGuests,
@@ -39,42 +36,34 @@ const GuestSeating: React.FC = () => {
         handleAutoAssign,
     } = useGuestData(currentEvent, viewMode);
 
-    // Compute which guests are “unassigned” (and not declined)
     const guestsToShow = useMemo(
         () =>
             guests.filter((g) => !g.tableId && g.status !== RsvpStatus.DECLINE),
         [guests]
     );
 
-    // If either query is still loading, show loader
     if (isLoading) {
         return <MainLoader isPending />;
     }
-    // If either query errored, show error text
     if (isError) {
         return <Text className="gs-error-text">Error loading data.</Text>;
     }
 
-    // Drop handler: assign multiple guest IDs to a given table
     const handleDrop = (tableId: string, ids: string[]) => {
         const idSet = new Set(ids);
         setGuests((prev) =>
             prev.map((g) => (idSet.has(g.id) ? { ...g, tableId } : g))
         );
-        // No need to recalc satisfaction manually; hook's useEffect runs automatically
     };
 
-    // Remove handler: unassign a single guest
     const handleRemove = (guestId: string) => {
         setGuests((prev) =>
             prev.map((g) =>
                 g.id === guestId ? { ...g, tableId: undefined } : g
             )
         );
-        // Hook’s useEffect will recalc once state updates
     };
 
-    // Check total seats vs. unassigned guests for “Auto Assign” validation
     const totalSeats = elements.reduce(
         (sum, el) => sum + (el.seatCount || 0),
         0
@@ -83,10 +72,8 @@ const GuestSeating: React.FC = () => {
 
     return (
         <Flex className="gs-container" onClick={() => setOpenTableId(null)}>
-            {/* Overlay loader while transitions (save/auto‐assign) are pending */}
             <MainLoader isPending={isPending} />
 
-            {/* ─── LEFT PANEL: Unassigned Guests + Actions ───────────────── */}
             <UnassignedGuestsPanel
                 guestsToShow={guestsToShow}
                 onAutoAssign={() => {
@@ -99,7 +86,6 @@ const GuestSeating: React.FC = () => {
                 onSave={() => startTransition(() => handleSaveSeating())}
             />
 
-            {/* ─── RIGHT PANEL: Canvas of Tables & Text Elements ────────── */}
             <Box className="gs-canvas">
                 <SegmentedControl
                     value={viewMode}

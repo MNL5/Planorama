@@ -1,5 +1,3 @@
-// src/hooks/useGuestData.ts
-
 import { useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 
@@ -13,6 +11,7 @@ import { Guest, AIGuest } from '../types/guest';
 import { GuestRelation } from '../types/guest-relation';
 import Algorithm from '../utils/algorithem';
 import Element from '../types/Element';
+import { toast } from 'react-toastify';
 
 export interface UseGuestDataResult {
     guests: Guest[];
@@ -29,11 +28,10 @@ export interface UseGuestDataResult {
     handleAutoAssign: () => void;
 }
 
-export function useGuestData(
+const useGuestData = (
     currentEvent: { id: string; diagram: { elements: Element[] } } | null,
     viewMode: 'regular' | 'satisfaction'
-): UseGuestDataResult {
-    // ─── Local state ───────────────────────────────────────────────────────
+): UseGuestDataResult => {
     const [elements, setElements] = useState<Element[]>([]);
     const [guests, setGuests] = useState<Guest[]>([]);
     const [relations, setRelations] = useState<GuestRelation[]>([]);
@@ -41,7 +39,6 @@ export function useGuestData(
         Record<string, number>
     >({});
 
-    // ─── Fetch GUESTS ───────────────────────────────────────────────────────
     const {
         data: guestsData = [],
         isLoading: guestsLoading,
@@ -52,7 +49,6 @@ export function useGuestData(
         enabled: !!currentEvent?.id,
     });
 
-    // ─── Fetch RELATIONS ────────────────────────────────────────────────────
     const {
         data: relationsData = [],
         isLoading: relationsLoading,
@@ -63,18 +59,15 @@ export function useGuestData(
         enabled: !!currentEvent?.id,
     });
 
-    // ─── Sync “elements” when event changes ─────────────────────────────────
     useEffect(() => {
         if (!currentEvent) return;
         setElements(currentEvent.diagram.elements || []);
     }, [currentEvent]);
 
-    // ─── Sync “guests” state when guestsData changes ────────────────────────
     useEffect(() => {
         setGuests(guestsData);
     }, [guestsData]);
 
-    // ─── Sync “relations” state when relationsData changes ─────────────────
     useEffect(() => {
         setRelations(relationsData);
     }, [relationsData]);
@@ -82,7 +75,6 @@ export function useGuestData(
     const isLoading = guestsLoading || relationsLoading;
     const isError = guestsError || relationsError;
 
-    // ─── Save seating assignments back to server ────────────────────────────
     const handleSaveSeating = async () => {
         if (!currentEvent) return;
         const payload: Record<string, { tableId?: string }> = {};
@@ -91,23 +83,19 @@ export function useGuestData(
         });
         try {
             await updateGuests(currentEvent.id, payload);
-            // Optionally: toast.success('Guest seating saved')
+            toast.success('Guest seating saved');
         } catch (err) {
             console.error(err);
-            // Optionally: toast.error('Failed to save guest seating')
+            toast.error('Failed to save guest seating');
         }
     };
 
-    // ─── Auto‐assign from server & merge results ────────────────────────────
     const handleAutoAssign = async () => {
         if (!currentEvent) return;
 
-        // The calling component should check seat availability first.
         try {
             const response = await autoAssign(currentEvent.id);
-            // response.guests: Array<{ id: string; table: string; satisfaction: number }>
 
-            // Build a quick lookup for table assignments
             const assignments: Record<string, string> = {};
             response.guests.forEach((g) => {
                 assignments[g.id] = g.table;
@@ -120,7 +108,6 @@ export function useGuestData(
                 })
             );
 
-            // Merge satisfaction scores from response into satisfactionMap
             const newMap: Record<string, number> = {};
             response.guests.forEach((g) => {
                 if (typeof g.satisfaction === 'number') {
@@ -130,19 +117,16 @@ export function useGuestData(
             setSatisfactionMap(newMap);
         } catch (err) {
             console.error(err);
-            // Optionally: toast.error('Failed to auto assign')
+            toast.error('Failed to auto assign');
         }
     };
 
-    // ─── Compute satisfactionMap whenever dependencies change ────────────────
     useEffect(() => {
         if (viewMode !== 'satisfaction') {
-            // In “regular” mode, clear any existing satisfaction scores
             setSatisfactionMap({});
             return;
         }
 
-        // Build input for Algorithm: only guests who already have a tableId
         const assignedGuests: AIGuest[] = guests
             .filter((g) => !!g.tableId)
             .map((g) => ({
@@ -152,14 +136,13 @@ export function useGuestData(
                 satisfaction: undefined,
             }));
 
-        // Filter only “table” elements
         const tableElements = elements.filter(
             (el) => el.elementType === 'table'
         );
+
         const algo = new Algorithm(assignedGuests, tableElements, relations);
         const updatedList = algo.setSatisfactory(assignedGuests);
 
-        // Build a new map { guest.id → updated.satisfaction }
         const newMap: Record<string, number> = {};
         updatedList.forEach((u) => {
             if (typeof u.satisfaction === 'number') {
@@ -182,4 +165,6 @@ export function useGuestData(
         handleSaveSeating,
         handleAutoAssign,
     };
-}
+};
+
+export default useGuestData;

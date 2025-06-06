@@ -1,5 +1,3 @@
-// src/components/GuestSeating/TableCanvas.tsx
-
 import React from 'react';
 import { Box, Text } from '@mantine/core';
 import gridCanvas from '../../assets/grid-canvas.png';
@@ -46,7 +44,6 @@ const TableCanvas: React.FC<TableCanvasProps> = ({
             className="gs-table-canvas"
             style={{ backgroundImage: `url(${gridCanvas})` }}
         >
-            {/* Render all tables */}
             {tableElements.map((table) => {
                 const assignedGuests = guests.filter(
                     (g) => g.tableId === table.id
@@ -62,7 +59,6 @@ const TableCanvas: React.FC<TableCanvasProps> = ({
                         ? satisfactionToColor(avg)
                         : '#d0b9e0';
 
-                // Attach satisfaction to each guest
                 const seatedWithSatisfaction = assignedGuests.map((g) => ({
                     ...g,
                     satisfaction:
@@ -86,7 +82,6 @@ const TableCanvas: React.FC<TableCanvasProps> = ({
                 );
             })}
 
-            {/* Render text labels on top of grid */}
             {textElements.map((textEl) => (
                 <Box
                     key={textEl.id}

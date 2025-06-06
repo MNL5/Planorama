@@ -1,5 +1,3 @@
-// src/components/GuestSeating/UnassignedGuestsPanel.tsx
-
 import { Button, Stack, Title } from '@mantine/core';
 import React from 'react';
 import { Guest } from '../../types/guest';
@@ -17,7 +15,6 @@ const UnassignedGuestsPanel: React.FC<UnassignedGuestsPanelProps> = ({
     onAutoAssign,
     onSave,
 }) => {
-    // Drag start: embed guest IDs in dataTransfer
     const handleGuestDragStart = (
         e: React.DragEvent<HTMLDivElement>,
         ids: string[]
