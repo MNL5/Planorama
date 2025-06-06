@@ -39,8 +39,14 @@ const guestColumns: (event: Event) => Column<Guest>[] = (event: Event) => {
       isEdit: true,
       isMulti: false,
       isNullable: false,
-      validationFunction: (value: unknown) =>
-        /^[+\d]?(?:[\d-.\s()]*)$/.test(value as string),
+      validationFunction: (value: unknown) => {
+        if (!/^(?:\(?\+972\)?|0)(?:[-\s]?\(?5\d\)?[-\s]?)\d{7}$/.test(value as string)) return false;
+        const phoneNumber = (value as string).replace(/[-\s]/g, "");
+        return (
+          phoneNumber.length === 10 ||
+          phoneNumber.length === 13
+        );
+      },
     },
     {
       key: "meal",

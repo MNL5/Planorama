@@ -58,7 +58,7 @@ const App: React.FC = () => {
         draggable
         pauseOnHover
         theme={"colored"}
-        style={{ zIndex: "999999999999" }}
+        style={{ zIndex: "999999999999", whiteSpace: "pre-line" }}
       />
       {isLogged && <Navbar />}
       <Routes>
