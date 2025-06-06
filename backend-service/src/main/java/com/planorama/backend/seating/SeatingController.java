@@ -24,4 +24,11 @@ public class SeatingController {
         return seatingService.autoSeat(eventId)
                 .block();
     }
+
+    @GetMapping("/satisfaction/{eventId}")
+    @PreAuthorize("hasAuthority(#eventId)")
+    public SeatingResponse satisfaction(@PathVariable("eventId") UUID eventId) {
+        return seatingService.satisfaction(eventId)
+                .block();
+    }
 }
