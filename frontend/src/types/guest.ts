@@ -16,7 +16,7 @@ type AIGuest = {
     id: string;
     group: string;
     table: string;
-    satisfaction: number;
+    satisfaction: number | undefined;
 };
 
 export type { Guest, AIGuest };
