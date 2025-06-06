@@ -40,12 +40,14 @@ const guestColumns: (event: Event) => Column<Guest>[] = (event: Event) => {
       isMulti: false,
       isNullable: false,
       validationFunction: (value: unknown) => {
-        if (!/^(?:\(?\+972\)?|0)(?:[-\s]?\(?5\d\)?[-\s]?)\d{7}$/.test(value as string)) return false;
+        if (
+          !/^(?:\(?\+972\)?|0)(?:[-\s]?\(?5\d\)?[-\s]?)\d{7}$/.test(
+            value as string,
+          )
+        )
+          return false;
         const phoneNumber = (value as string).replace(/[-\s]/g, "");
-        return (
-          phoneNumber.length === 10 ||
-          phoneNumber.length === 13
-        );
+        return phoneNumber.length === 10 || phoneNumber.length === 13;
       },
     },
     {

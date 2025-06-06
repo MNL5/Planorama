@@ -202,11 +202,7 @@ function CustomTable<T extends { id: string }>({
     });
 
     if (newErrors.length > 0) {
-      toast.error(
-        `- ${newErrors.join(
-          "\n- "
-        )}`
-      );
+      toast.error(`- ${newErrors.join("\n- ")}`);
     }
 
     return newErrors.length === 0;
