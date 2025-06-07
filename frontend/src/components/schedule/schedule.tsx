@@ -31,7 +31,7 @@ import {
   formatTime,
   getMaxTime,
   getMinTime,
-  timeToIsoTimeString,
+  toIsoDateTimeString,
 } from "../../utils/time-utils";
 
 export const Schedule: React.FC = () => {
@@ -109,11 +109,17 @@ export const Schedule: React.FC = () => {
     setModalOpen(true);
   };
 
+  const isSaveDisabled: boolean =
+    !startTime ||
+    !endTime ||
+    !description.trim() ||
+    (startTime !== "" && endTime !== "" && endTime <= startTime);
+
   const handleSave = async () => {
-    if (!startTime || !endTime || !description) return;
+    if (isSaveDisabled || !currentEvent?.time) return;
     await createMutation.mutateAsync({
-      startTime: timeToIsoTimeString(startTime),
-      endTime: timeToIsoTimeString(endTime),
+      startTime: toIsoDateTimeString(currentEvent.time, startTime),
+      endTime: toIsoDateTimeString(currentEvent.time, endTime),
       description,
     });
     setModalOpen(false);
@@ -142,12 +148,6 @@ export const Schedule: React.FC = () => {
     setMenuOpened(false);
     setMenuPosition(null);
   };
-
-  const isSaveDisabled: boolean =
-    !startTime ||
-    !endTime ||
-    !description.trim() ||
-    (startTime !== "" && endTime !== "" && endTime <= startTime);
 
   return (
     <Box
@@ -391,7 +391,11 @@ export const Schedule: React.FC = () => {
             <Button
               mt="md"
               onClick={handleSave}
-              disabled={isSaveDisabled || createMutation.isPending}
+              disabled={
+                isSaveDisabled ||
+                createMutation.isPending ||
+                !currentEvent?.time
+              }
               fullWidth
               loading={createMutation.isPending}
             >

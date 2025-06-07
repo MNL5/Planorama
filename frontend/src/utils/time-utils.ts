@@ -20,12 +20,11 @@ function getMaxTime(timeSlots: FormattedTimeSlot[]) {
   );
 }
 
-function timeToIsoTimeString(time: string): string {
+function toIsoDateTimeString(date: Date, time: string): string {
   const [hours, minutes] = time.split(":").map(Number);
-  return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(
-    2,
-    "0"
-  )}:00`;
+  const result = new Date(date);
+  result.setHours(hours, minutes, 0, 0);
+  return result.toISOString();
 }
 
-export { formatTime, getMinTime, getMaxTime, timeToIsoTimeString };
+export { formatTime, getMinTime, getMaxTime, toIsoDateTimeString };
