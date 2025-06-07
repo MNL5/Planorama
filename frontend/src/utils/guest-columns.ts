@@ -10,7 +10,7 @@ import { FilterOperator } from "../types/filter-operator";
 
 const guestColumns: (event: Event, guests: Guest[]) => Column<Guest>[] = (
   event: Event,
-  guests: Guest[]
+  guests: Guest[],
 ) => {
   const tables =
     event.diagram?.elements
@@ -64,7 +64,7 @@ const guestColumns: (event: Event, guests: Guest[]) => Column<Guest>[] = (
       validationFunction: (value: unknown) => {
         if (
           !/^(?:\(?\+972\)?|0)(?:[-\s]?\(?5\d\)?[-\s]?)\d{7}$/.test(
-            value as string
+            value as string,
           )
         )
           return false;
