@@ -14,27 +14,67 @@ import {
 import { toast } from "react-toastify";
 import Element from "../../types/Element";
 import { Guest } from "../../types/guest";
+import { satisfactionToColor } from "../../utils/satisfactionUtils";
+import {
+  getGroupGradient,
+  getPastelColorForGroup,
+} from "../../utils/colorUtils";
+import "./GuestTable.css";
 
 interface GuestTableProps {
   table: Element;
-  assignedGuests: Guest[];
+  seatedGuestsWithSatisfaction: (Guest & {
+    satisfaction: number | undefined;
+  })[];
   isOpen: boolean;
   onOpen: (id: string) => void;
   onClose: () => void;
   onDrop: (tableId: string, ids: string[]) => void;
   onRemove: (guestId: string) => void;
+  tableColor: string;
+  viewMode: "regular" | "satisfaction" | "groups";
+}
+
+const satisfactionGradient = (satisfaction?: number) => {
+  if (satisfaction === undefined) return "transparent";
+  const color = satisfactionToColor(satisfaction);
+  return `linear-gradient(50deg, ${color} 0% 0%, transparent 100%)`;
+};
+
+const groupGradient = (group: string) => {
+  const color = getPastelColorForGroup(group);
+  return `linear-gradient(50deg, ${color} 0% 0%, transparent 100%)`;
+};
+
+function formatNumber(num: number) {
+  return num % 1 === 0 ? num.toString() : num.toFixed(2);
 }
 
 const GuestTable: React.FC<GuestTableProps> = ({
   table,
-  assignedGuests,
+  seatedGuestsWithSatisfaction,
   isOpen,
   onOpen,
   onClose,
   onDrop,
   onRemove,
+  tableColor,
+  viewMode,
 }) => {
-  const isFull = assignedGuests.length >= Number(table.seatCount);
+  const isFull = seatedGuestsWithSatisfaction.length >= Number(table.seatCount);
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    const ids = JSON.parse(e.dataTransfer.getData("ids"));
+    if (
+      ids.length + seatedGuestsWithSatisfaction.length >
+      Number(table.seatCount)
+    ) {
+      toast.error("Table has not enough seats");
+    } else {
+      onDrop(table.id, ids);
+    }
+  };
 
   return (
     <Popover
@@ -43,13 +83,9 @@ const GuestTable: React.FC<GuestTableProps> = ({
       position="right"
       withArrow
       trapFocus={false}
-      styles={{
-        dropdown: {
-          padding: 0,
-          background: "transparent",
-          boxShadow: "none",
-        },
-        arrow: { color: "transparent" },
+      classNames={{
+        dropdown: "guest-table-popover-dropdown",
+        arrow: "guest-table-popover-arrow",
       }}
     >
       <Popover.Target>
@@ -58,67 +94,70 @@ const GuestTable: React.FC<GuestTableProps> = ({
             e.stopPropagation();
             onOpen(table.id);
           }}
-          onDrop={(e) => {
-            e.preventDefault();
-            const ids = JSON.parse(e.dataTransfer.getData("ids"));
-            if (ids.length + assignedGuests.length > Number(table.seatCount))
-              toast.error("Table has not enough seats");
-            else onDrop(table.id, ids);
-          }}
+          onDrop={handleDrop}
           onDragOver={(e) => e.preventDefault()}
+          className={`guest-table ${table.type}`}
           style={{
-            border: "1px dashed #ccc",
-            position: "absolute",
             top: table.y,
             left: table.x,
             width: table.width,
             height: table.height,
-            backgroundColor: "#d0b9e0",
-            borderRadius: table.type === "circle" ? "50%" : 8,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
-            cursor: "pointer",
+            background:
+              viewMode === "groups" && seatedGuestsWithSatisfaction.length > 0
+                ? getGroupGradient(seatedGuestsWithSatisfaction)
+                : tableColor,
           }}
         >
           <Text size="md" color="#3c096c">
-            ({assignedGuests.length}/{table.seatCount})
+            ({seatedGuestsWithSatisfaction.length}/{table.seatCount})
           </Text>
         </Box>
       </Popover.Target>
 
       <Popover.Dropdown>
-        <Card shadow="sm" radius="md" withBorder style={{ width: 260 }}>
-          <Group align="center" style={{ padding: "8px 16px" }}>
+        <Card shadow="sm" radius="md" withBorder className="popover-card">
+          <Group align="center" className="popover-header">
             <Title order={5}>Table Guests</Title>
             <Badge color={isFull ? "red" : "teal"} variant="light">
-              {assignedGuests.length}/{table.seatCount}
+              {seatedGuestsWithSatisfaction.length}/{table.seatCount}
             </Badge>
           </Group>
+
           <Divider />
-          <ScrollArea style={{ height: 200, padding: "8px 16px" }}>
-            {assignedGuests.length === 0 ? (
+
+          <ScrollArea className="guest-list">
+            {seatedGuestsWithSatisfaction.length === 0 ? (
               <Text color="dimmed" mt="md">
                 No guests assigned
               </Text>
             ) : (
-              assignedGuests.map((g) => (
-                <Group key={g.id} style={{ padding: "4px 0" }}>
+              seatedGuestsWithSatisfaction.map((g) => (
+                <Group key={g.id} className="guest-item">
                   <Box
                     draggable
                     onDragStart={(e) =>
                       e.dataTransfer.setData("ids", JSON.stringify([g.id]))
                     }
-                    style={{ flex: 1, cursor: "grab" }}
+                    className="guest-box"
+                    style={{
+                      background:
+                        viewMode === "groups"
+                          ? groupGradient(g.group || "unknown")
+                          : satisfactionGradient(g.satisfaction),
+                    }}
                   >
-                    {g.name}
+                    <span>{g.name}</span>
+                    <span>
+                      {g.satisfaction !== undefined &&
+                        `${formatNumber(g.satisfaction * 100)}%`}
+                    </span>
+                    <span>{viewMode === "groups" && g.group}</span>
                   </Box>
                   <Button
-                    size={"xs"}
-                    color={"red"}
-                    radius={"md"}
-                    variant={"outline"}
+                    size="xs"
+                    color="red"
+                    radius="md"
+                    variant="outline"
                     onClick={() => onRemove(g.id)}
                   >
                     Remove

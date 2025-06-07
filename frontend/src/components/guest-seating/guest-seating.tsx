@@ -1,63 +1,55 @@
 import { toast } from "react-toastify";
-import { useQuery } from "@tanstack/react-query";
-import { Flex, Button, Box, Text, Stack, Title } from "@mantine/core";
-import React, { useEffect, useMemo, useState, useTransition } from "react";
-import { useEventContext } from "../../contexts/event-context";
-import {
-  autoAssign,
-  getAllGuests,
-  updateGuests,
-} from "../../services/guest-service/guest-service";
-import Element from "../../types/Element";
-import { Guest } from "../../types/guest";
-import GuestTable from "../guest-table/guest-table";
+import React, { useState, useMemo, useTransition } from "react";
+import { Flex, Box, SegmentedControl, Text } from "@mantine/core";
+
+import "./GuestSeating.css";
+import { ViewMode } from "../../types/view-mode";
 import MainLoader from "../mainLoader/MainLoader";
+import useGuestData from "../../hooks/useGuestData";
 import { RsvpStatus } from "../../types/rsvp-status";
-import { CustomTable } from "../custom-table/custom-table";
-import { seatingGuestColumns } from "../../utils/seating-guest-columns";
-import gridCanvas from "../../assets/grid-canvas.png";
+import ElementsCanvas from "../ElementsCanvas/ElementsCanvas";
+import { useEventContext } from "../../contexts/event-context";
+import { computeTableAverage } from "../../utils/satisfactionUtils";
+import UnassignedGuestsPanel from "../UnassignedGuestsPanel/UnassignedGuestsPanel";
 
 const GuestSeating: React.FC = () => {
   const { currentEvent } = useEventContext();
-  const [elements, setTables] = useState<Element[]>([]);
-  const [guests, setGuests] = useState<Guest[]>([]);
+  const [viewMode, setViewMode] = useState<ViewMode>("regular");
   const [openTableId, setOpenTableId] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+
+  const {
+    guests,
+    setGuests,
+    elements,
+    satisfactionMap,
+    isLoading,
+    isError,
+    handleSaveSeating,
+    handleAutoAssign,
+  } = useGuestData(currentEvent, viewMode);
 
   const guestsToShow = useMemo(
     () =>
       guests.filter(
-        (guest) =>
-          (!guest.tableId || guest.tableId === "No Table") &&
-          guest.status !== RsvpStatus.DECLINE
+        (g) =>
+          (!g.tableId || g.tableId === "No Table") &&
+          g.status !== RsvpStatus.DECLINE
       ),
     [guests]
   );
 
-  const {
-    data: guestsData = [],
-    isLoading,
-    isError,
-  } = useQuery<Guest[], Error>({
-    queryKey: ["fetchGuests", currentEvent?.id],
-    queryFn: () => getAllGuests(currentEvent?.id as string),
-    enabled: !!currentEvent?.id,
-  });
-
-  useEffect(() => {
-    if (currentEvent) {
-      setTables(currentEvent.diagram.elements || []);
-    }
-  }, [currentEvent]);
-
-  useEffect(() => {
-    setGuests(guestsData);
-  }, [guestsData]);
+  if (isLoading) {
+    return <MainLoader isPending />;
+  }
+  if (isError) {
+    return <Text className="gs-error-text">Error loading data.</Text>;
+  }
 
   const handleDrop = (tableId: string, ids: string[]) => {
-    const idsSet = new Set(ids);
+    const idSet = new Set(ids);
     setGuests((prev) =>
-      prev.map((g) => (idsSet.has(g.id) ? { ...g, tableId } : g))
+      prev.map((g) => (idSet.has(g.id) ? { ...g, tableId } : g))
     );
   };
 
@@ -67,165 +59,48 @@ const GuestSeating: React.FC = () => {
     );
   };
 
-  const handleSave = async () => {
-    if (!currentEvent) return;
-    startTransition(async () => {
-      try {
-        const updatedGuestsTables: Record<string, { tableId?: string }> = {};
-
-        guests.forEach((guest) => {
-          updatedGuestsTables[guest.id] = {
-            tableId: guest?.tableId || "",
-          };
-        });
-
-        await updateGuests(currentEvent.id, updatedGuestsTables);
-        toast.success("Guest seating saved");
-      } catch (err) {
-        console.error(err);
-        toast.error("Failed to save guest seating");
-      }
-    });
-  };
-
-  const handleAutoAssign = async () => {
-    if (!currentEvent) return;
-
-    const numOfSeats = elements.reduce(
-      (acc, table) => acc + (table.seatCount || 0),
-      0,
-    );
-    const numOfGuests = guests.filter(
-      (guest) => guest.status !== RsvpStatus.DECLINE,
-    ).length;
-    if (numOfGuests > numOfSeats) {
-      toast.error("Not enough seats for all guests");
-      return;
-    }
-
-    startTransition(async () => {
-      try {
-        const response = await autoAssign(currentEvent.id);
-
-        const assignedGuests: { [key: string]: string } = {};
-        response.guests.forEach((guest) => {
-          assignedGuests[guest.id] = guest.table;
-        });
-
-        setGuests((prev) =>
-          prev.map((guest) => {
-            return { ...guest, tableId: assignedGuests[guest.id] };
-          }),
-        );
-      } catch (err) {
-        console.error(err);
-        toast.error("Failed to auto assign");
-      }
-    });
-  };
-
-  const handleGuestDragStart = (
-    e: React.DragEvent<HTMLDivElement>,
-    ids: string[]
-  ) => {
-    e.dataTransfer.setData("ids", JSON.stringify(ids));
-  };
-
-  if (isLoading) return <MainLoader isPending />;
-  if (isError) return <Text>Error loading guests</Text>;
+  const totalSeats = elements.reduce((sum, el) => sum + (el.seatCount || 0), 0);
+  const canAutoAssign = guestsToShow.length <= totalSeats;
 
   return (
-    <Flex
-      bg={"primary.0"}
-      flex={"1 1"}
-      style={{
-        overflow: "hidden",
-      }}
-      onClick={() => setOpenTableId(null)}
-    >
+    <Flex className="gs-container" onClick={() => setOpenTableId(null)}>
       <MainLoader isPending={isPending} />
-      <Stack
-        p={"lg"}
-        align={"center"}
-        bg={"linear-gradient(to right, #e9dbf1, #e6c8fa)"}
-      >
-        <Title order={2} c={"primary"}>
-          Guests
-        </Title>
-        <Button
-          size={"md"}
-          radius={"md"}
-          variant={"light"}
-          onClick={handleAutoAssign}
-          mih={"2rem"}
-          w={"100%"}
-        >
-          Auto Assign
-        </Button>
-        <CustomTable<Guest>
-          data={guestsToShow}
-          columns={seatingGuestColumns}
-          onDragStart={handleGuestDragStart}
-          rowStyle={{ cursor: "pointer" }}
-          selectable
-        />
-        <Button
-          size={"md"}
-          radius={"md"}
-          variant={"light"}
-          onClick={handleSave}
-          mih={"2rem"}
-          mt={"auto"}
-        >
-          Save Seating
-        </Button>
-      </Stack>
-      <Box
-        flex={1}
-        pos={"relative"}
-        style={{ backgroundImage: `url(${gridCanvas})` }}
-      >
-        {elements
-          .filter((element) => element.seatCount)
-          .map((table) => (
-            <GuestTable
-              key={table.id}
-              table={table}
-              assignedGuests={guests.filter((g) => g.tableId === table.id)}
-              isOpen={openTableId === table.id}
-              onOpen={(id) => setOpenTableId(id)}
-              onClose={() => setOpenTableId(null)}
-              onDrop={handleDrop}
-              onRemove={handleRemove}
-            />
-          ))}
 
-        {elements
-          .filter((element) => !element.seatCount)
-          .map((objective) => (
-            <Box
-              key={objective.id}
-              style={{
-                position: "absolute",
-                top: objective.y,
-                left: objective.x,
-                width: objective.width,
-                height: objective.height,
-                backgroundColor: objective.color,
-                border: "1px dashed #ccc",
-                borderRadius: objective.type === "circle" ? "50%" : 4,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: "#666",
-                padding: 4,
-                boxShadow: "0 1px 4px rgba(0,0,0,0.1)",
-                cursor: "default",
-              }}
-            >
-              <Text size="sm">{objective.label}</Text>
-            </Box>
-          ))}
+      <UnassignedGuestsPanel
+        guestsToShow={guestsToShow}
+        onAutoAssign={() => {
+          if (!canAutoAssign) {
+            toast.error("Not enough seats for all guests");
+            return;
+          }
+          startTransition(() => handleAutoAssign());
+        }}
+        onSave={() => startTransition(() => handleSaveSeating())}
+      />
+      <Box className="gs-canvas">
+        <SegmentedControl
+          value={viewMode}
+          onChange={(val) => setViewMode(val as ViewMode)}
+          data={[
+            { label: "Regular", value: "regular" },
+            { label: "Satisfaction", value: "satisfaction" },
+            { label: "Groups", value: "groups" },
+          ]}
+          className="gs-view-switch"
+        />
+
+        <ElementsCanvas
+          elements={elements}
+          guests={guests}
+          satisfactionMap={satisfactionMap}
+          viewMode={viewMode}
+          openTableId={openTableId}
+          onOpenTable={(id) => setOpenTableId(id)}
+          onCloseTable={() => setOpenTableId(null)}
+          onDrop={handleDrop}
+          onRemove={handleRemove}
+          computeTableAverage={computeTableAverage}
+        />
       </Box>
     </Flex>
   );
