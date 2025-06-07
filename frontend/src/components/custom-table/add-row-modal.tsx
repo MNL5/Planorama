@@ -5,6 +5,7 @@ import {
   Select,
   TextInput,
   MultiSelect,
+  Autocomplete,
 } from "@mantine/core";
 import { isEmpty } from "lodash";
 import { useState } from "react";
@@ -82,7 +83,7 @@ function AddRowModal<T>({
         {columns.map((col) => (
           <div key={String(col.key)} style={{ marginBottom: "10px" }}>
             <label>{col.label}</label>
-            {!col.values || col.isOpenList ? (
+            {!col.values ? (
               <TextInput
                 size={"sm"}
                 value={(newRowData[col.key] as string) || ""}
@@ -98,6 +99,16 @@ function AddRowModal<T>({
                 size={"sm"}
                 data={col.values}
                 value={(newRowData[col.key] as string[]) || []}
+                onChange={(value) => handleInputChange(col.key, value)}
+                placeholder={`Select ${col.label}`}
+                style={{ marginTop: "5px" }}
+                error={!col.isNullable ? errors[col.key as string] : undefined}
+              />
+            ) : col.isOpenList ? (
+              <Autocomplete
+                size={"sm"}
+                data={col.values.map((v) => v.value)}
+                value={(newRowData[col.key] as string) || ""}
                 onChange={(value) => handleInputChange(col.key, value)}
                 placeholder={`Select ${col.label}`}
                 style={{ marginTop: "5px" }}
