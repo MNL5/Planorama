@@ -27,6 +27,7 @@ import {
 import { useEventContext } from "../../contexts/event-context";
 import { FormattedTimeSlot, TimeSlot } from "../../types/time-slot";
 import { formatTime, getMaxTime, getMinTime } from "../../utils/time-utils";
+import { toast } from "react-toastify";
 
 export const Schedule: React.FC = () => {
   const { currentEvent } = useEventContext();
@@ -54,13 +55,16 @@ export const Schedule: React.FC = () => {
     mutationFn: (newTimeSlot) =>
       createTimeSlot(currentEvent?.id as string, newTimeSlot),
     onSuccess: () => {
+      toast.success("Time slot created successfully");
       refetch();
     },
   });
 
   const deleteMutation = useMutation<TimeSlot, Error, string>({
-    mutationFn: deleteTimeSlot,
+    mutationFn: (timeSlotId) =>
+      deleteTimeSlot(currentEvent?.id as string, timeSlotId),
     onSuccess: () => {
+      toast.success("Time slot deleted successfully");
       refetch();
     },
   });

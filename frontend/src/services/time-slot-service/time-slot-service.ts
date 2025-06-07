@@ -26,9 +26,10 @@ const getAllTimeSlots = async (eventId: string) => {
   return response.data.schedule;
 };
 
-const deleteTimeSlot = async (id: string) => {
+const deleteTimeSlot = async (eventId: string, timeSlotId: string) => {
   const response: AxiosResponse<Schedule> =
-    await abortableDeleteRequest<Schedule>(`schedules/${id}`).request;
+    await abortableDeleteRequest<Schedule>(`schedules/${eventId}/${timeSlotId}`)
+      .request;
   return response.data.schedule[0];
 };
 
