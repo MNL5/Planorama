@@ -10,10 +10,13 @@ import {
   Button,
   Tooltip,
   TextInput,
+  Loader,
+  Center,
 } from "@mantine/core";
 import { useState } from "react";
 import { TimeInput } from "@mantine/dates";
 import { IconTrash } from "@tabler/icons-react";
+import { useQuery, useMutation } from "@tanstack/react-query";
 
 import {
   formatTime,
@@ -23,9 +26,43 @@ import {
 } from "../../utils/time-utils";
 import { TimeSlot } from "../../types/time-slot";
 import { barColors, horizontalPadding } from "./consts";
+import {
+  getAllTimeSlots,
+  createTimeSlot,
+  deleteTimeSlot,
+} from "../../services/time-slot-service/time-slot-service";
+import { useEventContext } from "../../contexts/event-context";
 
 export const Schedule: React.FC = () => {
-  const [timeSlots, setTimeSlots] = useState<Omit<TimeSlot, "id">[]>([]);
+  const { currentEvent } = useEventContext();
+  const {
+    data: timeSlots = [],
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery<TimeSlot[], Error>({
+    queryKey: ["timeSlots"],
+    queryFn: () => getAllTimeSlots(currentEvent?.id as string),
+    enabled: !!currentEvent?.id,
+  });
+
+  // Mutations
+  const createMutation = useMutation<TimeSlot, Error, Omit<TimeSlot, "id">>({
+    mutationFn: (newTimeSlot) =>
+      createTimeSlot(currentEvent?.id as string, newTimeSlot),
+    onSuccess: () => {
+      refetch();
+    },
+  });
+
+  const deleteMutation = useMutation<TimeSlot, Error, string>({
+    mutationFn: deleteTimeSlot,
+    onSuccess: () => {
+      refetch()
+    },
+  });
+
   const [modalOpen, setModalOpen] = useState(false);
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
@@ -38,6 +75,7 @@ export const Schedule: React.FC = () => {
     y: number;
   } | null>(null);
 
+  // Time calculations
   const minTime = Number.isFinite(getMinTime(timeSlots))
     ? getMinTime(timeSlots)
     : 0;
@@ -46,6 +84,7 @@ export const Schedule: React.FC = () => {
     : 30;
   const totalMinutes = Math.max(maxTime - minTime, 30);
 
+  // Handlers
   const handleAdd = () => {
     setStartTime("");
     setEndTime("");
@@ -54,16 +93,13 @@ export const Schedule: React.FC = () => {
     setModalOpen(true);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!startTime || !endTime || !description) return;
-    setTimeSlots([
-      ...timeSlots,
-      {
-        startTime: timeStringToDate(startTime),
-        endTime: timeStringToDate(endTime),
-        description,
-      },
-    ]);
+    await createMutation.mutateAsync({
+      startTime: timeStringToDate(startTime),
+      endTime: timeStringToDate(endTime),
+      description,
+    });
     setModalOpen(false);
   };
 
@@ -74,9 +110,12 @@ export const Schedule: React.FC = () => {
     setMenuOpened(true);
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (contextMenuIdx === null) return;
-    setTimeSlots(timeSlots.filter((_, idx) => idx !== contextMenuIdx));
+    const slot = timeSlots[contextMenuIdx];
+    if (slot && slot.id) {
+      await deleteMutation.mutateAsync(slot.id);
+    }
     setContextMenuIdx(null);
     setMenuOpened(false);
     setMenuPosition(null);
@@ -138,100 +177,114 @@ export const Schedule: React.FC = () => {
           }}
         >
           <Stack gap="xs">
-            {timeSlots.length === 0 && (
-              <Text c="dimmed" ta="center" py="md">
-                No time slots yet. Click "Add Time Slot" to create one.
+            {isLoading ? (
+              <Center py="md">
+                <Loader />
+              </Center>
+            ) : isError ? (
+              <Text c="red" ta="center" py="md">
+                {error instanceof Error
+                  ? error.message
+                  : "Failed to load time slots."}
               </Text>
-            )}
-            {timeSlots.map((event, idx) => {
-              const start =
-                event.startTime.getHours() * 60 +
-                event.startTime.getMinutes() -
-                minTime;
-              const duration =
-                event.endTime.getHours() * 60 +
-                event.endTime.getMinutes() -
-                (event.startTime.getHours() * 60 +
-                  event.startTime.getMinutes());
-              const left = (start / totalMinutes) * 100;
-              const width = (duration / totalMinutes) * 100;
-              return (
-                <Box
-                  key={idx}
-                  style={{ position: "relative", height: 40 }}
-                  onContextMenu={(e) => handleRightClick(e, idx)}
-                >
-                  <Tooltip
-                    label={`${formatTime(event.startTime)} - ${formatTime(
-                      event.endTime
-                    )}`}
-                    withArrow
-                    transitionProps={{ transition: "pop", duration: 150 }}
-                  >
+            ) : (
+              timeSlots &&
+              (timeSlots.length === 0 ? (
+                <Text c="dimmed" ta="center" py="md">
+                  No time slots yet. Click "Add Time Slot" to create one.
+                </Text>
+              ) : (
+                timeSlots.map((event, idx) => {
+                  const start =
+                    event.startTime.getHours() * 60 +
+                    event.startTime.getMinutes() -
+                    minTime;
+                  const duration =
+                    event.endTime.getHours() * 60 +
+                    event.endTime.getMinutes() -
+                    (event.startTime.getHours() * 60 +
+                      event.startTime.getMinutes());
+                  const left = (start / totalMinutes) * 100;
+                  const width = (duration / totalMinutes) * 100;
+                  return (
                     <Box
-                      style={{
-                        position: "absolute",
-                        top: 4,
-                        height: 32,
-                        background: barColors[idx % barColors.length],
-                        borderRadius: 6,
-                        width: `calc(${width}% - 8px)`,
-                        marginLeft: `calc(${left}% )`,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        color: "#222",
-                        fontWeight: 500,
-                        fontSize: 14,
-                        cursor: "pointer",
-                        boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
-                        transition: "all 0.3s",
-                        overflow: "hidden",
-                        whiteSpace: "nowrap",
-                        textOverflow: "ellipsis",
-                        left: 0,
-                        right: 0,
-                        userSelect: "none",
-                      }}
+                      key={event.id ?? idx}
+                      style={{ position: "relative", height: 40 }}
+                      onContextMenu={(e) => handleRightClick(e, idx)}
                     >
-                      {event.description}
-                    </Box>
-                  </Tooltip>
-                  {/* Mantine Menu for context menu */}
-                  {menuOpened && contextMenuIdx === idx && menuPosition && (
-                    <div
-                      style={{
-                        position: "fixed",
-                        left: menuPosition.x,
-                        top: menuPosition.y,
-                        zIndex: 9999,
-                        minWidth: 140,
-                        background: "#fff",
-                        border: "1px solid #eee",
-                        borderRadius: 6,
-                        boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
-                        padding: 0,
-                      }}
-                      onMouseLeave={handleMenuClose}
-                    >
-                      <Button
-                        variant="subtle"
-                        color="red"
-                        fullWidth
-                        leftSection={<IconTrash size={18} />}
-                        onClick={() => {
-                          handleDelete();
-                          handleMenuClose();
-                        }}
-                        style={{ borderRadius: 0, background: "#fff" }}
+                      <Tooltip
+                        label={`${formatTime(event.startTime)} - ${formatTime(
+                          event.endTime
+                        )}`}
+                        withArrow
+                        transitionProps={{ transition: "pop", duration: 150 }}
                       >
-                        Delete Time Slot
-                      </Button>
-                    </div>
-                  )}
-                </Box>
-              );
-            })}
+                        <Box
+                          style={{
+                            position: "absolute",
+                            top: 4,
+                            height: 32,
+                            background: barColors[idx % barColors.length],
+                            borderRadius: 6,
+                            width: `calc(${width}% - 8px)`,
+                            marginLeft: `calc(${left}% )`,
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            color: "#222",
+                            fontWeight: 500,
+                            fontSize: 14,
+                            cursor: "pointer",
+                            boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
+                            transition: "all 0.3s",
+                            overflow: "hidden",
+                            whiteSpace: "nowrap",
+                            textOverflow: "ellipsis",
+                            left: 0,
+                            right: 0,
+                            userSelect: "none",
+                          }}
+                        >
+                          {event.description}
+                        </Box>
+                      </Tooltip>
+                      {/* Custom Context Menu */}
+                      {menuOpened && contextMenuIdx === idx && menuPosition && (
+                        <div
+                          style={{
+                            position: "fixed",
+                            left: menuPosition.x,
+                            top: menuPosition.y,
+                            zIndex: 9999,
+                            minWidth: 140,
+                            background: "#fff",
+                            border: "1px solid #eee",
+                            borderRadius: 6,
+                            boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+                            padding: 0,
+                          }}
+                          onMouseLeave={handleMenuClose}
+                        >
+                          <Button
+                            variant="subtle"
+                            color="red"
+                            fullWidth
+                            leftSection={<IconTrash size={18} />}
+                            onClick={async () => {
+                              await handleDelete();
+                              handleMenuClose();
+                            }}
+                            style={{ borderRadius: 0, background: "#fff" }}
+                          >
+                            Delete Time Slot
+                          </Button>
+                        </div>
+                      )}
+                    </Box>
+                  );
+                })
+              ))
+            )}
           </Stack>
           {/* Time axis */}
           <Box
@@ -322,8 +375,9 @@ export const Schedule: React.FC = () => {
             <Button
               mt="md"
               onClick={handleSave}
-              disabled={isSaveDisabled}
+              disabled={isSaveDisabled || createMutation.isPending}
               fullWidth
+              loading={createMutation.isPending}
             >
               Save
             </Button>
