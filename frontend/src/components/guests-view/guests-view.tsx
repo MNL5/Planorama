@@ -21,12 +21,6 @@ const GuestsView: React.FC = () => {
   const { currentEvent } = useEventContext();
   const [columns, setColumns] = useState<Column<Guest>[] | null>(null);
 
-  useEffect(() => {
-    if (currentEvent) {
-      setColumns(guestColumns(currentEvent));
-    }
-  }, [currentEvent]);
-
   const {
     guestsData: guests,
     isSuccess,
@@ -34,6 +28,12 @@ const GuestsView: React.FC = () => {
     isError,
     isFetching,
   } = useFetchAllGuests(true);
+
+  useEffect(() => {
+    if (currentEvent && guests) {
+      setColumns(guestColumns(currentEvent, guests));
+    }
+  }, [currentEvent, guests]);
 
   const { mutateAsync: mutateCreateGuest, isPending: isCreatePending } =
     useMutation<Guest, Error, Omit<Guest, "id">>({

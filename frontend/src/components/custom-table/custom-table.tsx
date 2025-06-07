@@ -67,7 +67,7 @@ function CustomTable<T extends { id: string }>({
       );
       setSelectedIds(newSelectedIds);
     }
-  }, [initialData]);
+  }, [initialData, selectedIds]);
 
   const [
     filterModalOpened,

@@ -6,14 +6,25 @@ import rsvpOptions from "./rsvp-options";
 import { listToMap } from "./list-to-map";
 import { FilterOperator } from "../types/filter-operator";
 
-const guestColumns: (event: Event) => Column<Guest>[] = (event: Event) => {
+const guestColumns: (event: Event, guests: Guest[]) => Column<Guest>[] = (
+  event: Event,
+  guests: Guest[]
+) => {
   const tables =
     event.diagram?.elements
       ?.filter((element) => element.seatCount)
       .map((table, index) => ({
         label: `${index + 1}`,
         value: table.id,
-      })) || [];
+      }))
+      .concat({
+        label: "No Table",
+        value: "No Table",
+      }) || [];
+
+  const groups = guests
+    .map((guest) => guest.group)
+    .map((group) => ({ label: group, value: group }));
 
   return [
     {
@@ -31,6 +42,8 @@ const guestColumns: (event: Event) => Column<Guest>[] = (event: Event) => {
       isMulti: false,
       isNullable: true,
       isFilterable: true,
+      values: groups,
+      alt: listToMap(groups),
       filterOperators: [FilterOperator.EQUALS, FilterOperator.NOT_EQUALS],
     },
     {

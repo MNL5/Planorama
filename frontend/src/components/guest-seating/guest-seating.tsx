@@ -26,9 +26,11 @@ const GuestSeating: React.FC = () => {
   const guestsToShow = useMemo(
     () =>
       guests.filter(
-        (guest) => !guest.tableId && guest.status !== RsvpStatus.DECLINE,
+        (guest) =>
+          (!guest.tableId || guest.tableId === "No Table") &&
+          guest.status !== RsvpStatus.DECLINE
       ),
-    [guests],
+    [guests]
   );
 
   const {
@@ -54,13 +56,13 @@ const GuestSeating: React.FC = () => {
   const handleDrop = (tableId: string, ids: string[]) => {
     const idsSet = new Set(ids);
     setGuests((prev) =>
-      prev.map((g) => (idsSet.has(g.id) ? { ...g, tableId } : g)),
+      prev.map((g) => (idsSet.has(g.id) ? { ...g, tableId } : g))
     );
   };
 
   const handleRemove = (guestId: string) => {
     setGuests((prev) =>
-      prev.map((g) => (g.id === guestId ? { ...g, tableId: undefined } : g)),
+      prev.map((g) => (g.id === guestId ? { ...g, tableId: undefined } : g))
     );
   };
 
@@ -87,7 +89,7 @@ const GuestSeating: React.FC = () => {
 
   const handleGuestDragStart = (
     e: React.DragEvent<HTMLDivElement>,
-    ids: string[],
+    ids: string[]
   ) => {
     e.dataTransfer.setData("ids", JSON.stringify(ids));
   };
