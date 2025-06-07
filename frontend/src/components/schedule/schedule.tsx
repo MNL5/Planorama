@@ -8,10 +8,10 @@ import {
   Group,
   Title,
   Button,
-  Tooltip,
-  TextInput,
   Loader,
   Center,
+  Tooltip,
+  TextInput,
 } from "@mantine/core";
 import { toast } from "react-toastify";
 import { useMemo, useState } from "react";
@@ -19,7 +19,14 @@ import { TimeInput } from "@mantine/dates";
 import { IconTrash } from "@tabler/icons-react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 
-import { barColors, horizontalPadding } from "./consts";
+import {
+  formatTime,
+  getMaxTime,
+  getMinTime,
+  getMinutes,
+  toIsoDateTimeString,
+} from "../../utils/time-utils";
+import { barColors, horizontalPadding, minSlotMinutes } from "./consts";
 import {
   deleteTimeSlot,
   createTimeSlot,
@@ -27,12 +34,6 @@ import {
 } from "../../services/time-slot-service/time-slot-service";
 import { useEventContext } from "../../contexts/event-context";
 import { FormattedTimeSlot, TimeSlot } from "../../types/time-slot";
-import {
-  formatTime,
-  getMaxTime,
-  getMinTime,
-  toIsoDateTimeString,
-} from "../../utils/time-utils";
 
 export const Schedule: React.FC = () => {
   const { currentEvent } = useEventContext();
@@ -78,7 +79,6 @@ export const Schedule: React.FC = () => {
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
   const [description, setDescription] = useState("");
-  const [touched, setTouched] = useState(false);
   const [contextMenuIdx, setContextMenuIdx] = useState<number | null>(null);
   const [menuOpened, setMenuOpened] = useState(false);
   const [menuPosition, setMenuPosition] = useState<{
@@ -105,7 +105,6 @@ export const Schedule: React.FC = () => {
     setStartTime("");
     setEndTime("");
     setDescription("");
-    setTouched(false);
     setModalOpen(true);
   };
 
@@ -113,7 +112,24 @@ export const Schedule: React.FC = () => {
     !startTime ||
     !endTime ||
     !description.trim() ||
-    (startTime !== "" && endTime !== "" && endTime <= startTime);
+    (startTime !== "" &&
+      endTime !== "" &&
+      (endTime <= startTime ||
+        getMinutes(endTime) - getMinutes(startTime) < minSlotMinutes));
+
+  const errorMessage = useMemo(() => {
+    if (!startTime || !endTime || !description.trim()) {
+      return "Missing required fields.";
+    } else if (startTime && endTime && startTime >= endTime) {
+      return "End time must be after start time.";
+    } else if (getMinutes(endTime) - getMinutes(startTime) < minSlotMinutes) {
+      return `Time slot must be at least ${minSlotMinutes} minutes long.`;
+    } else if (!currentEvent?.time) {
+      return "Event date is not set.";
+    } else {
+      return "";
+    }
+  }, [startTime, endTime, description, currentEvent]);
 
   const handleSave = async () => {
     if (isSaveDisabled || !currentEvent?.time) return;
@@ -374,11 +390,6 @@ export const Schedule: React.FC = () => {
               withSeconds={false}
               placeholder="Pick end time"
               w="100%"
-              error={
-                touched && startTime && endTime && endTime <= startTime
-                  ? "End time must be after start time"
-                  : undefined
-              }
             />
             <TextInput
               label="Description"
@@ -388,19 +399,21 @@ export const Schedule: React.FC = () => {
               placeholder="Enter description"
               w="100%"
             />
-            <Button
-              mt="md"
-              onClick={handleSave}
-              disabled={
-                isSaveDisabled ||
-                createMutation.isPending ||
-                !currentEvent?.time
-              }
-              fullWidth
-              loading={createMutation.isPending}
-            >
-              Save
-            </Button>
+            <Tooltip label={errorMessage} disabled={!errorMessage}>
+              <Button
+                mt="md"
+                onClick={handleSave}
+                disabled={
+                  isSaveDisabled ||
+                  createMutation.isPending ||
+                  !currentEvent?.time
+                }
+                fullWidth
+                loading={createMutation.isPending}
+              >
+                Save
+              </Button>
+            </Tooltip>
           </Stack>
         </Modal>
       </Card>

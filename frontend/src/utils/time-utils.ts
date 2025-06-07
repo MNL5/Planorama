@@ -27,4 +27,9 @@ function toIsoDateTimeString(date: Date, time: string): string {
   return result.toISOString();
 }
 
-export { formatTime, getMinTime, getMaxTime, toIsoDateTimeString };
+function getMinutes(time: string) {
+  const [h, m] = time.split(":").map(Number);
+  return h * 60 + m;
+}
+
+export { formatTime, getMinTime, getMaxTime, toIsoDateTimeString, getMinutes };
