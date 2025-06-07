@@ -212,6 +212,7 @@ export const Schedule: React.FC = () => {
                     >
                       <Button
                         variant="subtle"
+                        color="red"
                         fullWidth
                         leftSection={<IconTrash size={18} />}
                         onClick={() => {
