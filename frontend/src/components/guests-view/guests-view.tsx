@@ -6,6 +6,7 @@ import { useMutation } from "@tanstack/react-query";
 
 import { Guest } from "../../types/guest";
 import { Column } from "../../types/column";
+import MainLoader from "../mainLoader/MainLoader";
 import {
   createGuest,
   updateGuest,
@@ -15,7 +16,6 @@ import { guestColumns } from "../../utils/guest-columns";
 import { CustomTable } from "../custom-table/custom-table";
 import { useEventContext } from "../../contexts/event-context";
 import { useFetchAllGuests } from "../../hooks/use-fetch-all-guests";
-import MainLoader from "../mainLoader/MainLoader";
 
 const GuestsView: React.FC = () => {
   const { currentEvent } = useEventContext();
