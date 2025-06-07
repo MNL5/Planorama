@@ -1,4 +1,4 @@
-import { uniq } from "lodash";
+import { chain } from "lodash";
 
 import { Guest } from "../types/guest";
 import { Event } from "../types/event";
@@ -24,10 +24,15 @@ const guestColumns: (event: Event, guests: Guest[]) => Column<Guest>[] = (
         value: "No Table",
       }) || [];
 
-  const groups = uniq(guests.map((guest) => guest.group)).map((group) => ({
-    label: group,
-    value: group,
-  }));
+  const groups = chain(guests)
+    .map((guest) => guest.group)
+    .compact()
+    .uniq()
+    .map((group) => ({
+      label: group,
+      value: group,
+    }))
+    .value();
 
   return [
     {
@@ -59,7 +64,7 @@ const guestColumns: (event: Event, guests: Guest[]) => Column<Guest>[] = (
       validationFunction: (value: unknown) => {
         if (
           !/^(?:\(?\+972\)?|0)(?:[-\s]?\(?5\d\)?[-\s]?)\d{7}$/.test(
-            value as string,
+            value as string
           )
         )
           return false;
