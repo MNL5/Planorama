@@ -245,9 +245,17 @@ export const Schedule: React.FC = () => {
                       onContextMenu={(e) => handleRightClick(e, idx)}
                     >
                       <Tooltip
-                        label={`${formatTime(
-                          timeSlot.startTime
-                        )} - ${formatTime(timeSlot.endTime)}`}
+                        label={
+                          <>
+                            <span style={{ fontWeight: 400 }}>
+                              {timeSlot.description}
+                            </span>
+                            <br />
+                            {`${formatTime(timeSlot.startTime)} - ${formatTime(
+                              timeSlot.endTime
+                            )}`}
+                          </>
+                        }
                         withArrow
                         transitionProps={{ transition: "pop", duration: 150 }}
                       >
