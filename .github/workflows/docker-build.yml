@@ -35,3 +35,8 @@ jobs:
         run: |
           docker build --no-cache -t ${{ secrets.DOCKERHUB_USERNAME }}/aiservice:${{ env.IMAGE_TAG }} ./aiService
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/aiservice:${{ env.IMAGE_TAG }}
+
+      - name: Build and Push reverse proxy
+        run: |
+          docker build --no-cache -t ${{ secrets.DOCKERHUB_USERNAME }}/reverse-proxy:${{ env.IMAGE_TAG }} ./reverse-proxy
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/reverse-proxy:${{ env.IMAGE_TAG }}

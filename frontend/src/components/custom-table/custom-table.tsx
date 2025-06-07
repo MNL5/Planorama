@@ -28,6 +28,7 @@ import { Column } from "../../types/column";
 import { AddRowModal } from "./add-row-modal";
 import { FilterOperator } from "../../types/filter-operator";
 import { FilterOperatorFunctions } from "../../utils/filter-operator-functions";
+import { toast } from "react-toastify";
 
 interface CustomTableProps<T> {
   data: T[];
@@ -182,8 +183,36 @@ function CustomTable<T extends { id: string }>({
     }));
   };
 
+  const validateForm = (newRowData: Partial<T>) => {
+    const newErrors: string[] = [];
+
+    columns.forEach((col) => {
+      const value = newRowData[col.key];
+      if (
+        !col.isNullable &&
+        (value === undefined ||
+          (typeof value === "string" && value.trim() === "") ||
+          (Array.isArray(value) && value.length === 0))
+      ) {
+        newErrors.push(`${col.label} is required`);
+      } else if (
+        !isEmpty(value) &&
+        col.validationFunction &&
+        !col.validationFunction(value)
+      ) {
+        newErrors.push(`${col.label} is invalid`);
+      }
+    });
+
+    if (newErrors.length > 0) {
+      toast.error(`- ${newErrors.join("\n- ")}`);
+    }
+
+    return newErrors.length === 0;
+  };
+
   const handleSaveClick = async () => {
-    if (editRowId !== null && updateRow) {
+    if (editRowId !== null && updateRow && validateForm(editFormData)) {
       const updatedRow = await updateRow({
         ...editFormData,
         id: editRowId,

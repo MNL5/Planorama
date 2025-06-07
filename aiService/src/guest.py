@@ -2,7 +2,7 @@ class Guest:
     def __init__(self, id, group, table=None):
         self.group = group
         self.id = id
-        self.table = table
+        self.table = None if table is "" else table
         self.satisfaction = None
     
     def __str__(self) -> str:
