@@ -24,7 +24,6 @@ import {
   getMinTime,
   timeStringToDate,
 } from "../../utils/time-utils";
-import { Schedule as ScheduleType } from "../../types/schedule";
 import { TimeSlot } from "../../types/time-slot";
 import { barColors, horizontalPadding } from "./consts";
 import {
@@ -37,24 +36,18 @@ import { useEventContext } from "../../contexts/event-context";
 export const Schedule: React.FC = () => {
   const { currentEvent } = useEventContext();
   const {
-    data: schedules = [],
+    data: timeSlots = [],
     isLoading,
     isError,
     error,
     refetch,
-  } = useQuery<ScheduleType[], Error>({
-    queryKey: ["schedules"],
+  } = useQuery<TimeSlot[], Error>({
+    queryKey: ["timeSlots"],
     queryFn: () => getAllTimeSlots(currentEvent?.id as string),
     enabled: !!currentEvent?.id,
   });
 
-  const timeSlots = useMemo(() => {
-    if (schedules) {
-      return schedules.map((schedule) => schedule.schedule);
-    }
-  }, [schedules]);
-
-  const createMutation = useMutation<TimeSlot, Error, TimeSlot>({
+  const createMutation = useMutation<TimeSlot, Error, Omit<TimeSlot, "id">>({
     mutationFn: (newTimeSlot) =>
       createTimeSlot(currentEvent?.id as string, newTimeSlot),
     onSuccess: () => {
@@ -129,7 +122,7 @@ export const Schedule: React.FC = () => {
 
   const handleDelete = async () => {
     if (contextMenuIdx === null) return;
-    const slot = schedules[contextMenuIdx];
+    const slot = timeSlots[contextMenuIdx];
     if (slot && slot.id) {
       await deleteMutation.mutateAsync(slot.id);
     }
@@ -211,8 +204,7 @@ export const Schedule: React.FC = () => {
                   No time slots yet. Click "Add Time Slot" to create one.
                 </Text>
               ) : (
-                schedules.map((schedule, idx) => {
-                  const { schedule: timeSlot } = schedule;
+                timeSlots.map((timeSlot, idx) => {
                   const start =
                     timeSlot.startTime.getHours() * 60 +
                     timeSlot.startTime.getMinutes() -
@@ -226,7 +218,7 @@ export const Schedule: React.FC = () => {
                   const width = (duration / totalMinutes) * 100;
                   return (
                     <Box
-                      key={schedule.id ?? idx}
+                      key={timeSlot.id ?? idx}
                       style={{ position: "relative", height: 40 }}
                       onContextMenu={(e) => handleRightClick(e, idx)}
                     >
