@@ -1,0 +1,56 @@
+.guest-table {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 8px;
+  cursor: pointer;
+  padding: 4px;
+  text-align: center;
+}
+
+.guest-table-popover-dropdown {
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.guest-table-popover-arrow {
+  color: transparent;
+}
+
+.popover-card {
+  width: 300px;
+  max-height: 400px;
+  display: flex;
+  flex-direction: column;
+}
+
+.popover-header {
+  justify-content: space-between;
+  padding: 8px 12px;
+}
+
+.guest-list {
+  padding: 8px 12px;
+  overflow-y: auto;
+}
+
+.guest-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 8px 0;
+}
+
+.guest-box {
+  flex-grow: 1;
+  padding: 6px 10px;
+  border-radius: 6px;
+  color: #1a1a1a;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background 0.3s ease-in-out;
+}
