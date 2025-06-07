@@ -12,6 +12,7 @@ const useFetchAllGuests = (isLogged: boolean) => {
     isLoading,
     isError,
     isFetching,
+    refetch: refetchGuests
   } = useQuery<Guest[], Error>({
     queryKey: ["fetchGuests", currentEvent?.id],
     queryFn: () => getAllGuests(currentEvent?.id as string),
@@ -24,6 +25,7 @@ const useFetchAllGuests = (isLogged: boolean) => {
     isLoading,
     isFetching,
     guestsData,
+    refetchGuests
   };
 };
 

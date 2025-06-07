@@ -27,6 +27,7 @@ const GuestsView: React.FC = () => {
     isLoading,
     isError,
     isFetching,
+    refetchGuests,
   } = useFetchAllGuests(true);
 
   useEffect(() => {
@@ -86,6 +87,7 @@ const GuestsView: React.FC = () => {
         createRow={mutateCreateGuest}
         updateRow={mutateUpdateGuest}
         deleteRow={mutateDeleteGuest}
+        refetchData={refetchGuests}
       />
     </Container>
   ) : isLoading ? (

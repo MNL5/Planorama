@@ -38,6 +38,7 @@ interface CustomTableProps<T> {
   onDragStart?: (e: React.DragEvent<HTMLDivElement>, ids: string[]) => void;
   rowStyle?: React.CSSProperties;
   selectable?: boolean;
+  refetchData?: () => void;
 }
 
 function CustomTable<T extends { id: string }>({
@@ -49,6 +50,7 @@ function CustomTable<T extends { id: string }>({
   onDragStart,
   rowStyle = {},
   selectable = false,
+  refetchData
 }: CustomTableProps<T>) {
   const [opened, { open, close }] = useDisclosure();
   const [data, setData] = useState<T[]>(initialData);
@@ -159,6 +161,7 @@ function CustomTable<T extends { id: string }>({
 
   const handleAddRow = (newRow: T) => {
     setData((prev) => [...prev, newRow]);
+    refetchData?.();
     close();
   };
 

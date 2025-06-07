@@ -82,7 +82,7 @@ function AddRowModal<T>({
         {columns.map((col) => (
           <div key={String(col.key)} style={{ marginBottom: "10px" }}>
             <label>{col.label}</label>
-            {!col.values ? (
+            {!col.values || col.isOpenList ? (
               <TextInput
                 size={"sm"}
                 value={(newRowData[col.key] as string) || ""}

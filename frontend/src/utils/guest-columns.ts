@@ -44,6 +44,7 @@ const guestColumns: (event: Event, guests: Guest[]) => Column<Guest>[] = (
       isFilterable: true,
       values: groups,
       alt: listToMap(groups),
+      isOpenList: true,
       filterOperators: [FilterOperator.EQUALS, FilterOperator.NOT_EQUALS],
     },
     {
