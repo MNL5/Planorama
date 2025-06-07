@@ -9,7 +9,7 @@ import {
 import { getAllRelations } from "../services/relation-service/relation-service";
 import { Guest, AIGuest } from "../types/guest";
 import { GuestRelation } from "../types/guest-relation";
-import Algorithm from "../utils/algorithem";
+import Algorithm from "../utils/algorithm";
 import Element from "../types/Element";
 import { toast } from "react-toastify";
 
@@ -134,7 +134,7 @@ const useGuestData = (
       satisfaction: undefined,
     }));
 
-    const tableElements = elements.filter((el) => el.elementType === "table");
+    const tableElements = elements.filter((el) => el.seatCount !== null);
 
     const algo = new Algorithm(aloGuests, tableElements, relations);
     const updatedList = algo.setSatisfactory(aloGuests);

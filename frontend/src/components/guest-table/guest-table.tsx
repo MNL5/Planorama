@@ -46,6 +46,10 @@ const groupGradient = (group: string) => {
   return `linear-gradient(50deg, ${color} 0% 0%, transparent 100%)`;
 };
 
+function formatNumber(num: number) {
+  return num % 1 === 0 ? num.toString() : num.toFixed(2);
+}
+
 const GuestTable: React.FC<GuestTableProps> = ({
   table,
   seatedGuestsWithSatisfaction,
@@ -145,7 +149,7 @@ const GuestTable: React.FC<GuestTableProps> = ({
                     <span>{g.name}</span>
                     <span>
                       {g.satisfaction !== undefined &&
-                        `${g.satisfaction * 100}%`}
+                        `${formatNumber(g.satisfaction * 100)}%`}
                     </span>
                     <span>{viewMode === "groups" && g.group}</span>
                   </Box>
