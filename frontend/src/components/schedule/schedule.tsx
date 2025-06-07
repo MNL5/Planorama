@@ -13,7 +13,7 @@ import {
   Loader,
   Center,
 } from "@mantine/core";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { TimeInput } from "@mantine/dates";
 import { IconTrash } from "@tabler/icons-react";
 import { useQuery, useMutation } from "@tanstack/react-query";
@@ -24,6 +24,7 @@ import {
   getMinTime,
   timeStringToDate,
 } from "../../utils/time-utils";
+import { Schedule as ScheduleType } from "../../types/schedule";
 import { TimeSlot } from "../../types/time-slot";
 import { barColors, horizontalPadding } from "./consts";
 import {
@@ -36,19 +37,24 @@ import { useEventContext } from "../../contexts/event-context";
 export const Schedule: React.FC = () => {
   const { currentEvent } = useEventContext();
   const {
-    data: timeSlots = [],
+    data: schedules = [],
     isLoading,
     isError,
     error,
     refetch,
-  } = useQuery<TimeSlot[], Error>({
-    queryKey: ["timeSlots"],
+  } = useQuery<ScheduleType[], Error>({
+    queryKey: ["schedules"],
     queryFn: () => getAllTimeSlots(currentEvent?.id as string),
     enabled: !!currentEvent?.id,
   });
 
+  const timeSlots = useMemo(
+    () => schedules.map((schedule) => schedule.schedule),
+    [schedules]
+  );
+
   // Mutations
-  const createMutation = useMutation<TimeSlot, Error, Omit<TimeSlot, "id">>({
+  const createMutation = useMutation<TimeSlot, Error, TimeSlot>({
     mutationFn: (newTimeSlot) =>
       createTimeSlot(currentEvent?.id as string, newTimeSlot),
     onSuccess: () => {
@@ -59,7 +65,7 @@ export const Schedule: React.FC = () => {
   const deleteMutation = useMutation<TimeSlot, Error, string>({
     mutationFn: deleteTimeSlot,
     onSuccess: () => {
-      refetch()
+      refetch();
     },
   });
 
@@ -75,16 +81,27 @@ export const Schedule: React.FC = () => {
     y: number;
   } | null>(null);
 
-  // Time calculations
-  const minTime = Number.isFinite(getMinTime(timeSlots))
-    ? getMinTime(timeSlots)
-    : 0;
-  const maxTime = Number.isFinite(getMaxTime(timeSlots))
-    ? getMaxTime(timeSlots)
-    : 30;
-  const totalMinutes = Math.max(maxTime - minTime, 30);
+  const minTime = useMemo(() => {
+    return timeSlots
+      ? Number.isFinite(getMinTime(timeSlots))
+        ? getMinTime(timeSlots)
+        : 0
+      : 0;
+  }, [timeSlots]);
 
-  // Handlers
+  const maxTime = useMemo(() => {
+    return timeSlots
+      ? Number.isFinite(getMaxTime(timeSlots))
+        ? getMaxTime(timeSlots)
+        : 30
+      : 30;
+  }, [timeSlots]);
+
+  const totalMinutes = useMemo(
+    () => Math.max(maxTime - minTime, 30),
+    [maxTime, minTime]
+  );
+
   const handleAdd = () => {
     setStartTime("");
     setEndTime("");
@@ -112,7 +129,7 @@ export const Schedule: React.FC = () => {
 
   const handleDelete = async () => {
     if (contextMenuIdx === null) return;
-    const slot = timeSlots[contextMenuIdx];
+    const slot = schedules[contextMenuIdx];
     if (slot && slot.id) {
       await deleteMutation.mutateAsync(slot.id);
     }
@@ -194,28 +211,29 @@ export const Schedule: React.FC = () => {
                   No time slots yet. Click "Add Time Slot" to create one.
                 </Text>
               ) : (
-                timeSlots.map((event, idx) => {
+                schedules.map((schedule, idx) => {
+                  const { schedule: timeSlot } = schedule;
                   const start =
-                    event.startTime.getHours() * 60 +
-                    event.startTime.getMinutes() -
+                    timeSlot.startTime.getHours() * 60 +
+                    timeSlot.startTime.getMinutes() -
                     minTime;
                   const duration =
-                    event.endTime.getHours() * 60 +
-                    event.endTime.getMinutes() -
-                    (event.startTime.getHours() * 60 +
-                      event.startTime.getMinutes());
+                    timeSlot.endTime.getHours() * 60 +
+                    timeSlot.endTime.getMinutes() -
+                    (timeSlot.startTime.getHours() * 60 +
+                      timeSlot.startTime.getMinutes());
                   const left = (start / totalMinutes) * 100;
                   const width = (duration / totalMinutes) * 100;
                   return (
                     <Box
-                      key={event.id ?? idx}
+                      key={schedule.id ?? idx}
                       style={{ position: "relative", height: 40 }}
                       onContextMenu={(e) => handleRightClick(e, idx)}
                     >
                       <Tooltip
-                        label={`${formatTime(event.startTime)} - ${formatTime(
-                          event.endTime
-                        )}`}
+                        label={`${formatTime(
+                          timeSlot.startTime
+                        )} - ${formatTime(timeSlot.endTime)}`}
                         withArrow
                         transitionProps={{ transition: "pop", duration: 150 }}
                       >
@@ -245,7 +263,7 @@ export const Schedule: React.FC = () => {
                             userSelect: "none",
                           }}
                         >
-                          {event.description}
+                          {timeSlot.description}
                         </Box>
                       </Tooltip>
                       {/* Custom Context Menu */}
