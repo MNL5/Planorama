@@ -48,12 +48,12 @@ export const Schedule: React.FC = () => {
     enabled: !!currentEvent?.id,
   });
 
-  const timeSlots = useMemo(
-    () => schedules.map((schedule) => schedule.schedule),
-    [schedules]
-  );
+  const timeSlots = useMemo(() => {
+    if (schedules) {
+      return schedules.map((schedule) => schedule.schedule);
+    }
+  }, [schedules]);
 
-  // Mutations
   const createMutation = useMutation<TimeSlot, Error, TimeSlot>({
     mutationFn: (newTimeSlot) =>
       createTimeSlot(currentEvent?.id as string, newTimeSlot),
