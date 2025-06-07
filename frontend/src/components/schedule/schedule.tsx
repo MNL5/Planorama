@@ -25,7 +25,7 @@ import { TimeSlot } from "../../types/time-slot";
 import { barColors, horizontalPadding } from "./consts";
 
 export const Schedule: React.FC = () => {
-  const [events, setEvents] = useState<TimeSlot[]>([]);
+  const [timeSlots, setTimeSlots] = useState<Omit<TimeSlot, "id">[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
@@ -38,8 +38,12 @@ export const Schedule: React.FC = () => {
     y: number;
   } | null>(null);
 
-  const minTime = Number.isFinite(getMinTime(events)) ? getMinTime(events) : 0;
-  const maxTime = Number.isFinite(getMaxTime(events)) ? getMaxTime(events) : 30;
+  const minTime = Number.isFinite(getMinTime(timeSlots))
+    ? getMinTime(timeSlots)
+    : 0;
+  const maxTime = Number.isFinite(getMaxTime(timeSlots))
+    ? getMaxTime(timeSlots)
+    : 30;
   const totalMinutes = Math.max(maxTime - minTime, 30);
 
   const handleAdd = () => {
@@ -52,8 +56,8 @@ export const Schedule: React.FC = () => {
 
   const handleSave = () => {
     if (!startTime || !endTime || !description) return;
-    setEvents([
-      ...events,
+    setTimeSlots([
+      ...timeSlots,
       {
         startTime: timeStringToDate(startTime),
         endTime: timeStringToDate(endTime),
@@ -72,7 +76,7 @@ export const Schedule: React.FC = () => {
 
   const handleDelete = () => {
     if (contextMenuIdx === null) return;
-    setEvents(events.filter((_, idx) => idx !== contextMenuIdx));
+    setTimeSlots(timeSlots.filter((_, idx) => idx !== contextMenuIdx));
     setContextMenuIdx(null);
     setMenuOpened(false);
     setMenuPosition(null);
@@ -134,12 +138,12 @@ export const Schedule: React.FC = () => {
           }}
         >
           <Stack gap="xs">
-            {events.length === 0 && (
+            {timeSlots.length === 0 && (
               <Text c="dimmed" ta="center" py="md">
                 No time slots yet. Click "Add Time Slot" to create one.
               </Text>
             )}
-            {events.map((event, idx) => {
+            {timeSlots.map((event, idx) => {
               const start =
                 event.startTime.getHours() * 60 +
                 event.startTime.getMinutes() -
