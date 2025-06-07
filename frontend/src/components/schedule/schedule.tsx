@@ -13,6 +13,7 @@ import {
   Loader,
   Center,
 } from "@mantine/core";
+import { toast } from "react-toastify";
 import { useMemo, useState } from "react";
 import { TimeInput } from "@mantine/dates";
 import { IconTrash } from "@tabler/icons-react";
@@ -26,8 +27,12 @@ import {
 } from "../../services/time-slot-service/time-slot-service";
 import { useEventContext } from "../../contexts/event-context";
 import { FormattedTimeSlot, TimeSlot } from "../../types/time-slot";
-import { formatTime, getMaxTime, getMinTime } from "../../utils/time-utils";
-import { toast } from "react-toastify";
+import {
+  formatTime,
+  getMaxTime,
+  getMinTime,
+  timeToIsoTimeString,
+} from "../../utils/time-utils";
 
 export const Schedule: React.FC = () => {
   const { currentEvent } = useEventContext();
@@ -107,8 +112,8 @@ export const Schedule: React.FC = () => {
   const handleSave = async () => {
     if (!startTime || !endTime || !description) return;
     await createMutation.mutateAsync({
-      startTime,
-      endTime,
+      startTime: timeToIsoTimeString(startTime),
+      endTime: timeToIsoTimeString(endTime),
       description,
     });
     setModalOpen(false);
