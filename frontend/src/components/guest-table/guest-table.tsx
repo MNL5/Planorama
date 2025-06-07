@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import {
     Box,
     Button,
@@ -15,6 +15,10 @@ import { toast } from 'react-toastify';
 import Element from '../../types/Element';
 import { Guest } from '../../types/guest';
 import { satisfactionToColor } from '../../utils/satisfactionUtils';
+import {
+    getGroupGradient,
+    getPastelColorForGroup,
+} from '../../utils/colorUtils';
 import './GuestTable.css';
 
 interface GuestTableProps {
@@ -28,11 +32,17 @@ interface GuestTableProps {
     onDrop: (tableId: string, ids: string[]) => void;
     onRemove: (guestId: string) => void;
     tableColor: string;
+    viewMode: 'regular' | 'satisfaction' | 'groups';
 }
 
 const satisfactionGradient = (satisfaction?: number) => {
     if (satisfaction === undefined) return 'transparent';
     const color = satisfactionToColor(satisfaction);
+    return `linear-gradient(50deg, ${color} 0% 0%, transparent 100%)`;
+};
+
+const groupGradient = (group: string) => {
+    const color = getPastelColorForGroup(group);
     return `linear-gradient(50deg, ${color} 0% 0%, transparent 100%)`;
 };
 
@@ -45,6 +55,7 @@ const GuestTable: React.FC<GuestTableProps> = ({
     onDrop,
     onRemove,
     tableColor,
+    viewMode,
 }) => {
     const isFull =
         seatedGuestsWithSatisfaction.length >= Number(table.seatCount);
@@ -88,7 +99,11 @@ const GuestTable: React.FC<GuestTableProps> = ({
                         left: table.x,
                         width: table.width,
                         height: table.height,
-                        backgroundColor: tableColor,
+                        background:
+                            viewMode === 'groups' &&
+                            seatedGuestsWithSatisfaction.length > 0
+                                ? getGroupGradient(seatedGuestsWithSatisfaction)
+                                : tableColor,
                     }}
                 >
                     <Text size="md" color="#3c096c">
@@ -133,16 +148,23 @@ const GuestTable: React.FC<GuestTableProps> = ({
                                         }
                                         className="guest-box"
                                         style={{
-                                            background: satisfactionGradient(
-                                                g.satisfaction
-                                            ),
+                                            background:
+                                                viewMode === 'groups'
+                                                    ? groupGradient(
+                                                          g.group || 'unknown'
+                                                      )
+                                                    : satisfactionGradient(
+                                                          g.satisfaction
+                                                      ),
                                         }}
                                     >
                                         <span>{g.name}</span>
                                         <span>
-                                            {g.satisfaction !== undefined
-                                                ? `${g.satisfaction * 100}%`
-                                                : ''}
+                                            {g.satisfaction !== undefined &&
+                                                `${g.satisfaction * 100}%`}
+                                        </span>
+                                        <span>
+                                            {viewMode === 'groups' && g.group}
                                         </span>
                                     </Box>
                                     <Button

@@ -14,7 +14,7 @@ import { RsvpStatus } from '../../types/rsvp-status';
 import './GuestSeating.css';
 import MainLoader from '../mainLoader/MainLoader';
 
-type ViewMode = 'regular' | 'satisfaction';
+type ViewMode = 'regular' | 'satisfaction' | 'groups';
 
 const GuestSeating: React.FC = () => {
     const { currentEvent } = useEventContext();
@@ -89,6 +89,7 @@ const GuestSeating: React.FC = () => {
                     data={[
                         { label: 'Regular', value: 'regular' },
                         { label: 'Satisfaction', value: 'satisfaction' },
+                        { label: 'Groups', value: 'groups' },
                     ]}
                     className="gs-view-switch"
                 />
