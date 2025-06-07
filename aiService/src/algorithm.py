@@ -136,8 +136,6 @@ class Algorithm:
                     tablesSwitch[newTable] = table
                     break
 
-        print("Tables switch:", tablesSwitch)
-
         tablesSwitchValues = set(tablesSwitch.values())
         for newTable in newGuestsPerTable:
             if newTable not in tablesSwitch:
