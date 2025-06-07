@@ -5,6 +5,7 @@ import mealOptions from "./meal-options";
 import rsvpOptions from "./rsvp-options";
 import { listToMap } from "./list-to-map";
 import { FilterOperator } from "../types/filter-operator";
+import { uniq } from "lodash";
 
 const guestColumns: (event: Event, guests: Guest[]) => Column<Guest>[] = (
   event: Event,
@@ -22,9 +23,10 @@ const guestColumns: (event: Event, guests: Guest[]) => Column<Guest>[] = (
         value: "No Table",
       }) || [];
 
-  const groups = guests
-    .map((guest) => guest.group)
-    .map((group) => ({ label: group, value: group }));
+  const groups = uniq(guests.map((guest) => guest.group)).map((group) => ({
+    label: group,
+    value: group,
+  }));
 
   return [
     {
