@@ -1,3 +1,5 @@
+import { uniq } from "lodash";
+
 import { Guest } from "../types/guest";
 import { Event } from "../types/event";
 import { Column } from "../types/column";
@@ -5,7 +7,6 @@ import mealOptions from "./meal-options";
 import rsvpOptions from "./rsvp-options";
 import { listToMap } from "./list-to-map";
 import { FilterOperator } from "../types/filter-operator";
-import { uniq } from "lodash";
 
 const guestColumns: (event: Event, guests: Guest[]) => Column<Guest>[] = (
   event: Event,
