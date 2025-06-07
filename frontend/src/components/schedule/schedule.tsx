@@ -18,20 +18,15 @@ import { TimeInput } from "@mantine/dates";
 import { IconTrash } from "@tabler/icons-react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 
-import {
-  formatTime,
-  getMaxTime,
-  getMinTime,
-  timeStringToDate,
-} from "../../utils/time-utils";
-import { TimeSlot } from "../../types/time-slot";
 import { barColors, horizontalPadding } from "./consts";
 import {
-  getAllTimeSlots,
-  createTimeSlot,
   deleteTimeSlot,
+  createTimeSlot,
+  getAllTimeSlots,
 } from "../../services/time-slot-service/time-slot-service";
 import { useEventContext } from "../../contexts/event-context";
+import { FormattedTimeSlot, TimeSlot } from "../../types/time-slot";
+import { formatTime, getMaxTime, getMinTime } from "../../utils/time-utils";
 
 export const Schedule: React.FC = () => {
   const { currentEvent } = useEventContext();
@@ -46,6 +41,14 @@ export const Schedule: React.FC = () => {
     queryFn: () => getAllTimeSlots(currentEvent?.id as string),
     enabled: !!currentEvent?.id,
   });
+
+  const formattedTimeSlots: FormattedTimeSlot[] = useMemo(() => {
+    return timeSlots.map((slot) => ({
+      ...slot,
+      startTime: new Date(slot.startTime),
+      endTime: new Date(slot.endTime),
+    }));
+  }, [timeSlots]);
 
   const createMutation = useMutation<TimeSlot, Error, Omit<TimeSlot, "id">>({
     mutationFn: (newTimeSlot) =>
@@ -75,20 +78,14 @@ export const Schedule: React.FC = () => {
   } | null>(null);
 
   const minTime = useMemo(() => {
-    return timeSlots
-      ? Number.isFinite(getMinTime(timeSlots))
-        ? getMinTime(timeSlots)
-        : 0
-      : 0;
-  }, [timeSlots]);
+    const min = getMinTime(formattedTimeSlots);
+    return formattedTimeSlots ? (Number.isFinite(min) ? min : 0) : 0;
+  }, [formattedTimeSlots]);
 
   const maxTime = useMemo(() => {
-    return timeSlots
-      ? Number.isFinite(getMaxTime(timeSlots))
-        ? getMaxTime(timeSlots)
-        : 30
-      : 30;
-  }, [timeSlots]);
+    const max = getMaxTime(formattedTimeSlots);
+    return formattedTimeSlots ? (Number.isFinite(max) ? max : 30) : 30;
+  }, [formattedTimeSlots]);
 
   const totalMinutes = useMemo(
     () => Math.max(maxTime - minTime, 30),
@@ -106,8 +103,8 @@ export const Schedule: React.FC = () => {
   const handleSave = async () => {
     if (!startTime || !endTime || !description) return;
     await createMutation.mutateAsync({
-      startTime: timeStringToDate(startTime),
-      endTime: timeStringToDate(endTime),
+      startTime,
+      endTime,
       description,
     });
     setModalOpen(false);
@@ -198,13 +195,13 @@ export const Schedule: React.FC = () => {
                   : "Failed to load time slots."}
               </Text>
             ) : (
-              timeSlots &&
-              (timeSlots.length === 0 ? (
+              formattedTimeSlots &&
+              (formattedTimeSlots.length === 0 ? (
                 <Text c="dimmed" ta="center" py="md">
                   No time slots yet. Click "Add Time Slot" to create one.
                 </Text>
               ) : (
-                timeSlots.map((timeSlot, idx) => {
+                formattedTimeSlots.map((timeSlot, idx) => {
                   const start =
                     timeSlot.startTime.getHours() * 60 +
                     timeSlot.startTime.getMinutes() -
