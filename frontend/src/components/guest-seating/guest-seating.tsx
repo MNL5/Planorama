@@ -31,7 +31,7 @@ const GuestSeating: React.FC = () => {
 
   const guestsToShow = useMemo(
     () => guests.filter((g) => !g.tableId && g.status !== RsvpStatus.DECLINE),
-    [guests]
+    [guests],
   );
 
   if (isLoading) {
@@ -44,13 +44,13 @@ const GuestSeating: React.FC = () => {
   const handleDrop = (tableId: string, ids: string[]) => {
     const idSet = new Set(ids);
     setGuests((prev) =>
-      prev.map((g) => (idSet.has(g.id) ? { ...g, tableId } : g))
+      prev.map((g) => (idSet.has(g.id) ? { ...g, tableId } : g)),
     );
   };
 
   const handleRemove = (guestId: string) => {
     setGuests((prev) =>
-      prev.map((g) => (g.id === guestId ? { ...g, tableId: undefined } : g))
+      prev.map((g) => (g.id === guestId ? { ...g, tableId: undefined } : g)),
     );
   };
 

@@ -66,7 +66,7 @@ function CustomTable<T extends { id: string }>({
     if (selectedIds.size > 0) {
       const dataIds = new Set(initialData.map((row) => row.id));
       const newSelectedIds = new Set(
-        Array.from(selectedIds).filter((id) => dataIds.has(id))
+        Array.from(selectedIds).filter((id) => dataIds.has(id)),
       );
       setSelectedIds(newSelectedIds);
     }
@@ -90,7 +90,7 @@ function CustomTable<T extends { id: string }>({
         value: col.key as string,
         label: col.label,
       })),
-    [filterableColumns]
+    [filterableColumns],
   );
 
   const operatorOptions = useMemo(() => {
@@ -117,9 +117,9 @@ function CustomTable<T extends { id: string }>({
                   .toLowerCase()
                   .includes(searchQuery.toLowerCase())
               );
-            })
+            }),
           ),
-    [data, searchQuery, searchableColumns]
+    [data, searchQuery, searchableColumns],
   );
 
   const valuesOptions = useMemo(() => {
@@ -130,9 +130,9 @@ function CustomTable<T extends { id: string }>({
         (value) => ({
           value: String(value),
           label: String(
-            value ? (column.alt ? column.alt[String(value)] : value) : ""
+            value ? (column.alt ? column.alt[String(value)] : value) : "",
           ),
-        })
+        }),
       );
     }
   }, [selectedField, searchedData, filterableColumns]);
@@ -144,7 +144,7 @@ function CustomTable<T extends { id: string }>({
 
         return FilterOperatorFunctions[selectedOperator](
           cellValue,
-          selectedValue
+          selectedValue,
         );
       });
       setData(filteredData);
@@ -219,7 +219,7 @@ function CustomTable<T extends { id: string }>({
       } as T);
 
       setData((prev: T[]) =>
-        prev.map((row: T) => (row.id === updatedRow.id ? updatedRow : row))
+        prev.map((row: T) => (row.id === updatedRow.id ? updatedRow : row)),
       );
 
       refetchData?.();
@@ -244,7 +244,7 @@ function CustomTable<T extends { id: string }>({
 
     if (e.shiftKey) {
       let lastIndex = searchedData.findIndex(
-        (row) => row.id === lastId.current
+        (row) => row.id === lastId.current,
       );
       if (lastIndex === -1) lastIndex = 0;
 
@@ -273,7 +273,7 @@ function CustomTable<T extends { id: string }>({
 
   const handleRowDragStart = (
     e: React.DragEvent<HTMLDivElement>,
-    id: string
+    id: string,
   ) => {
     if (onDragStart) {
       if (selectedIds.has(id)) {
@@ -435,7 +435,7 @@ function CustomTable<T extends { id: string }>({
                               onChange={(e) =>
                                 handleInputChange(
                                   col.key,
-                                  e.currentTarget.value
+                                  e.currentTarget.value,
                                 )
                               }
                             />
@@ -491,16 +491,16 @@ function CustomTable<T extends { id: string }>({
                             />
                           )
                         ) : col.isMulti ? (
-                          (row[col.key] as string[])
+                          ((row[col.key] as string[])
                             ?.map((val) => (col.alt ? col.alt[val] : val))
-                            .join(", ") ?? ""
+                            .join(", ") ?? "")
                         ) : (
                           String(
                             row[col.key]
                               ? col.alt
                                 ? col.alt[String(row[col.key] as string)]
                                 : row[col.key]
-                              : ""
+                              : "",
                           )
                         )}
                       </Table.Td>
