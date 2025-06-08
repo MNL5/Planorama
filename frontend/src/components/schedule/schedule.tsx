@@ -98,7 +98,7 @@ export const Schedule: React.FC = () => {
 
   const totalMinutes = useMemo(
     () => Math.max(maxTime - minTime, 30),
-    [maxTime, minTime],
+    [maxTime, minTime]
   );
 
   const handleAdd = () => {
@@ -252,7 +252,7 @@ export const Schedule: React.FC = () => {
                             </span>
                             <br />
                             {`${formatTime(timeSlot.startTime)} - ${formatTime(
-                              timeSlot.endTime,
+                              timeSlot.endTime
                             )}`}
                           </>
                         }
@@ -347,7 +347,7 @@ export const Schedule: React.FC = () => {
             >
               {[
                 ...Array(
-                  Math.max(1, 1 + Math.floor(Math.max(0, totalMinutes) / 30)),
+                  Math.max(1, 1 + Math.floor(Math.max(0, totalMinutes) / 30))
                 ),
               ].map((_, i) => {
                 const minutes = minTime + i * 30;
@@ -377,7 +377,11 @@ export const Schedule: React.FC = () => {
         <Modal
           opened={modalOpen}
           onClose={() => setModalOpen(false)}
-          title="Add Time Slot"
+          title={
+            <Title order={2} c={"primary"} fw={700}>
+              Add Time Slot
+            </Title>
+          }
           centered
         >
           <Stack w="100%">
