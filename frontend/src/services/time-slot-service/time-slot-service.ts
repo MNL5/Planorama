@@ -10,7 +10,7 @@ import { TimeSlot } from "../../types/time-slot";
 
 const createTimeSlot = async (
   eventId: string,
-  timeSlot: Omit<TimeSlot, "id">
+  timeSlot: Omit<TimeSlot, "id">,
 ) => {
   const response = await abortablePostRequest<Schedule>("schedules", {
     eventId,
@@ -21,7 +21,7 @@ const createTimeSlot = async (
 
 const getAllTimeSlots = async (eventId: string) => {
   const response: AxiosResponse<Schedule> = await abortableGetRequest<Schedule>(
-    `schedules?event=${eventId}`
+    `schedules?event=${eventId}`,
   ).request;
   return response.data.schedule ?? ([] as TimeSlot[]);
 };

@@ -8,15 +8,15 @@ function getMinTime(timeSlots: FormattedTimeSlot[]) {
   if (timeSlots.length === 0) return 0;
   return Math.min(
     ...timeSlots.map(
-      (t) => t.startTime.getHours() * 60 + t.startTime.getMinutes()
-    )
+      (t) => t.startTime.getHours() * 60 + t.startTime.getMinutes(),
+    ),
   );
 }
 
 function getMaxTime(timeSlots: FormattedTimeSlot[]) {
   if (timeSlots.length === 0) return 60;
   return Math.max(
-    ...timeSlots.map((t) => t.endTime.getHours() * 60 + t.endTime.getMinutes())
+    ...timeSlots.map((t) => t.endTime.getHours() * 60 + t.endTime.getMinutes()),
   );
 }
 
