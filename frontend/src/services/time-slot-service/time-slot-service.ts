@@ -23,7 +23,7 @@ const getAllTimeSlots = async (eventId: string) => {
   const response: AxiosResponse<Schedule> = await abortableGetRequest<Schedule>(
     `schedules?event=${eventId}`
   ).request;
-  return response.data.schedule;
+  return response.data.schedule ?? ([] as TimeSlot[]);
 };
 
 const deleteTimeSlot = async (eventId: string, timeSlotId: string) => {
