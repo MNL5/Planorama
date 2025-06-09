@@ -70,7 +70,7 @@ function CustomTable<T extends { id: string }>({
       );
       setSelectedIds(newSelectedIds);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialData]);
 
   const [
