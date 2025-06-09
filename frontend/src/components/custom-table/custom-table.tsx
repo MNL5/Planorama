@@ -70,7 +70,8 @@ function CustomTable<T extends { id: string }>({
       );
       setSelectedIds(newSelectedIds);
     }
-  }, [initialData, selectedIds]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialData]);
 
   const [
     filterModalOpened,
