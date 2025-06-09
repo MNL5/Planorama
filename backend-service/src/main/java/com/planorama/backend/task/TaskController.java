@@ -5,7 +5,6 @@ import com.planorama.backend.task.api.CreateTaskDTO;
 import com.planorama.backend.task.api.TaskDTO;
 import com.planorama.backend.task.api.UpdateTaskDTO;
 import com.planorama.backend.task.mapper.TaskMapper;
-import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -43,7 +42,7 @@ public class TaskController implements EventEntityAPI<TaskDTO> {
 
     @PostMapping
     @PreAuthorize("hasAuthority(#createTaskDTO.eventId)")
-    public TaskDTO createTask(@Valid CreateTaskDTO createTaskDTO) {
+    public TaskDTO createTask(@RequestBody CreateTaskDTO createTaskDTO) {
         return taskService.createTask(createTaskDTO)
                 .map(taskMapper::daoToDTO)
                 .block();
@@ -52,7 +51,7 @@ public class TaskController implements EventEntityAPI<TaskDTO> {
     @PutMapping("/{taskId}")
     @PreAuthorize("@securityUtils.canAccessEntity('tasks', #taskId, authentication)")
     public TaskDTO updateTask(@PathVariable("taskId") UUID taskId,
-                              @Valid UpdateTaskDTO updateTaskDTO) {
+                              @RequestBody UpdateTaskDTO updateTaskDTO) {
         return taskService.updateTask(taskId, updateTaskDTO)
                 .map(taskMapper::daoToDTO)
                 .block();

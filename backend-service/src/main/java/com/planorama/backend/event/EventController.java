@@ -69,21 +69,19 @@ public class EventController implements EventAPI {
     }
 
     @PutMapping("/{eventId}")
-    @PreAuthorize("hasAuthority(#eventUUID)")
-    public EventDTO updateEvent(@PathVariable("eventId") UUID eventUUID,
-                                @RequestBody UpdateEventDTO updateEventDTO,
-                                @NotNull @NotEmpty @RequestAttribute("userID") String userID) {
-        return eventService.updateEvent(eventUUID, updateEventDTO, userID)
+    @PreAuthorize("hasAuthority(#eventID)")
+    public EventDTO updateEvent(@PathVariable("eventId") UUID eventID,
+                                @RequestBody UpdateEventDTO updateEventDTO) {
+        return eventService.updateEvent(eventID, updateEventDTO)
                 .map(eventMapper::daoToDTO)
                 .block();
     }
 
     @DeleteMapping("/{eventId}")
-    @PreAuthorize("hasAuthority(#eventUUID)")
-    public EventDTO deleteEvent(@PathVariable("eventId") UUID eventID,
-                                @NotNull @NotEmpty @RequestAttribute("userID") String userID) {
-        return eventService.deleteEvent(eventID, userID)
-                .map(eventMapper::daoToDTO)
+    @PreAuthorize("hasAuthority(#eventID)")
+    public String deleteEvent(@PathVariable("eventId") UUID eventID) {
+        return eventService.deleteEvent(eventID)
+                .map(Object::toString)
                 .block();
     }
 }
