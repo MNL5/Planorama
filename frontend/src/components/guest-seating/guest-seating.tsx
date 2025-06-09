@@ -1,20 +1,16 @@
+import { toast } from "react-toastify";
 import React, { useState, useMemo, useTransition } from "react";
 import { Flex, Box, SegmentedControl, Text } from "@mantine/core";
-import { toast } from "react-toastify";
-
-import { useEventContext } from "../../contexts/event-context";
-import useGuestData from "../../hooks/useGuestData";
-
-import UnassignedGuestsPanel from "../UnassignedGuestsPanel/UnassignedGuestsPanel";
-import ElementsCanvas from "../ElementsCanvas/ElementsCanvas";
-
-import { computeTableAverage } from "../../utils/satisfactionUtils";
-import { RsvpStatus } from "../../types/rsvp-status";
 
 import "./GuestSeating.css";
+import { ViewMode } from "../../types/view-mode";
 import MainLoader from "../mainLoader/MainLoader";
-
-type ViewMode = "regular" | "satisfaction" | "groups";
+import useGuestData from "../../hooks/useGuestData";
+import { RsvpStatus } from "../../types/rsvp-status";
+import ElementsCanvas from "../ElementsCanvas/ElementsCanvas";
+import { useEventContext } from "../../contexts/event-context";
+import { computeTableAverage } from "../../utils/satisfactionUtils";
+import UnassignedGuestsPanel from "../UnassignedGuestsPanel/UnassignedGuestsPanel";
 
 const GuestSeating: React.FC = () => {
   const { currentEvent } = useEventContext();

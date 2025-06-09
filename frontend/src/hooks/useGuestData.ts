@@ -1,17 +1,18 @@
-import { useQuery } from "@tanstack/react-query";
+import { toast } from "react-toastify";
 import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 
 import {
+  autoAssign,
   getAllGuests,
   updateGuests,
-  autoAssign,
 } from "../services/guest-service/guest-service";
-import { getAllRelations } from "../services/relation-service/relation-service";
+import Element from "../types/Element";
+import Algorithm from "../utils/algorithm";
+import { ViewMode } from "../types/view-mode";
 import { Guest, AIGuest } from "../types/guest";
 import { GuestRelation } from "../types/guest-relation";
-import Algorithm from "../utils/algorithm";
-import Element from "../types/Element";
-import { toast } from "react-toastify";
+import { getAllRelations } from "../services/relation-service/relation-service";
 
 export interface UseGuestDataResult {
   guests: Guest[];
@@ -30,7 +31,7 @@ export interface UseGuestDataResult {
 
 const useGuestData = (
   currentEvent: { id: string; diagram: { elements: Element[] } } | null,
-  viewMode: "regular" | "satisfaction",
+  viewMode: ViewMode,
 ): UseGuestDataResult => {
   const [elements, setElements] = useState<Element[]>([]);
   const [guests, setGuests] = useState<Guest[]>([]);
