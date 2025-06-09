@@ -6,6 +6,7 @@ import { useMutation } from "@tanstack/react-query";
 
 import { Guest } from "../../types/guest";
 import { Column } from "../../types/column";
+import MainLoader from "../mainLoader/MainLoader";
 import {
   createGuest,
   updateGuest,
@@ -15,17 +16,10 @@ import { guestColumns } from "../../utils/guest-columns";
 import { CustomTable } from "../custom-table/custom-table";
 import { useEventContext } from "../../contexts/event-context";
 import { useFetchAllGuests } from "../../hooks/use-fetch-all-guests";
-import MainLoader from "../mainLoader/MainLoader";
 
 const GuestsView: React.FC = () => {
   const { currentEvent } = useEventContext();
   const [columns, setColumns] = useState<Column<Guest>[] | null>(null);
-
-  useEffect(() => {
-    if (currentEvent) {
-      setColumns(guestColumns(currentEvent));
-    }
-  }, [currentEvent]);
 
   const {
     guestsData: guests,
@@ -33,7 +27,14 @@ const GuestsView: React.FC = () => {
     isLoading,
     isError,
     isFetching,
+    refetchGuests,
   } = useFetchAllGuests(true);
+
+  useEffect(() => {
+    if (currentEvent && guests) {
+      setColumns(guestColumns(currentEvent, guests));
+    }
+  }, [currentEvent, guests]);
 
   const { mutateAsync: mutateCreateGuest, isPending: isCreatePending } =
     useMutation<Guest, Error, Omit<Guest, "id">>({
@@ -86,6 +87,7 @@ const GuestsView: React.FC = () => {
         createRow={mutateCreateGuest}
         updateRow={mutateUpdateGuest}
         deleteRow={mutateDeleteGuest}
+        refetchData={refetchGuests}
       />
     </Container>
   ) : isLoading ? (
