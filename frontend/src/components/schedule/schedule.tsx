@@ -1,12 +1,6 @@
-import {
-  Box,
-  Card,
-  Group,
-  Text,
-  Title,
-} from "@mantine/core";
-import { useMutation, useQuery, } from "@tanstack/react-query";
-import Scheduler from 'devextreme-react/scheduler';
+import { Box, Card, Group, Text, Title } from "@mantine/core";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import Scheduler from "devextreme-react/scheduler";
 
 import {
   createTimeSlot,
@@ -31,7 +25,7 @@ export const Schedule: React.FC = () => {
     isError,
     isFetching,
     isSuccess,
-    refetch
+    refetch,
   } = useQuery<TimeSlot[], Error>({
     queryKey: ["timeSlots"],
     queryFn: () => getAllTimeSlots(currentEvent?.id as string),
@@ -72,55 +66,64 @@ export const Schedule: React.FC = () => {
     description: slot.description,
   }));
 
-  console.log(data)
+  console.log(data);
 
-  const onAdded = useCallback((e) => {
-    createMutation.mutate({
-      startTime: e.appointmentData.startDate,
-      endTime: e.appointmentData.endDate,
-      text: e.appointmentData.text,
-      description: e.appointmentData.description,
-    });
-  }, [createMutation]);
-  const onUpdated = useCallback((e) => {
-    updateMutation.mutate({
-      id: e.appointmentData.id,
-      startTime: e.appointmentData.startDate,
-      endTime: e.appointmentData.endDate,
-      text: e.appointmentData.text,
-      description: e.appointmentData.description,
-    });
-  }, [updateMutation]);
+  const onAdded = useCallback(
+    (e) => {
+      createMutation.mutate({
+        startTime: e.appointmentData.startDate,
+        endTime: e.appointmentData.endDate,
+        text: e.appointmentData.text,
+        description: e.appointmentData.description,
+      });
+    },
+    [createMutation],
+  );
+  const onUpdated = useCallback(
+    (e) => {
+      updateMutation.mutate({
+        id: e.appointmentData.id,
+        startTime: e.appointmentData.startDate,
+        endTime: e.appointmentData.endDate,
+        text: e.appointmentData.text,
+        description: e.appointmentData.description,
+      });
+    },
+    [updateMutation],
+  );
 
-  const onDeleted = useCallback((e) => {
-    deleteMutation.mutate(e.appointmentData.id);
-  }, [deleteMutation]);
+  const onDeleted = useCallback(
+    (e) => {
+      deleteMutation.mutate(e.appointmentData.id);
+    },
+    [deleteMutation],
+  );
 
   const onAppointmentFormOpening = useCallback((e) => {
     const { form } = e;
 
     // Get current form items
-    const items = form.option('items');
+    const items = form.option("items");
 
     // Locate the "Main" tab (usually contains startDate, endDate, allDay)
-    const mainGroup = items.find((item) => item.name === 'mainGroup');
+    const mainGroup = items.find((item) => item.name === "mainGroup");
     if (mainGroup && Array.isArray(mainGroup.items)) {
       // Filter out the "allDay" field
       mainGroup.items = mainGroup.items.filter((_, i) => i !== 2); // Assuming "allDay" is the third item (index 2)
       mainGroup.items.forEach((item) => {
-      if (item.dataField === 'text') {
-        // Add validation rule
-        item.validationRules = [
-          {
-            type: 'required',
-            message: 'Subject is required',
-          },
-        ];
-      }
-    });
+        if (item.dataField === "text") {
+          // Add validation rule
+          item.validationRules = [
+            {
+              type: "required",
+              message: "Subject is required",
+            },
+          ];
+        }
+      });
     }
-    
-    form.option('items', items);
+
+    form.option("items", items);
   }, []);
 
   const handleAdd = useCallback(() => {
@@ -129,15 +132,18 @@ export const Schedule: React.FC = () => {
         {
           startDate: date.current,
           endDate: new Date(date.current.getTime() + 3600000), // Default to 1 hour later
-          text: '',
-          description: '',
+          text: "",
+          description: "",
         },
-        true
+        true,
       );
     }
   }, []);
 
-  const viewRef  = useRef<Array<'timelineDay' | 'week'>>(['timelineDay', 'week']);
+  const viewRef = useRef<Array<"timelineDay" | "week">>([
+    "timelineDay",
+    "week",
+  ]);
 
   return isSuccess && currentEvent ? (
     <Box
@@ -179,7 +185,7 @@ export const Schedule: React.FC = () => {
           onAppointmentUpdated={onUpdated}
           onAppointmentDeleted={onDeleted}
           onAppointmentFormOpening={onAppointmentFormOpening}
-        ></Scheduler> 
+        ></Scheduler>
       </Card>
     </Box>
   ) : isLoading ? (

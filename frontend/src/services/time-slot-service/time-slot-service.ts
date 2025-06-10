@@ -19,11 +19,11 @@ const createTimeSlot = async (
   return response.data.schedule[0];
 };
 
-const updateTimeSlot = async (
-  eventId: string,
-  timeSlot: TimeSlot,
-) => {
-  const response = await abortablePutRequest<Schedule>(`schedules/${eventId}/${timeSlot.id}`, timeSlot).request;
+const updateTimeSlot = async (eventId: string, timeSlot: TimeSlot) => {
+  const response = await abortablePutRequest<Schedule>(
+    `schedules/${eventId}/${timeSlot.id}`,
+    timeSlot,
+  ).request;
   return response.data.schedule[0];
 };
 
