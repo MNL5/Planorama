@@ -9,5 +9,6 @@ import java.util.UUID;
 public record TimeSlotDTO(@NotNull UUID id,
                           @NotNull OffsetDateTime startTime,
                           @NotNull OffsetDateTime endTime,
-                          @NotEmpty String description) {
+                          @NotEmpty String text,
+                          String description) {
 }

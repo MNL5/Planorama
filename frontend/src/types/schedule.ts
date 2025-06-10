@@ -1,8 +1,14 @@
-import { TimeSlot } from "./time-slot";
-
 interface Schedule {
   id: string;
   schedule: TimeSlot[];
 }
 
-export type { Schedule };
+interface TimeSlot {
+  id: string;
+  startTime: string;
+  endTime: string;
+  description: string;
+  text: string;
+}
+
+export type { Schedule, TimeSlot };

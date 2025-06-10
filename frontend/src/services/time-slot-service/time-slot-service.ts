@@ -4,9 +4,9 @@ import {
   abortableGetRequest,
   abortablePostRequest,
   abortableDeleteRequest,
+  abortablePutRequest,
 } from "../abortable-request";
-import { Schedule } from "../../types/schedule";
-import { TimeSlot } from "../../types/time-slot";
+import { Schedule, TimeSlot } from "../../types/schedule";
 
 const createTimeSlot = async (
   eventId: string,
@@ -16,6 +16,14 @@ const createTimeSlot = async (
     eventId,
     ...timeSlot,
   }).request;
+  return response.data.schedule[0];
+};
+
+const updateTimeSlot = async (
+  eventId: string,
+  timeSlot: TimeSlot,
+) => {
+  const response = await abortablePutRequest<Schedule>(`schedules/${eventId}/${timeSlot.id}`, timeSlot).request;
   return response.data.schedule[0];
 };
 
@@ -33,4 +41,4 @@ const deleteTimeSlot = async (eventId: string, timeSlotId: string) => {
   return response.data.schedule[0];
 };
 
-export { createTimeSlot, getAllTimeSlots, deleteTimeSlot };
+export { createTimeSlot, getAllTimeSlots, deleteTimeSlot, updateTimeSlot };

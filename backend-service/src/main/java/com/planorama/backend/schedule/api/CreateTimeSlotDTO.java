@@ -7,5 +7,6 @@ import java.time.OffsetDateTime;
 public record CreateTimeSlotDTO(@NotNull String eventId,
                                 @NotNull OffsetDateTime startTime,
                                 @NotNull OffsetDateTime endTime,
-                                @NotNull String description) {
+                                @NotNull String text,
+                                String description) {
 }
