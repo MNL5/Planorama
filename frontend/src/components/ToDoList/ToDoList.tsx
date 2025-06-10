@@ -114,39 +114,39 @@ const TodoList = () => {
 
           <MainLoader isPending={isPending} />
           <Stack>
-              {tasks.length === 0 && <Text c="dimmed">No tasks yet</Text>}
-              {sortedTasks.map((task) => (
-                <Paper
-                  key={task.id}
-                  withBorder
-                  p="sm"
-                  radius="md"
-                  bg={task.fulfilled ? "gray.1" : "white"}
-                >
-                  <Group justify="space-between">
-                    <Checkbox
-                      label={task.description}
-                      checked={task.fulfilled}
-                      onChange={() => handleToggleDone(task)}
-                      styles={{
-                        label: {
-                          textDecoration: task.fulfilled
-                            ? "line-through"
-                            : "none",
-                          color: task.fulfilled ? "#888" : "inherit",
-                        },
-                      }}
-                    />
-                    <ActionIcon
-                      color="red"
-                      onClick={() => handleDeleteTask(task.id)}
-                    >
-                      <IconTrash size={16} />
-                    </ActionIcon>
-                  </Group>
-                </Paper>
-              ))}
-            </Stack>
+            {tasks.length === 0 && <Text c="dimmed">No tasks yet</Text>}
+            {sortedTasks.map((task) => (
+              <Paper
+                key={task.id}
+                withBorder
+                p="sm"
+                radius="md"
+                bg={task.fulfilled ? "gray.1" : "white"}
+              >
+                <Group justify="space-between">
+                  <Checkbox
+                    label={task.description}
+                    checked={task.fulfilled}
+                    onChange={() => handleToggleDone(task)}
+                    styles={{
+                      label: {
+                        textDecoration: task.fulfilled
+                          ? "line-through"
+                          : "none",
+                        color: task.fulfilled ? "#888" : "inherit",
+                      },
+                    }}
+                  />
+                  <ActionIcon
+                    color="red"
+                    onClick={() => handleDeleteTask(task.id)}
+                  >
+                    <IconTrash size={16} />
+                  </ActionIcon>
+                </Group>
+              </Paper>
+            ))}
+          </Stack>
         </>
       )}
     </Container>
