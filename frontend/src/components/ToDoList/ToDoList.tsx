@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useTransition } from "react";
 import {
   Container,
   TextInput,
@@ -10,7 +10,6 @@ import {
   Stack,
   Title,
   ActionIcon,
-  Loader,
 } from "@mantine/core";
 import { IconPlus, IconTrash } from "@tabler/icons-react";
 import Task from "../../types/task";
@@ -22,26 +21,22 @@ import {
 } from "../../services/TaskService/TaskService";
 import { toast } from "react-toastify";
 import { useEventContext } from "../../contexts/event-context";
+import MainLoader from "../mainLoader/MainLoader";
 
 const TodoList = () => {
   const { currentEvent } = useEventContext();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [newDescription, setNewDescription] = useState("");
-  const [loading, setLoading] = useState(true);
+  const [isPending, startTransition] = useTransition();
 
   const eventId = currentEvent?.id;
 
   const loadTasks = async () => {
     if (!eventId) return;
-    try {
-      setLoading(true);
+    startTransition(async () => {
       const data = await getAllTasks(eventId);
       setTasks(data);
-    } catch (err) {
-      toast.error("Failed to load tasks.");
-    } finally {
-      setLoading(false);
-    }
+    });
   };
 
   useEffect(() => {
@@ -84,6 +79,13 @@ const TodoList = () => {
     }
   };
 
+  const sortedTasks = tasks.sort((a, b) => {
+    if (a.fulfilled === b.fulfilled) {
+      return a.description.localeCompare(b.description);
+    }
+    return a.fulfilled ? 1 : -1; // Unfulfilled tasks come first
+  });
+
   return (
     <Container py="xl" style={{ width: "35rem" }}>
       <Title order={2} mb="md">
@@ -110,12 +112,10 @@ const TodoList = () => {
             </Button>
           </Group>
 
-          {loading ? (
-            <Loader />
-          ) : (
-            <Stack>
+          <MainLoader isPending={isPending} />
+          <Stack>
               {tasks.length === 0 && <Text c="dimmed">No tasks yet</Text>}
-              {tasks.map((task) => (
+              {sortedTasks.map((task) => (
                 <Paper
                   key={task.id}
                   withBorder
@@ -147,7 +147,6 @@ const TodoList = () => {
                 </Paper>
               ))}
             </Stack>
-          )}
         </>
       )}
     </Container>
