@@ -36,7 +36,7 @@ public class RelationService {
     @EventListener
     public void removeEvent(DeleteEvent deleteEvent) {
         reactiveMongoTemplate.remove(Query.query(Criteria.where(RelationDAO.EVENT_ID_FIELD)
-                        .is(deleteEvent.getEventId())))
+                        .is(deleteEvent.eventId())))
                 .retry()
                 .subscribe();
     }
@@ -45,9 +45,9 @@ public class RelationService {
     @EventListener
     public void removeGuest(DeleteGuest deleteGuest) {
         reactiveMongoTemplate.remove(Query.query(Criteria.where(RelationDAO.FIRST_GUEST_ID_FIELD)
-                        .is(deleteGuest.getGuestId()).orOperator(
+                        .is(deleteGuest.guestId()).orOperator(
                                 Criteria.where(RelationDAO.SECOND_GUEST_ID_FIELD)
-                                        .is(deleteGuest.getGuestId()
+                                        .is(deleteGuest.guestId()
                                         ))))
                 .retry()
                 .subscribe();

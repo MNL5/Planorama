@@ -1,3 +1,5 @@
+import { chain } from "lodash";
+
 import { Guest } from "../types/guest";
 import { Event } from "../types/event";
 import { Column } from "../types/column";
@@ -6,14 +8,27 @@ import rsvpOptions from "./rsvp-options";
 import { listToMap } from "./list-to-map";
 import { FilterOperator } from "../types/filter-operator";
 
-const guestColumns: (event: Event) => Column<Guest>[] = (event: Event) => {
+const guestColumns: (event: Event, guests: Guest[]) => Column<Guest>[] = (
+  event: Event,
+  guests: Guest[],
+) => {
   const tables =
     event.diagram?.elements
-      ?.filter((element) => element.seatCount)
+      ?.filter((element) => element.seatCount != null)
       .map((table, index) => ({
         label: `${index + 1}`,
         value: table.id,
       })) || [];
+
+  const groups = chain(guests)
+    .map((guest) => guest.group)
+    .compact()
+    .uniq()
+    .map((group) => ({
+      label: group,
+      value: group,
+    }))
+    .value();
 
   return [
     {
@@ -31,6 +46,9 @@ const guestColumns: (event: Event) => Column<Guest>[] = (event: Event) => {
       isMulti: false,
       isNullable: true,
       isFilterable: true,
+      values: groups,
+      alt: listToMap(groups),
+      isOpenList: true,
       filterOperators: [FilterOperator.EQUALS, FilterOperator.NOT_EQUALS],
     },
     {
@@ -41,7 +59,7 @@ const guestColumns: (event: Event) => Column<Guest>[] = (event: Event) => {
       isNullable: false,
       validationFunction: (value: unknown) => {
         if (
-          !/^(?:\(?\+972\)?|0)(?:[-\s]?\(?5\d\)?[-\s]?)\d{7}$/.test(
+          !/^(?:\(?\+972\)?|0)[\s-]?(?:\(?5\d\)?)[\s-]?\d{3}[\s-]?\d{4}$/.test(
             value as string,
           )
         )

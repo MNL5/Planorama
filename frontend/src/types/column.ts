@@ -14,6 +14,7 @@ interface Column<T> {
   isSearchable?: boolean;
   isFilterable?: boolean;
   filterOperators?: FilterOperator[];
+  isOpenList?: boolean;
 }
 
 export type { Column };
