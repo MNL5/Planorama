@@ -8,7 +8,6 @@ import com.planorama.backend.event.entity.EventDAO;
 import com.planorama.backend.guest.api.GuestAPI;
 import com.planorama.backend.guest.api.GuestDTO;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import org.bson.BsonBinarySubType;
 import org.bson.types.Binary;
@@ -88,10 +87,10 @@ public class EventService {
                 null);
     }
 
-    public Mono<EventDAO> updateEvent(@Valid @NotNull UUID eventID, @Valid @NotNull UpdateEventDTO updateEventDTO, @NotNull @NotEmpty String userID) {
+    public Mono<EventDAO> updateEvent(@Valid @NotNull UUID eventID, @Valid @NotNull UpdateEventDTO updateEventDTO) {
         return Mono.just(updateEventDTO)
                 .map(this::createUpdateCommand)
-                .flatMap(updateCommand -> reactiveMongoTemplate.findAndModify(Query.query(where(EventDAO.ID_FIELD).is(eventID).and(EventDAO.OWNER_ID_FIELD).is(userID)),
+                .flatMap(updateCommand -> reactiveMongoTemplate.findAndModify(Query.query(where(EventDAO.ID_FIELD).is(eventID)),
                         updateCommand,
                         FindAndModifyOptions.options().returnNew(true),
                         EventDAO.class));
@@ -107,9 +106,9 @@ public class EventService {
         return update;
     }
 
-    public Mono<EventDAO> deleteEvent(@Valid @NotNull UUID eventID, @NotNull @NotEmpty String userID) {
-        return reactiveMongoTemplate.findAndRemove(Query.query(where(EventDAO.ID_FIELD).is(eventID).and(EventDAO.OWNER_ID_FIELD).is(userID)), EventDAO.class)
-                .doOnNext(dao -> eventPublisher.publishEvent(new DeleteEvent(this, eventID.toString())));
+    public Mono<EventDAO> deleteEvent(@Valid @NotNull UUID eventID) {
+        return reactiveMongoTemplate.findAndRemove(Query.query(where(EventDAO.ID_FIELD).is(eventID)), EventDAO.class)
+                .doOnNext(dao -> eventPublisher.publishEvent(new DeleteEvent(eventID.toString())));
     }
 
     public Mono<EventDAO> findEventByGuestID(UUID guestID) {

@@ -63,7 +63,7 @@ public class GuestService {
     @EventListener
     public void removeEvent(DeleteEvent deleteEvent) {
         reactiveMongoTemplate.remove(Query.query(Criteria.where(GuestDAO.EVENT_ID_FIELD)
-                        .is(deleteEvent.getEventId())))
+                        .is(deleteEvent.eventId())))
                 .retry()
                 .subscribe();
     }
@@ -88,19 +88,17 @@ public class GuestService {
 
     public Mono<GuestDAO> createGuest(@Valid @NotNull CreateGuestDTO createGuestDTO) {
         Optional<String> normalizePhoneNumber = phoneNumberValidator.normalize(createGuestDTO.phoneNumber());
-        if (normalizePhoneNumber.isEmpty()) {
-            return Mono.error(new IllegalArgumentException("Phone number format is invalid"));
-        }
+        return normalizePhoneNumber.map(s -> reactiveMongoTemplate.save(createGuestDao(createGuestDTO, s))
+                        .switchIfEmpty(Mono.error(new RuntimeException("Failed to create an guest"))))
+                .orElseGet(() -> Mono.error(new IllegalArgumentException("Phone number format is invalid")));
 
-        return reactiveMongoTemplate.save(createGuestDao(createGuestDTO))
-                .switchIfEmpty(Mono.error(new RuntimeException("Failed to create an guest")));
     }
 
-    private GuestDAO createGuestDao(CreateGuestDTO createGuestDTO) {
+    private GuestDAO createGuestDao(CreateGuestDTO createGuestDTO, String normalizePhoneNumber) {
         return new GuestDAO(UUID.randomUUID(),
                 createGuestDTO.eventId(),
                 createGuestDTO.name(),
-                createGuestDTO.phoneNumber(),
+                normalizePhoneNumber,
                 createGuestDTO.gender(),
                 createGuestDTO.group(),
                 createGuestDTO.status() != null ? createGuestDTO.status().name() : RSVPStatusDTO.TENTATIVE.name(),
@@ -142,6 +140,6 @@ public class GuestService {
 
     public Mono<GuestDAO> deleteGuest(@Valid @NotNull UUID guestId) {
         return reactiveMongoTemplate.findAndRemove(Query.query(Criteria.where(GuestDAO.ID_FIELD).is(guestId)), GuestDAO.class)
-                .doOnNext(dao -> eventPublisher.publishEvent(new DeleteEvent(this, guestId.toString())));
+                .doOnNext(dao -> eventPublisher.publishEvent(new DeleteEvent(guestId.toString())));
     }
 }

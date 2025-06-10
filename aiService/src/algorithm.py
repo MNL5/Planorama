@@ -133,9 +133,22 @@ class Algorithm:
         for table in oldGuestsPerTable:
             for newTable in newGuestsPerTable:
                 if table != newTable and self.tableToNumOfSeats[table] == self.tableToNumOfSeats[newTable] and len(oldGuestsPerTable[table] & newGuestsPerTable[newTable]) >= self.tableToNumOfSeats[table] / 2:
-                    tablesSwitch[tablesSwitch[table] if table in tablesSwitch else table] = newTable
                     tablesSwitch[newTable] = table
                     break
+
+        tablesSwitchValues = set(tablesSwitch.values())
+        for newTable in newGuestsPerTable:
+            if newTable not in tablesSwitch:
+                if newTable not in tablesSwitchValues:
+                    tablesSwitch[newTable] = newTable
+                    tablesSwitchValues.add(newTable)
+                else:
+                    for newTable2 in newGuestsPerTable:
+                        if newTable2 not in tablesSwitchValues and self.tableToNumOfSeats[newTable] == self.tableToNumOfSeats[newTable2]:
+                            tablesSwitch[newTable] = newTable2
+                            tablesSwitchValues.add(newTable2)
+                            break
+
         return tablesSwitch
     
     def setTables(self, guests):

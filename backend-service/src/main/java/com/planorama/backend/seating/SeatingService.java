@@ -15,6 +15,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
 
@@ -46,7 +47,7 @@ public class SeatingService {
     public Mono<SeatingResponse> requestAiService(UUID eventId, String requestPath) {
         return Mono.zip(Flux.fromIterable(guestAPI.getAllGuestByEventID(eventId.toString()))
                                 .filter(guest -> !RSVPStatusDTO.DECLINE.equals(guest.status()))
-                                .map(guest -> new GuestApiDto(guest.id(), guest.group(), guest.tableId(), null))
+                                .map(guest -> new GuestApiDto(guest.id(), Optional.ofNullable(guest.group()).orElse(guest.id().toString()), guest.tableId(), null))
                                 .collectList(),
                         Mono.just(eventAPI.getEventByID(eventId))
                                 .map(EventDTO::diagram)

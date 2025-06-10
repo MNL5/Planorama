@@ -7,6 +7,7 @@ import GuestSeating from "../components/guest-seating/guest-seating";
 import { CreateEvent } from "../components/create-event/create-event";
 import TableArrangement from "../components/table-arragment/table-arragement";
 import InvitationPage from "../components/invitationPage/invitationPage";
+import ToDoList from "../components/ToDoList/ToDoList";
 
 export const ENDPOINTS = [
   {
@@ -43,6 +44,11 @@ export const ENDPOINTS = [
     name: "Schedule",
     path: "/schedule",
     element: <Schedule />,
+  },
+  {
+    name: "To Do",
+    path: "/todo",
+    element: <ToDoList />,
   },
 ];
 
