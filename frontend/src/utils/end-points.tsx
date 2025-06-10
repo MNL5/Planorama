@@ -6,6 +6,7 @@ import GuestSeating from "../components/guest-seating/guest-seating";
 import InvitationPage from "../components/invitationPage/invitationPage";
 import GiftPage from "../components/giftPage/giftPage";
 import { GiftsList } from "../components/gifts-list/gifts-list";
+import ToDoList from "../components/ToDoList/ToDoList";
 
 export const ENDPOINTS = [
   {
@@ -37,6 +38,11 @@ export const ENDPOINTS = [
     name: "Gifts",
     path: "/gifts",
     element: <GiftsList />,
+  },
+  {
+    name: "To Do",
+    path: "/todo",
+    element: <ToDoList />,
   },
 ];
 
