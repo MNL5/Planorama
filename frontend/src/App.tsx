@@ -1,3 +1,4 @@
+import "devextreme/dist/css/dx.light.css";
 import { useState } from "react";
 import { ToastContainer } from "react-toastify";
 import { CircularProgress } from "@mui/material";

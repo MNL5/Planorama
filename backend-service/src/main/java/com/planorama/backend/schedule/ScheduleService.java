@@ -31,7 +31,8 @@ public class ScheduleService {
         this.updateFields = Map.of(
                 INNER_TIME_SLOT + TimeSlotDAO.START_TIME_FIELD, u -> u.startTime() != null ? u.startTime().toInstant().toEpochMilli() : null,
                 INNER_TIME_SLOT + TimeSlotDAO.END_TIME_FIELD, u -> u.endTime() != null ? u.endTime().toInstant().toEpochMilli() : null,
-                INNER_TIME_SLOT + TimeSlotDAO.DESCRIPTION_FIELD, UpdateTimeSlotDTO::description
+                INNER_TIME_SLOT + TimeSlotDAO.DESCRIPTION_FIELD, UpdateTimeSlotDTO::description,
+                INNER_TIME_SLOT + TimeSlotDAO.TEXT_FIELD, UpdateTimeSlotDTO::text
         );
     }
 
@@ -40,7 +41,7 @@ public class ScheduleService {
     }
 
     public Mono<ScheduleDAO> upsertSchedule(CreateTimeSlotDTO createTimeSlotDTO) {
-        final TimeSlotDAO timeSlot = createTimeSlot(createTimeSlotDTO.startTime(), createTimeSlotDTO.endTime(), createTimeSlotDTO.description());
+        final TimeSlotDAO timeSlot = createTimeSlot(createTimeSlotDTO.startTime(), createTimeSlotDTO.endTime(), createTimeSlotDTO.text(), createTimeSlotDTO.description());
 
         return reactiveMongoTemplate.findOne(
                         Query.query(Criteria.where(ScheduleDAO.EVENT_FIELD).is(createTimeSlotDTO.eventId())),
@@ -61,8 +62,8 @@ public class ScheduleService {
                 )));
     }
 
-    private TimeSlotDAO createTimeSlot(OffsetDateTime startTime, OffsetDateTime endTime, String description) {
-        return new TimeSlotDAO(UUID.randomUUID(), startTime.toInstant().toEpochMilli(), endTime.toInstant().toEpochMilli(), description);
+    private TimeSlotDAO createTimeSlot(OffsetDateTime startTime, OffsetDateTime endTime, String text, String description) {
+        return new TimeSlotDAO(UUID.randomUUID(), startTime.toInstant().toEpochMilli(), endTime.toInstant().toEpochMilli(), text, description);
     }
 
     public Mono<ScheduleDAO> updateTimeSlot(String eventId, UUID timeSlotId, UpdateTimeSlotDTO updateTimeSlotDTO) {
