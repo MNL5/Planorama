@@ -59,7 +59,7 @@ const guestColumns: (event: Event, guests: Guest[]) => Column<Guest>[] = (
       isNullable: false,
       validationFunction: (value: unknown) => {
         if (
-          !/^(?:\(?\+972\)?|0)(?:[-\s]?\(?5\d\)?[-\s]?)\d{7}$/.test(
+          !/^(?:\(?\+972\)?|0)[\s-]?(?:\(?5\d\)?)[\s-]?\d{3}[\s-]?\d{4}$/.test(
             value as string,
           )
         )

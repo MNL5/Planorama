@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 @Component
 public class PhoneNumberValidator {
     private static final Pattern PHONE_FORMAT_PATTERN = Pattern.compile(
-            "^(?:\\(?\\+972\\)?|0)(?:[-\\s]?\\(?5\\d\\)?[-\\s]?)\\d{7}$");
+            "^(?:\\(?\\+972\\)?|0)[\\s-]?(?:\\(?5\\d\\)?)[\\s-]?\\d{3}[\\s-]?\\d{4}$");
 
     public Optional<String> normalize(String input) {
         if (input == null || input.isBlank()) {
