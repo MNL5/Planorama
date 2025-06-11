@@ -156,13 +156,15 @@ export class Algorithm {
     for (const guest of guests) {
       if (guest.group === "_" || !guest.table) continue;
       const max = this.maxHappinessFunc(guest);
-      guest.satisfaction = max === 0 ? 100 :
-          this.happinessFunc(
-            guest,
-            guest.table,
-            groupToAmountPerTable,
-            guestToTable,
-          ) / max;
+      guest.satisfaction =
+        max === 0
+          ? 100
+          : this.happinessFunc(
+              guest,
+              guest.table,
+              groupToAmountPerTable,
+              guestToTable,
+            ) / max;
     }
 
     return guests;
