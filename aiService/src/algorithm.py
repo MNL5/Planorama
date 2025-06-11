@@ -41,10 +41,10 @@ class Algorithm:
         score = self.groupToAmount[guest.group] - 1
 
         if guest.id in self.relations:
-            if RelationType.MUST in self.relations[guest.id]:
-                score += len(self.relations[guest.id][RelationType.MUST]) * 1.5
-            if RelationType.LIKE in self.relations[guest.id]:
-                score += len(self.relations[guest.id][RelationType.LIKE])
+            if RelationType.MUST.value in self.relations[guest.id]:
+                score += len(self.relations[guest.id][RelationType.MUST.value]) * 1.5
+            if RelationType.LIKE.value in self.relations[guest.id]:
+                score += len(self.relations[guest.id][RelationType.LIKE.value])
 
         return score
 
@@ -57,7 +57,7 @@ class Algorithm:
         if guest.id in self.relations:
             if RelationType.MUST.value in self.relations[guest.id]:
                 withMust = getNumOf(RelationType.MUST)
-                withoutMust = len(self.relations[guest.id][RelationType.MUST]) - withMust
+                withoutMust = len(self.relations[guest.id][RelationType.MUST.value]) - withMust
                 score += withMust * 1.5
                 score -= withoutMust * 5
             if RelationType.LIKE.value in self.relations[guest.id]:
