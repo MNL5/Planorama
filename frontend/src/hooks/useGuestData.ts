@@ -135,7 +135,7 @@ const useGuestData = (
       satisfaction: undefined,
     }));
 
-    const tableElements = elements.filter((el) => el.seatCount !== null);
+    const tableElements = elements.filter((el) => el.elementType === "table");
 
     const algo = new Algorithm(aloGuests, tableElements, relations);
     const updatedList = algo.setSatisfactory(aloGuests);

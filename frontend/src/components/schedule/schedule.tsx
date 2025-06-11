@@ -12,7 +12,7 @@ import { useEventContext } from "../../contexts/event-context";
 import MainLoader from "../mainLoader/MainLoader";
 import { toast } from "react-toastify";
 import { TimeSlot } from "../../types/schedule";
-import { useCallback, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { Button } from "@mui/material";
 
 export const Schedule: React.FC = () => {
@@ -65,8 +65,6 @@ export const Schedule: React.FC = () => {
     text: slot.text,
     description: slot.description,
   }));
-
-  console.log(data);
 
   const onAdded = useCallback(
     (e) => {
@@ -144,6 +142,12 @@ export const Schedule: React.FC = () => {
     "timelineDay",
     "week",
   ]);
+
+  useEffect(() => {
+    if (isSuccess && currentEvent && schedulerRef.current) {
+      schedulerRef.current.instance.scrollTo(date.current);
+    }
+  }, [isSuccess, currentEvent]);
 
   return isSuccess && currentEvent ? (
     <Box
