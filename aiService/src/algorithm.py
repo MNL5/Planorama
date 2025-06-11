@@ -233,7 +233,7 @@ class Algorithm:
         for guest in guests:
             if guest.group == "_" or guest.table == None: continue
             maxScore = self.maxHappinesFunc(guest)
-            guest.satisfaction = 100 if maxScore == 0 else self.happinesFunc(guest, guest.table, groupToAmountPerTable, guestToTable) / maxScore
+            guest.satisfaction = 1 if maxScore == 0 else self.happinesFunc(guest, guest.table, groupToAmountPerTable, guestToTable) / maxScore
         return guests
     
     def solve(self, pop_size=100, elite_rate=0.1, mutation_rate=0.01, generations=100):
