@@ -158,7 +158,7 @@ export class Algorithm {
       const max = this.maxHappinessFunc(guest);
       guest.satisfaction =
         max === 0
-          ? 100
+          ? 1
           : this.happinessFunc(
               guest,
               guest.table,

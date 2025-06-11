@@ -159,7 +159,7 @@ const TableArrangement = () => {
         bd={"1px solid rgb(230, 229, 229)"}
       >
         {elements
-          .filter((ele) => ele.seatCount)
+          .filter((ele) => ele.elementType === "table")
           .map((el, i) => (
             <RndElement
               key={el.id}
@@ -178,7 +178,7 @@ const TableArrangement = () => {
             />
           ))}
         {elements
-          .filter((ele) => !ele.seatCount)
+          .filter((ele) => ele.elementType === "text")
           .map((el) => (
             <RndElement
               key={el.id}

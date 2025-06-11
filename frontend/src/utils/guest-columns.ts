@@ -14,7 +14,7 @@ const guestColumns: (event: Event, guests: Guest[]) => Column<Guest>[] = (
 ) => {
   const tables =
     event.diagram?.elements
-      ?.filter((element) => element.seatCount != null)
+      ?.filter((element) => element.elementType === "table")
       .map((table, index) => ({
         label: `${index + 1}`,
         value: table.id,

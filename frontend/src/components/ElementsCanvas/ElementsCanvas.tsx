@@ -37,8 +37,8 @@ const ElementsCanvas: React.FC<ElementsCanvasProps> = ({
   onRemove,
   computeTableAverage,
 }) => {
-  const tableElements = elements.filter((el) => el.seatCount !== null);
-  const textElements = elements.filter((el) => el.seatCount === null);
+  const tableElements = elements.filter((el) => el.elementType === "table");
+  const textElements = elements.filter((el) => el.elementType === "text");
 
   const getTableColor = (tableId: string, assignedGuests: Guest[]): string => {
     if (viewMode === "satisfaction") {
