@@ -66,8 +66,6 @@ export const Schedule: React.FC = () => {
     description: slot.description,
   }));
 
-  console.log(data);
-
   const onAdded = useCallback(
     (e) => {
       createMutation.mutate({
