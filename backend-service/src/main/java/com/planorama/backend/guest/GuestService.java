@@ -2,10 +2,7 @@ package com.planorama.backend.guest;
 
 import com.mongodb.bulk.BulkWriteResult;
 import com.planorama.backend.event.api.DeleteEvent;
-import com.planorama.backend.guest.api.CreateGuestDTO;
-import com.planorama.backend.guest.api.GuestsUpdateDTO;
-import com.planorama.backend.guest.api.RSVPStatusDTO;
-import com.planorama.backend.guest.api.UpdateGuestDTO;
+import com.planorama.backend.guest.api.*;
 import com.planorama.backend.guest.entity.GuestDAO;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -140,6 +137,6 @@ public class GuestService {
 
     public Mono<GuestDAO> deleteGuest(@Valid @NotNull UUID guestId) {
         return reactiveMongoTemplate.findAndRemove(Query.query(Criteria.where(GuestDAO.ID_FIELD).is(guestId)), GuestDAO.class)
-                .doOnNext(dao -> eventPublisher.publishEvent(new DeleteEvent(guestId.toString())));
+                .doOnNext(dao -> eventPublisher.publishEvent(new DeleteGuest(guestId.toString())));
     }
 }

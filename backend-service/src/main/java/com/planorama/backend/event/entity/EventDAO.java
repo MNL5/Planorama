@@ -16,7 +16,7 @@ public record EventDAO(@Id UUID id,
                        Binary invitationImg,
                        Long time,
                        List<DiagramObjectDAO> diagram) {
-    public static final String ID_FIELD = "id";
+    public static final String ID_FIELD = "_id";
     public static final String OWNER_ID_FIELD = "ownerID";
     public static final String NAME_FIELD = "name";
     public static final String INVITATION_TEXT_FIELD = "invitationText";

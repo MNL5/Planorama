@@ -12,7 +12,7 @@ public record TaskDAO(
         @Indexed String eventId,
         String description,
         Boolean fulfilled) {
-    public static final String ID_FIELD = "id";
+    public static final String ID_FIELD = "_id";
     public static final String EVENT_ID_FIELD = "eventId";
     public static final String DESCRIPTION_FIELD = "description";
     public static final String FULFILLED_FIELD = "fulfilled";

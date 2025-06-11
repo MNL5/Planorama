@@ -1,6 +1,7 @@
 package com.planorama.backend.common.security;
 
 import com.auth0.jwt.algorithms.Algorithm;
+import com.planorama.backend.event.api.EventAPI;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,7 +12,6 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -46,8 +46,6 @@ public class SecurityConfiguration {
     @Order(1)
     public SecurityFilterChain publicSecurityFilterChain(HttpSecurity http) throws Exception {
         return http
-                .cors(Customizer.withDefaults())
-                .csrf(AbstractHttpConfigurer::disable)
                 .securityMatcher(request -> {
                     final String requestURI = request.getRequestURI();
                     final String method = request.getMethod();
@@ -57,18 +55,21 @@ public class SecurityConfiguration {
                             "/events".equals(request.getRequestURI()) && request.getParameter("guest") != null);
                 })
                 .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
+                .cors(Customizer.withDefaults())
+                .csrf(AbstractHttpConfigurer::disable)
                 .build();
     }
 
     @Bean
     @Order(2)
-    public SecurityFilterChain apiSecurityFilterChain(HttpSecurity http, JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
+    public SecurityFilterChain apiSecurityFilterChain(HttpSecurity http,
+                                                      JWTUtil jwtUtil,
+                                                      EventAPI eventAPI) throws Exception {
         return http
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .securityMatcher("/events/**", "/gifts/**", "/guests/**", "/relations/**", "/schedules/**", "/tasks/**", "/seating/**")
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JwtAuthenticationFilter(jwtUtil, eventAPI), UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
                 .build();
     }
