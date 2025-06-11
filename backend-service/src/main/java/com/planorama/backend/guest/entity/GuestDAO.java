@@ -17,7 +17,7 @@ public record GuestDAO(@Id UUID id,
                        String status,
                        Set<String> meal,
                        String tableId) {
-    public static final String ID_FIELD = "id";
+    public static final String ID_FIELD = "_id";
     public static final String EVENT_ID_FIELD = "eventID";
     public static final String NAME_FIELD = "name";
     public static final String PHONE_NUMBER_FIELD = "phoneNumber";

@@ -44,12 +44,10 @@ public class RelationService {
     @Async
     @EventListener
     public void removeGuest(DeleteGuest deleteGuest) {
-        reactiveMongoTemplate.remove(Query.query(Criteria.where(RelationDAO.FIRST_GUEST_ID_FIELD)
-                        .is(deleteGuest.guestId()).orOperator(
-                                Criteria.where(RelationDAO.SECOND_GUEST_ID_FIELD)
-                                        .is(deleteGuest.guestId()
-                                        ))))
-                .retry()
+        reactiveMongoTemplate.remove(Query.query(new Criteria().orOperator(
+                        Criteria.where(RelationDAO.FIRST_GUEST_ID_FIELD).is(deleteGuest.guestId()),
+                        Criteria.where(RelationDAO.SECOND_GUEST_ID_FIELD).is(deleteGuest.guestId())
+                )), RelationDAO.class)
                 .subscribe();
     }
 
