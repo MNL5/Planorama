@@ -75,7 +75,7 @@ public class GuestController implements GuestAPI, EventEntityAPI<GuestDTO> {
     @PreAuthorize("hasAuthority(#guestsUpdateDTO.eventId)")
     public String updateGuests(@RequestBody GuestsUpdateDTO guestsUpdateDTO) {
         return guestService.updateGuests(guestsUpdateDTO)
-                .filter(result -> result.getModifiedCount() != guestsUpdateDTO.guests().size())
+                .filter(result -> result.getMatchedCount() == guestsUpdateDTO.guests().size())
                 .map(result -> String.format("Updated %d guests", result.getModifiedCount()))
                 .switchIfEmpty(Mono.error(new RuntimeException(String.format("Failed to update %d guests", guestsUpdateDTO.guests().size()))))
                 .block();

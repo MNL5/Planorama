@@ -36,20 +36,15 @@ class Algorithm:
             if guest.group not in self.groupToAmount:
                 self.groupToAmount[guest.group] = 0
             self.groupToAmount[guest.group] += 1
-        self.maxGroupSize = max(self.groupToAmount.values())
-
-        self.isGroupMustSplit = {}
-        for group, amount in self.groupToAmount.items():
-            self.isGroupMustSplit[group] = all(amount > table.numOfSeats for table in self.tables)
 
     def maxHappinesFunc(self, guest):
         score = self.groupToAmount[guest.group] - 1
 
         if guest.id in self.relations:
-            if RelationType.MUST in self.relations[guest.id]:
-                score += len(self.relations[guest.id][RelationType.MUST]) * 1.5
-            if RelationType.LIKE in self.relations[guest.id]:
-                score += len(self.relations[guest.id][RelationType.LIKE])
+            if RelationType.MUST.value in self.relations[guest.id]:
+                score += len(self.relations[guest.id][RelationType.MUST.value]) * 1.5
+            if RelationType.LIKE.value in self.relations[guest.id]:
+                score += len(self.relations[guest.id][RelationType.LIKE.value])
 
         return score
 
@@ -57,19 +52,19 @@ class Algorithm:
         score = groupToAmountPerTable[table][guest.group] - 1
 
         def getNumOf(type):
-            return reduce(lambda acc, guestId: acc + (1 if guestToTable[guestId] == table else 0), self.relations[guest.id][type], 0)
+            return reduce(lambda acc, guestId: acc + (1 if guestToTable[guestId] == table else 0), self.relations[guest.id][type.value], 0)
 
         if guest.id in self.relations:
-            if RelationType.MUST in self.relations[guest.id]:
+            if RelationType.MUST.value in self.relations[guest.id]:
                 withMust = getNumOf(RelationType.MUST)
-                withoutMust = len(self.relations[guest.id][RelationType.MUST]) - withMust
+                withoutMust = len(self.relations[guest.id][RelationType.MUST.value]) - withMust
                 score += withMust * 1.5
                 score -= withoutMust * 5
-            if RelationType.LIKE in self.relations[guest.id]:
+            if RelationType.LIKE.value in self.relations[guest.id]:
                 score += getNumOf(RelationType.LIKE)
-            if RelationType.HATE in self.relations[guest.id]:
+            if RelationType.HATE.value in self.relations[guest.id]:
                 score -= getNumOf(RelationType.HATE) * 1.2
-            if RelationType.MUST_NOT in self.relations[guest.id]:
+            if RelationType.MUST_NOT.value in self.relations[guest.id]:
                 withMustNot = getNumOf(RelationType.MUST_NOT)
                 score -= withMustNot * 5
 
@@ -252,10 +247,11 @@ class Algorithm:
             if currBest > best_fitness:
                 best_fitness = currBest
                 best_individual = currBestIndividual
-                
-                groupTables = self.calcGroupTables(best_individual)
-                if all(tables == 1 or self.isGroupMustSplit[group] for group, tables in groupTables.items()):
-                    break
+
+                if generation > 200:
+                    self.setSatisfactory(best_individual)
+                    if all(guest.satisfaction == 1 for guest in best_individual):
+                        break
 
             if generations - 1 == generation:
                 break

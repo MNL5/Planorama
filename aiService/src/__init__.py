@@ -61,7 +61,7 @@ def create_app(test_config=None):
     
     def calculate_algo_helper(data, numOfSeats):
         algorithm = get_algorithm(data, numOfSeats)
-        return algorithm.solve(generations=1000, pop_size=200, elite_rate=0.05, mutation_rate=0.01)
+        return algorithm.solve(generations=500, pop_size=200, elite_rate=0.05, mutation_rate=0.01)
 
     def calculate_algo(data, numOfSeats):
         best_result = None

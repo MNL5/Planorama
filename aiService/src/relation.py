@@ -11,7 +11,7 @@ class Relation:
         return cls(data['firstGuestId'], data['secondGuestId'], data['type'])
     
 class RelationType(Enum):
-    MUST = 'must'
-    LIKE = 'like'
-    HATE = 'hate'
-    MUST_NOT = 'must not'
+    MUST = 'MUST'
+    LIKE = 'LIKE'
+    HATE = 'HATE'
+    MUST_NOT = 'MUST_NOT'
