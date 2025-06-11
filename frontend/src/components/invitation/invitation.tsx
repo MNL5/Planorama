@@ -53,7 +53,7 @@ const Invitation: React.FC<{ event: Event; guestId?: string }> = ({
   };
 
   return (
-    <div style={{overflowY: "scroll"}}>
+    <div style={{ overflowY: "scroll" }}>
       <div className={style.container}>
         <h1 className={style.title}>Save The Date</h1>
         <span className={style.date}>
