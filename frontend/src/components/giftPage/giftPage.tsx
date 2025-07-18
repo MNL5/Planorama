@@ -123,7 +123,7 @@ const GiftPage: React.FC = () => {
   }
 
   const time = new Date(event.time);
-  const timeString = `${time.getHours()}:${time.getMinutes()}`;
+  const timeString = `${time.getHours().toString().padStart(2, "0")}:${time.getMinutes().toString().padStart(2, "0")}`;
 
   return (
     <Container
