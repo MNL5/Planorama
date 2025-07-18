@@ -204,7 +204,7 @@ const Preferences: React.FC = () => {
     <Stack
       w={"100%"}
       h={"100vh"}
-      p={100}
+      p={"100 10%"}
       align={"center"}
       gap={40}
       style={{ flex: "1 1", overflow: "hidden" }}
@@ -218,10 +218,10 @@ const Preferences: React.FC = () => {
           isDeletePending
         }
       />
-      <Stack align={"flex-end"} gap={20}>
-        <Flex align={"center"} gap={100} justify={"center"}>
+      <Stack align={"flex-end"} gap={20} w={"100%"}>
+        <Flex gap={100} w={"100%"} justify={"space-between"}>
           <Autocomplete
-            w={400}
+            w={"30%"}
             label={"Guest Name"}
             value={selectedGuest}
             data={guestOptionList}
@@ -229,7 +229,7 @@ const Preferences: React.FC = () => {
             placeholder={"Select a guest"}
             error={isError ? "Error fetching guests" : undefined}
           />
-          <Stack align={"flex-start"} gap={2}>
+          <Stack align={"flex-start"} gap={2} w={"30%"}>
             <InputLabel>Preference</InputLabel>
             <Combobox
               store={combobox}
@@ -244,7 +244,7 @@ const Preferences: React.FC = () => {
             >
               <Combobox.Target>
                 <InputBase
-                  w={400}
+                  w={"100%"}
                   component={"button"}
                   type={"button"}
                   pointer
@@ -264,7 +264,7 @@ const Preferences: React.FC = () => {
             </Combobox>
           </Stack>
           <Autocomplete
-            w={400}
+            w={"30%"}
             label={"Guest Name"}
             value={secondSelectedGuest}
             data={secondGuestOptionList}

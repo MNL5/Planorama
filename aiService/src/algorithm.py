@@ -146,11 +146,14 @@ class Algorithm:
 
         return tablesSwitch
     
+    def set_tables(self, guests):
+        for i, guest in enumerate(guests):
+            guest.table = self.seatToTable[i]
+    
     def setTables(self, guests):
         oldGuestsPerTable = self.splitToTables(guests)
 
-        for i, guest in enumerate(guests):
-            guest.table = self.seatToTable[i]
+        self.set_tables(guests)
 
         newGuestsPerTable = self.splitToTables(guests)
 
@@ -228,13 +231,13 @@ class Algorithm:
         for guest in guests:
             if guest.group == "_" or guest.table == None: continue
             maxScore = self.maxHappinesFunc(guest)
-            guest.satisfaction = 1 if maxScore == 0 else self.happinesFunc(guest, guest.table, groupToAmountPerTable, guestToTable) / maxScore
+            guest.satisfaction = 1.0 if maxScore == 0 else self.happinesFunc(guest, guest.table, groupToAmountPerTable, guestToTable) / maxScore
         return guests
     
     def solve(self, pop_size=100, elite_rate=0.1, mutation_rate=0.01, generations=100):
         population = self.create_population(pop_size)
         elite_size = round(pop_size * elite_rate)
-        best_fitness = 0
+        best_fitness = -1
         best_individual = None
 
         for generation in range(generations):
@@ -248,10 +251,10 @@ class Algorithm:
                 best_fitness = currBest
                 best_individual = currBestIndividual
 
-                if generation > 200:
-                    self.setSatisfactory(best_individual)
-                    if all(guest.satisfaction == 1 for guest in best_individual):
-                        break
+                self.set_tables(best_individual)
+                self.setSatisfactory(best_individual)
+                if all((guest.group == "_" or guest.satisfaction == 1.0) for guest in best_individual):
+                    break
 
             if generations - 1 == generation:
                 break
