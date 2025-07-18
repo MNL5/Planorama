@@ -9,6 +9,7 @@ import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
 @Component
@@ -26,6 +27,7 @@ public class MessagingUtil {
             %s
             """;
 
+    private static final ZoneId jerusalemZone = ZoneId.of("Asia/Jerusalem");
     private static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     private static final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
 
@@ -63,13 +65,13 @@ public class MessagingUtil {
 
     public void sendInvitation(EventDTO event, GuestDTO guest) {
         String link = clientDNS + "rsvp/" + guest.id();
-        String message = INVITATION_TEXT.formatted(event.name(), event.time().format(dateFormatter), link);
+        String message = INVITATION_TEXT.formatted(event.name(), event.time().atZoneSameInstant(jerusalemZone).format(dateFormatter), link);
         send(guest.phoneNumber(), message);
     }
 
     public void sendReminder(EventDTO event, GuestDTO guest, Integer tableNumber) {
         String link = clientDNS + "gift/" + guest.id();
-        String message = REMINDER_TEXT.formatted(guest.name(), event.name(), event.time().format(timeFormatter), tableNumber, link);
+        String message = REMINDER_TEXT.formatted(guest.name(), event.name(), event.time().atZoneSameInstant(jerusalemZone).format(timeFormatter), tableNumber, link);
         send(guest.phoneNumber(), message);
     }
 }
