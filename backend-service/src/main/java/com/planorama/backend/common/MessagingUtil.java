@@ -53,7 +53,7 @@ public class MessagingUtil {
     }
 
     private void send(String phoneNumber, String body) {
-        String from = (isWhatsappEnable ? "whatsapp:+" : "+") + phoneNumber;
+        String from = (isWhatsappEnable ? "whatsapp:" : "") + phoneNumber;
         String to = isWhatsappEnable ? "whatsapp:" + whatsappPhoneNumber : smsPhoneNumber;
 
         Message.creator(new PhoneNumber(from),
