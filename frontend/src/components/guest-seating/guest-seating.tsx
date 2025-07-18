@@ -54,7 +54,7 @@ const GuestSeating: React.FC = () => {
     );
   };
 
-  const totalSeats = elements.reduce((sum, el) => sum + (el.seatCount || 0), 0);
+  const totalSeats = elements?.reduce((sum, el) => sum + (el.seatCount || 0), 0) || 0;
   const canAutoAssign = guestsToShow.length <= totalSeats;
 
   return (

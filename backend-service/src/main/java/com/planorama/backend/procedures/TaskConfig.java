@@ -1,5 +1,6 @@
 package com.planorama.backend.procedures;
 
+import jakarta.annotation.PostConstruct;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.SchedulingConfigurer;
@@ -17,5 +18,10 @@ public class TaskConfig implements SchedulingConfigurer {
     @Override
     public void configureTasks(ScheduledTaskRegistrar registrar) {
         registrar.addCronTask(task, "0 0 9 * * *");
+    }
+
+    @PostConstruct
+    public void runOnStartup() {
+        new Thread(task).start();
     }
 }
