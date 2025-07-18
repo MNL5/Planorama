@@ -62,7 +62,7 @@ const useGuestData = (
 
   useEffect(() => {
     if (!currentEvent) return;
-    setElements(currentEvent.diagram.elements || []);
+    setElements(currentEvent.diagram?.elements || []);
   }, [currentEvent]);
 
   useEffect(() => {
